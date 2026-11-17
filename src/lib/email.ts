@@ -56,7 +56,7 @@ export function resultsEmail(r: Results) {
 <div style="font-size:12px;font-weight:800;letter-spacing:1px;color:#BFE3D6;text-transform:uppercase">Your heart age</div>
 <div style="font-size:48px;font-weight:800;color:#FF7A59;line-height:56px">${r.heart.heartAge.kind === "below" ? "&lt;" : r.heart.heartAge.kind === "above" ? "&gt;" : ""}${r.heart.heartAge.value}</div>
 <div style="font-size:15px;font-weight:700">You're ${r.age}. 10-year heart attack or stroke risk: ${r.heart.riskPercent}%</div>
-<div style="font-size:12px;color:#BFE3D6;margin-top:6px">Estimate based on WHO 2019 risk charts. Not a diagnosis.</div></div>`
+<div style="font-size:12px;color:#BFE3D6;margin-top:6px">${r.heart.earlyEstimate ? "Early estimate: the WHO risk charts were tested on people aged 40 and over, so treat this as a rough guide." : "Estimate based on WHO 2019 risk charts."} Not a diagnosis.</div></div>`
     : r.heartNote
       ? `<p style="background:#FFF1D6;color:#7A4A00;border-radius:16px;padding:12px 14px;font-weight:700">${esc(r.heartNote)}</p>`
       : "";

@@ -107,11 +107,19 @@ export function whoCvdRiskRaw(x: WhoInputs, year = DEFAULT_CALIBRATION_YEAR): nu
   return 1 - (1 - chd) * (1 - str);
 }
 
-/** Returns null when the person is outside the model's age range (40–80). */
-export function whoCvdRisk(x: WhoInputs, year = DEFAULT_CALIBRATION_YEAR): number | null {
-  if (x.age < WHO_MIN_AGE || x.age > WHO_MAX_AGE) return null;
+/**
+ * Returns null when the person is outside the allowed age range.
+ * By default that is the model's validated range (40–80). Poveon chose to allow a lower
+ * `minAge` (EXTENDED_MIN_AGE in src/config/site.ts): the same formula is then used BELOW the ages
+ * it was built and tested on. Those results are extrapolations and must be labelled "early estimate".
+ */
+export function whoCvdRisk(x: WhoInputs, year = DEFAULT_CALIBRATION_YEAR, minAge = WHO_MIN_AGE): number | null {
+  if (x.age < minAge || x.age > WHO_MAX_AGE) return null;
   return whoCvdRiskRaw(x, year);
 }
+
+/** True when a result relies on ages below the WHO model's validated range. */
+export const isExtrapolated = (age: number, ha: HeartAge | null) => age < WHO_MIN_AGE || (ha !== null && ha.value < WHO_MIN_AGE);
 
 /** WHO chart risk bands (Kaptoge 2019 charts). */
 export function whoRiskBand(risk: number): "<5%" | "5% to <10%" | "10% to <20%" | "20% to <30%" | "≥30%" {
@@ -141,14 +149,15 @@ export type HeartAge =
   | { kind: "below"; value: number } // younger than the model's minimum age
   | { kind: "above"; value: number }; // older than the model's maximum age
 
-export function heartAge(x: WhoInputs, ref: HeartAgeReference, year = DEFAULT_CALIBRATION_YEAR): HeartAge | null {
-  const risk = whoCvdRisk(x, year);
+/** `minAge` works as in whoCvdRisk: below 40 is an extrapolation (see isExtrapolated). */
+export function heartAge(x: WhoInputs, ref: HeartAgeReference, year = DEFAULT_CALIBRATION_YEAR, minAge = WHO_MIN_AGE): HeartAge | null {
+  const risk = whoCvdRisk(x, year, minAge);
   if (risk === null) return null;
   const refRisk = (age: number) => whoCvdRiskRaw({ age, sex: x.sex, sbp: ref.sbp, bmi: ref.bmi, smoker: false }, year);
-  if (risk <= refRisk(WHO_MIN_AGE)) return { kind: "below", value: WHO_MIN_AGE };
+  if (risk <= refRisk(minAge)) return { kind: "below", value: minAge };
   if (risk >= refRisk(WHO_MAX_AGE)) return { kind: "above", value: WHO_MAX_AGE };
   // Reference risk rises with age, so bisection finds the unique crossing point.
-  let lo = WHO_MIN_AGE;
+  let lo = minAge;
   let hi = WHO_MAX_AGE;
   for (let i = 0; i < 60; i++) {
     const mid = (lo + hi) / 2;

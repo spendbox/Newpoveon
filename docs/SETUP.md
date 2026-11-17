@@ -75,6 +75,7 @@ Tick everything before telling the public.
 
 **Medical and legal**
 - [ ] A clinician signs off on the heart age "healthy" values (`HEART_AGE_REFERENCE` in `src/config/site.ts`).
+- [ ] A clinician agrees to stretching the WHO model down to age 30, shown as an "early estimate" (`EXTENDED_MIN_AGE` in `src/config/site.ts`; set it to 40 to switch this off).
 - [ ] A clinician checks each tool against its official form, and the status mappings (see `SCREENING_TOOLS.md`).
 - [ ] STOP-Bang commercial-use permission confirmed with University Health Network (stopbang.ca).
 - [ ] FINDRISC commercial-use conditions confirmed with the Finnish Diabetes Association.

@@ -204,7 +204,14 @@ function Reveal({ results, saved }: { results: Results; saved: SavedScreening | 
               )}
             </p>
             <p className="mt-3 rounded-full bg-white/10 px-3 py-1.5 text-sm font-extrabold">10-year heart attack or stroke risk: {heart.riskPercent}%</p>
-            <p className="mt-2 text-center text-xs font-bold text-[#BFE3D6]">Estimate based on WHO 2019 risk charts. Not a diagnosis.</p>
+            {heart.earlyEstimate ? (
+              <p className="mt-2 text-center text-xs font-bold text-[#BFE3D6]">
+                <span className="mr-1 rounded-full bg-sun px-2 py-0.5 text-ink">Early estimate</span>
+                The WHO risk charts were tested on people aged 40 and over, so treat this as a rough guide. Not a diagnosis.
+              </p>
+            ) : (
+              <p className="mt-2 text-center text-xs font-bold text-[#BFE3D6]">Estimate based on WHO 2019 risk charts. Not a diagnosis.</p>
+            )}
           </>
         ) : (
           <>

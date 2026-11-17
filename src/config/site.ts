@@ -52,6 +52,14 @@ export function adminEmails(): string[] {
 export const HEART_AGE_REFERENCE = { sbp: 120, bmi: 22, smoker: false } as const;
 
 /**
+ * ⚠️ NEEDS CLINICAL SIGN-OFF BEFORE LAUNCH.
+ * The WHO 2019 model was built and tested on ages 40–80. Poveon decided to stretch the SAME formula
+ * down to this age so people aged 30–39 also get a heart age. Results that rely on ages under 40
+ * are shown as an "early estimate". Set this back to 40 to switch the extension off.
+ */
+export const EXTENDED_MIN_AGE = 30;
+
+/**
  * Fallback emergency contacts, shown if the database is unreachable.
  * The live list is edited in Admin → Emergency contacts.
  */

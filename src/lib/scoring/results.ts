@@ -2,9 +2,9 @@
  * Turns questionnaire answers into results. Pure functions: the same answers always give the same
  * results, on the phone and on the server (the server always recomputes; it never trusts the browser).
  */
-import { HEART_AGE_REFERENCE } from "@/config/site";
+import { EXTENDED_MIN_AGE, HEART_AGE_REFERENCE } from "@/config/site";
 import { type Answers, type BpValue, num, str } from "@/lib/questions";
-import { heartAge, whoCvdRisk, whoRiskBand, WHO_MIN_AGE, WHO_MAX_AGE, type HeartAge, type Sex } from "./who-cvd";
+import { heartAge, isExtrapolated, whoCvdRisk, whoRiskBand, WHO_MAX_AGE, type HeartAge, type Sex } from "./who-cvd";
 import {
   auditC, bmi as calcBmi, bmiClass, bpClass, FINDRISC_BAND_RISK, findrisc, gad2Positive, gad7, meetsSleepGuideline,
   meetsWhoActivity, phq2Positive, phq9, stopBang, waistToHeight, whtrClass,
@@ -48,6 +48,8 @@ export interface HeartResult {
   riskPercent: number; // one decimal
   band: string;
   heartAge: HeartAge;
+  /** Uses the WHO formula below age 40, outside the range it was tested on. */
+  earlyEstimate: boolean;
 }
 
 export interface Results {
@@ -92,10 +94,10 @@ export function computeResults(a: Answers): Results {
       summary: "After a heart attack or stroke, the best protection is regular check-ups and taking your medicines.",
       basis: "WHO risk charts are not used for people who already have heart disease.", next: doctor("Book a review with a doctor"),
     });
-  } else if (age < WHO_MIN_AGE || age > WHO_MAX_AGE) {
-    heartNote = age < WHO_MIN_AGE
-      ? `The WHO heart risk model starts at age ${WHO_MIN_AGE}. Keeping your blood pressure, weight and smoking in check now pays off later.`
-      : `The WHO heart risk model covers ages ${WHO_MIN_AGE}–${WHO_MAX_AGE}, so we can't give a heart age. A doctor can review your heart health.`;
+  } else if (age < EXTENDED_MIN_AGE || age > WHO_MAX_AGE) {
+    heartNote = age < EXTENDED_MIN_AGE
+      ? `Heart age starts at ${EXTENDED_MIN_AGE}. Keeping your blood pressure, weight and smoking in check now pays off later.`
+      : `The WHO heart risk model covers ages up to ${WHO_MAX_AGE}, so we can't give a heart age. A doctor can review your heart health.`;
   } else if (!bp || !bmi) {
     heartNote = "We need a real blood pressure reading to work out your heart age.";
     cards.push({
@@ -105,15 +107,18 @@ export function computeResults(a: Answers): Results {
     });
   } else {
     const inputs = { age, sex, sbp: bp.sbp, bmi, smoker };
-    const risk = whoCvdRisk(inputs)!;
-    const ha = heartAge(inputs, HEART_AGE_REFERENCE)!;
-    heart = { riskPercent: pct(risk), band: whoRiskBand(risk), heartAge: ha };
+    const risk = whoCvdRisk(inputs, undefined, EXTENDED_MIN_AGE)!;
+    const ha = heartAge(inputs, HEART_AGE_REFERENCE, undefined, EXTENDED_MIN_AGE)!;
+    const early = isExtrapolated(age, ha);
+    heart = { riskPercent: pct(risk), band: whoRiskBand(risk), heartAge: ha, earlyEstimate: early };
     const status: Status = risk < 0.1 ? "good" : risk < 0.2 ? "check" : "act";
     const haText = ha.kind === "below" ? `under ${ha.value}` : ha.kind === "above" ? `over ${ha.value}` : String(ha.value);
     cards.push({
       id: "heart", topic: "Heart age", status, value: `${haText} · ${pct(risk)}% risk`, sensitive: false,
       summary: `Your chance of a heart attack or stroke in the next 10 years is about ${pct(risk)}% (WHO band ${heart.band}).`,
-      basis: "Estimate based on WHO 2019 risk charts (non-lab, West Africa).",
+      basis: early
+        ? "Early estimate: uses the WHO 2019 risk charts (non-lab, West Africa) below age 40, younger than the ages they were tested on."
+        : "Estimate based on WHO 2019 risk charts (non-lab, West Africa).",
       next: status === "good" ? retest(12) : doctor(),
     });
   }

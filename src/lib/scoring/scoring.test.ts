@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import fixtures from "./__fixtures__.json";
-import { heartAge, whoCvdRisk, whoCvdRiskRaw, whoRiskBand, type Sex } from "./who-cvd";
+import { heartAge, isExtrapolated, whoCvdRisk, whoCvdRiskRaw, whoRiskBand, type Sex } from "./who-cvd";
 import { auditC, bmi, bmiClass, bpClass, findrisc, findriscBand, gad2Positive, gad7, phq2Positive, phq9, stopBang, waistToHeight, whtrClass } from "./tools";
 import { computeResults, shareSummary } from "./results";
 import { HEART_AGE_REFERENCE } from "@/config/site";
@@ -46,6 +46,13 @@ describe("WHO 2019 non-lab model, Western Sub-Saharan Africa", () => {
 });
 
 describe("Heart age", () => {
+  it("can be extended below 40 on purpose, and flags it", () => {
+    const ha = heartAge({ age: 35, sex: "male", sbp: 140, bmi: 28, smoker: true }, HEART_AGE_REFERENCE, undefined, 30)!;
+    expect(ha.value).toBeGreaterThan(35);
+    expect(isExtrapolated(35, ha)).toBe(true);
+    expect(isExtrapolated(50, { kind: "exact", value: 52 })).toBe(false);
+    expect(isExtrapolated(50, { kind: "exact", value: 38 })).toBe(true);
+  });
   it("equals real age for someone with exactly the reference (healthy) risk factors", () => {
     for (const age of [45, 55, 65]) {
       for (const sex of ["male", "female"] as const) {
@@ -58,7 +65,7 @@ describe("Heart age", () => {
     const ha = heartAge({ age: 50, sex: "male", sbp: 160, bmi: 30, smoker: true }, HEART_AGE_REFERENCE)!;
     expect(ha.value).toBeGreaterThan(50);
   });
-  it("reports 'below 40' rather than extrapolating outside the model", () => {
+  it("by default reports 'below 40' rather than extrapolating outside the model", () => {
     const ha = heartAge({ age: 41, sex: "female", sbp: 100, bmi: 20, smoker: false }, HEART_AGE_REFERENCE)!;
     expect(ha.kind).toBe("below");
   });
@@ -197,8 +204,21 @@ describe("computeResults", () => {
     const card = r.cards.find((c) => c.id === "heart")!;
     expect(card.next).toMatchObject({ kind: "test", testCode: "bp-check" });
   });
-  it("does not calculate heart age under 40", () => {
-    expect(computeResults({ ...healthy, age: 35 }).heart).toBeNull();
+  it("gives 30–39 year olds a heart age marked as an early estimate", () => {
+    const r = computeResults({ ...healthy, age: 35 });
+    expect(r.heart).not.toBeNull();
+    expect(r.heart!.earlyEstimate).toBe(true);
+    expect(r.cards.find((c) => c.id === "heart")!.basis).toMatch(/Early estimate/);
+  });
+  it("does not mark 40+ results as early estimates when heart age is 40+", () => {
+    const r = computeResults({ ...healthy, age: 55, smoking: "current" });
+    expect(r.heart!.heartAge.value).toBeGreaterThanOrEqual(40);
+    expect(r.heart!.earlyEstimate).toBe(false);
+  });
+  it("does not calculate heart age under 30", () => {
+    const r = computeResults({ ...healthy, age: 29 });
+    expect(r.heart).toBeNull();
+    expect(r.heartNote).toMatch(/starts at 30/);
   });
   it("raises the safety flag when PHQ-9 item 9 is above 'Not at all'", () => {
     const r = computeResults({ ...healthy, phq1: "2", phq2: "2", phq3: "0", phq4: "0", phq5: "0", phq6: "0", phq7: "0", phq8: "0", phq9: "1" });
