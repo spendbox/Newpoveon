@@ -1,0 +1,11 @@
+<svg viewBox="0 0 342 196" role="img" aria-label="A glass and a bottle">
+<path d="M0 180 Q171 168 342 180 V196 H0Z" fill="#F7DE9A"/>
+<rect x="196" y="78" width="54" height="100" rx="14" fill="#1F8A70" stroke="#0E2A24" stroke-width="4"/>
+<rect x="210" y="40" width="26" height="44" rx="6" fill="#1F8A70" stroke="#0E2A24" stroke-width="4"/>
+<rect x="206" y="110" width="34" height="34" rx="8" fill="#FFF1C9" stroke="#0E2A24" stroke-width="3"/>
+<g class="float"><path d="M96 70 H160 L152 176 H104Z" fill="#FFFFFF" stroke="#0E2A24" stroke-width="4" stroke-linejoin="round"/>
+<path d="M100 104 H156 L152 172 H104Z" fill="#FFC845"/>
+<path d="M96 70 H160 L152 176 H104Z" fill="none" stroke="#0E2A24" stroke-width="4" stroke-linejoin="round"/>
+<circle class="tw" cx="120" cy="130" r="4" fill="#FFFFFF"/><circle class="tw2" cx="136" cy="150" r="3" fill="#FFFFFF"/><circle class="tw" cx="130" cy="116" r="3" fill="#FFFFFF"/></g>
+<circle class="tw2" cx="290" cy="50" r="5" fill="#FF7A59"/>
+</svg>

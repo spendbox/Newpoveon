@@ -1,0 +1,15 @@
+<svg width="342" height="196" viewBox="0 0 342 196" role="img" aria-label="A family of three with a floating heart">
+          <path d="M0 176 Q171 160 342 176 V196 H0Z" fill="#D3C9FF"/>
+          <g class="float"><path d="M171 52 C155 40 151 30 157 23 C162 17 169 18 171 24 C173 18 180 17 185 23 C191 30 187 40 171 52 Z" fill="#FF7A59" stroke="#0E2A24" stroke-width="3" stroke-linejoin="round"/></g>
+          <path d="M84 196 C84 150 100 134 122 134 C144 134 160 150 160 196Z" fill="#1F8A70" stroke="#0E2A24" stroke-width="4" stroke-linejoin="round"/>
+          <circle cx="122" cy="104" r="28" fill="#8A5530" stroke="#0E2A24" stroke-width="4"/>
+          <path d="M98 96 C100 76 144 76 146 96 C136 88 108 88 98 96Z" fill="#E8E8E8" stroke="#0E2A24" stroke-width="3" stroke-linejoin="round"/>
+          <path d="M113 112 Q122 119 131 112" stroke="#0E2A24" stroke-width="3" stroke-linecap="round" fill="none"/>
+          <path d="M182 196 C182 150 198 134 220 134 C242 134 258 150 258 196Z" fill="#FF7A59" stroke="#0E2A24" stroke-width="4" stroke-linejoin="round"/>
+          <circle cx="220" cy="104" r="28" fill="#74462A" stroke="#0E2A24" stroke-width="4"/>
+          <path d="M192 104 C186 72 254 72 248 104 C244 86 232 82 220 82 C208 82 196 86 192 104Z" fill="#1E1410"/>
+          <path d="M211 112 Q220 119 229 112" stroke="#0E2A24" stroke-width="3" stroke-linecap="round" fill="none"/>
+          <path d="M146 196 C146 168 156 158 171 158 C186 158 196 168 196 196Z" fill="#FFC845" stroke="#0E2A24" stroke-width="4" stroke-linejoin="round"/>
+          <circle cx="171" cy="138" r="20" fill="#9A6136" stroke="#0E2A24" stroke-width="4"/>
+          <path d="M164 144 Q171 149 178 144" stroke="#0E2A24" stroke-width="3" stroke-linecap="round" fill="none"/>
+        </svg>

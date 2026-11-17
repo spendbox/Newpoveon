@@ -1,0 +1,15 @@
+<svg width="342" height="196" viewBox="0 0 342 196" role="img" aria-label="A sleepy moon with floating Zs">
+          <circle class="tw" cx="48" cy="40" r="3" fill="#FFFFFF"/>
+          <circle class="tw2" cx="300" cy="34" r="2.5" fill="#FFFFFF"/>
+          <circle class="tw" cx="270" cy="160" r="3" fill="#FFFFFF"/>
+          <circle class="tw2" cx="70" cy="150" r="2" fill="#FFFFFF"/>
+          <circle class="tw2" cx="110" cy="30" r="2" fill="#FFFFFF"/>
+          <g class="float">
+            <path d="M178 40 A62 62 0 1 0 214 150 A50 50 0 1 1 178 40 Z" fill="#FFC845" stroke="#0E2A24" stroke-width="4" stroke-linejoin="round"/>
+            <path d="M136 100 Q144 106 152 100M164 112 Q172 118 180 112" stroke="#0E2A24" stroke-width="3.5" stroke-linecap="round" fill="none"/>
+            <circle cx="150" cy="122" r="6" fill="#FF7A59" opacity="0.5"/>
+          </g>
+          <text class="z1" x="214" y="84" font-family="Baloo 2, sans-serif" font-weight="800" font-size="26" fill="#B9A8FF">Z</text>
+          <text class="z2" x="226" y="78" font-family="Baloo 2, sans-serif" font-weight="800" font-size="32" fill="#E6E0FF">Z</text>
+          <text class="z3" x="210" y="88" font-family="Baloo 2, sans-serif" font-weight="800" font-size="22" fill="#B9A8FF">z</text>
+        </svg>

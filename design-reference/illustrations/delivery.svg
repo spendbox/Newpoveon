@@ -1,0 +1,10 @@
+<svg viewBox="0 0 342 196" role="img" aria-label="A delivery box with medicine">
+<g class="dash"><path d="M40 110h40" stroke="#0E2A24" stroke-width="4" stroke-linecap="round"/></g>
+<g class="dash2"><path d="M30 134h46" stroke="#0E2A24" stroke-width="4" stroke-linecap="round"/></g>
+<g class="float"><path d="M110 80 L190 56 L270 80 L190 104Z" fill="#FFE3D9" stroke="#0E2A24" stroke-width="4" stroke-linejoin="round"/>
+<path d="M110 80 V160 L190 184 V104Z" fill="#FFC845" stroke="#0E2A24" stroke-width="4" stroke-linejoin="round"/>
+<path d="M270 80 V160 L190 184 V104Z" fill="#F2A93B" stroke="#0E2A24" stroke-width="4" stroke-linejoin="round"/>
+<rect x="128" y="112" width="44" height="22" rx="11" transform="rotate(16 150 123)" fill="#FFFFFF" stroke="#0E2A24" stroke-width="3.5"/>
+<path d="M150 112 L148 134" stroke="#0E2A24" stroke-width="3" transform="rotate(16 150 123)"/></g>
+<path class="tw" d="M296 40l4 10 10 4-10 4-4 10-4-10-10-4 10-4z" fill="#1F8A70" stroke="#0E2A24" stroke-width="2"/>
+</svg>

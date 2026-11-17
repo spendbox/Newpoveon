@@ -1,0 +1,60 @@
+/**
+ * ONE place for the things you are likely to change.
+ * Values marked "env" can also be set in Vercel (Settings → Environment Variables) without a code change.
+ */
+export const site = {
+  /** Working name of the screening app. Rename here and it changes everywhere. */
+  appName: process.env.NEXT_PUBLIC_APP_NAME || "HealthCheck",
+  /** The company / platform name. */
+  companyName: "Poveon",
+  tagline: "Friendly health screening for Nigerians",
+
+  /** Public web address, used in emails and share links (env: NEXT_PUBLIC_SITE_URL). */
+  siteUrl: (process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000").replace(/\/$/, ""),
+
+  /** Business WhatsApp number in international format, digits only, e.g. 2348012345678 (env). */
+  whatsappNumber: process.env.NEXT_PUBLIC_WHATSAPP_NUMBER || "",
+
+  /** Doctor consult price in naira. Paystack charges in kobo (naira × 100). */
+  consultPriceNaira: 5000,
+  consultMinutes: 20,
+
+  /** How long an unpaid booking holds a time slot before it is released. */
+  slotHoldMinutes: 30,
+
+  /** Where team notifications go (env: TEAM_NOTIFICATION_EMAIL). Server only. */
+  teamEmail: process.env.TEAM_NOTIFICATION_EMAIL || "",
+
+  /** Sender for all emails, e.g. "HealthCheck <hello@yourdomain.com>" (env: EMAIL_FROM). */
+  emailFrom: process.env.EMAIL_FROM || "HealthCheck <onboarding@resend.dev>",
+
+  /** Timezone used to show appointment times. */
+  timeZone: "Africa/Lagos",
+} as const;
+
+/** Comma-separated admin emails (env: ADMIN_EMAILS). Server only. */
+export function adminEmails(): string[] {
+  return (process.env.ADMIN_EMAILS || "")
+    .split(",")
+    .map((e) => e.trim().toLowerCase())
+    .filter(Boolean);
+}
+
+/**
+ * ⚠️ NEEDS CLINICAL SIGN-OFF BEFORE LAUNCH.
+ * Heart age compares you with someone of the same sex who has "healthy risk factors".
+ * The WHO model does not define these values. These are proposed defaults:
+ *  - systolic blood pressure 120 mmHg (the WHO model's own centring value, and the usual "normal" upper limit)
+ *  - BMI 22 kg/m² (middle of the WHO "healthy" range, 18.5–24.9)
+ *  - non-smoker
+ * Change them here once a doctor has approved them; all heart ages update automatically.
+ */
+export const HEART_AGE_REFERENCE = { sbp: 120, bmi: 22, smoker: false } as const;
+
+/**
+ * Fallback emergency contacts, shown if the database is unreachable.
+ * The live list is edited in Admin → Emergency contacts.
+ */
+export const FALLBACK_EMERGENCY_CONTACTS = [
+  { label: "Nigeria emergency number", phone: "112", description: "Free from any phone, 24 hours." },
+] as const;

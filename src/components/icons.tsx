@@ -1,0 +1,73 @@
+/** Stroke icons: 2.6px ink lines, round caps (design system "Iconography"). */
+import type { SVGProps } from "react";
+
+const P: Record<string, React.ReactNode> = {
+  thumbUp: <><path d="M14 18v16h-6V18z" /><path d="M14 19l6-11c2.5 0 4 1.8 3.4 4.4L22 18h8.5a3 3 0 0 1 3 3.5l-2 9.5a3 3 0 0 1-3 2.5H14" /></>,
+  thumbDown: <><path d="M14 22V6H8v16z" /><path d="M14 21l6 11c2.5 0 4-1.8 3.4-4.4L22 22h8.5a3 3 0 0 0 3-3.5l-2-9.5a3 3 0 0 0-3-2.5H14" /></>,
+  question: <><circle cx="20" cy="20" r="14" /><path d="M15.5 15.5a4.5 4.5 0 1 1 6.4 4.1c-1.3.6-1.9 1.6-1.9 3v.9M20 28.5h.01" /></>,
+  female: <><circle cx="20" cy="15" r="8" /><path d="M20 23v12M15 30h10" /></>,
+  male: <><circle cx="17" cy="23" r="8" /><path d="M23 17l9-9M24 8h8v8" /></>,
+  leaf: <><path d="M8 32C8 16 18 8 33 8c0 15-8 25-24 24z" /><path d="M8 32l14-14" /></>,
+  trophy: <><path d="M13 7h14v8a7 7 0 0 1-14 0z" /><path d="M13 10H8a5 5 0 0 0 5 6M27 10h5a5 5 0 0 1-5 6M20 22v6M14 33h12M16 28h8" /></>,
+  smoke: <><path d="M5 25h24v6H5z" /><path d="M29 25h6v6h-6M30 20c0-3 3-3 3-6s-3-3-3-6M25 20c0-3 3-3 3-6" /></>,
+  gauge: <><path d="M6 28a14 14 0 1 1 28 0" /><path d="M20 28l7-8M10 28h2M28 28h2M20 14v2" /><circle cx="20" cy="28" r="2" /></>,
+  family: <><circle cx="13" cy="12" r="4" /><circle cx="27" cy="12" r="4" /><circle cx="20" cy="22" r="3" /><path d="M6 33c0-7 3-12 7-12s5 2 5 2M34 33c0-7-3-12-7-12s-5 2-5 2M15 34c0-4 2-6 5-6s5 2 5 6" /></>,
+  veg: <><path d="M6 20h28a14 14 0 0 1-28 0z" /><path d="M14 20c-2-5 0-9 4-10M20 20c0-6 3-10 8-10M26 20c1-3 3-5 6-5" /></>,
+  calendar: <><rect x="6" y="9" width="28" height="25" rx="4" /><path d="M6 16h28M13 5v7M27 5v7M13 23h3M20 23h3M13 28h3" /></>,
+  couch: <><path d="M7 22v-6a4 4 0 0 1 4-4h18a4 4 0 0 1 4 4v6" /><path d="M4 21h32v8H4z" /><path d="M8 29v4M32 29v4" /></>,
+  walk: <><circle cx="21" cy="7" r="3.5" /><path d="M20 12l-2 10-5 11M18 22l6 5 1 6M19.5 15l-6 4M19.5 15l6 3" /></>,
+  run: <><circle cx="27" cy="7" r="3.5" /><path d="M25 12l-5 9-8 2M20 21l5 6-4 8M24 14l7 4M24 14l-7-1M3 17h6M2 24h7" /></>,
+  moon: <path d="M30 24A12 12 0 0 1 16 10a12 12 0 1 0 14 14z" />,
+  sun: <><circle cx="20" cy="20" r="7" /><path d="M20 5v4M20 31v4M5 20h4M31 20h4M9.4 9.4l2.8 2.8M27.8 27.8l2.8 2.8M9.4 30.6l2.8-2.8M27.8 12.2l2.8-2.8" /></>,
+  partCloud: <><path d="M15 12a6 6 0 0 1 11 2" /><path d="M14 9V6M8 13l-2-2M7 19H4" /><path d="M12 32h17a6 6 0 0 0 0-12 9 9 0 0 0-17 2 5 5 0 0 0 0 10z" /></>,
+  cloud: <path d="M11 30h18a7 7 0 0 0 0-14 10 10 0 0 0-19 3 5.5 5.5 0 0 0 1 11z" />,
+  rain: <><path d="M11 23h18a7 7 0 0 0 0-14 10 10 0 0 0-19 3 5.5 5.5 0 0 0 1 11z" /><path d="M14 28l-2 5M21 28l-2 5M28 28l-2 5" /></>,
+  drop: <path d="M20 5s10 11 10 18a10 10 0 0 1-20 0c0-7 10-18 10-18z" />,
+  shield: <><path d="M20 5l12 5v9c0 8-5 13-12 16C13 32 8 27 8 19v-9z" /><path d="M15 20l4 4 7-8" /></>,
+  dna: <><path d="M12 5c0 10 16 10 16 15S12 25 12 35M28 5c0 10-16 10-16 15s16 5 16 15" /><path d="M14 11h12M14 29h12" /></>,
+  heart: <path d="M20 33S7 25 7 15.5A6.5 6.5 0 0 1 20 12a6.5 6.5 0 0 1 13 3.5C33 25 20 33 20 33z" />,
+  arrowRight: <path d="M8 20h24M22 10l10 10-10 10" />,
+  arrowLeft: <path d="M32 20H8M18 10L8 20l10 10" />,
+  check: <path d="M9 21l7 7 15-16" />,
+  warning: <><path d="M20 6l15 27H5z" /><path d="M20 16v7M20 28h.01" /></>,
+  alert: <><circle cx="20" cy="20" r="14" /><path d="M20 12v10M20 28h.01" /></>,
+  chat: <path d="M34 20a13 13 0 0 1-19 11.5L6 33l1.8-7.5A13 13 0 1 1 34 20z" />,
+  whatsapp: <><path d="M34 20a13 13 0 0 1-19 11.5L6 33l1.8-7.5A13 13 0 1 1 34 20z" /><path d="M15 14c0 7 4 11 11 11l1.5-3-3.5-1.5-1.5 1.5c-2-1-3.5-2.5-4.5-4.5l1.5-1.5L18 12.5z" /></>,
+  home: <><path d="M6 19L20 7l14 12" /><path d="M10 16v17h20V16M17 33v-9h6v9" /></>,
+  pill: <><rect x="5" y="14" width="30" height="12" rx="6" transform="rotate(-35 20 20)" /><path d="M16 14l8 12" /></>,
+  flask: <><path d="M15 5h10M17 5v11L8 31a3 3 0 0 0 2.6 4.5h18.8A3 3 0 0 0 32 31l-9-15V5" /><path d="M12 25h16" /></>,
+  share: <><circle cx="29" cy="9" r="4" /><circle cx="11" cy="20" r="4" /><circle cx="29" cy="31" r="4" /><path d="M14.5 18l11-7M14.5 22l11 7" /></>,
+  download: <path d="M20 6v19M12 17l8 8 8-8M7 33h26" />,
+  close: <path d="M10 10l20 20M30 10L10 30" />,
+  phone: <path d="M12 5l5 8-3 3c1.8 4 5 7.2 9 9l3-3 8 5-2 6c-14 1-27-12-26-26z" />,
+  user: <><circle cx="20" cy="13" r="7" /><path d="M6 35c0-8 6-13 14-13s14 5 14 13" /></>,
+  link: <><path d="M17 23a6 6 0 0 0 8.5 0l6-6a6 6 0 0 0-8.5-8.5l-2 2" /><path d="M23 17a6 6 0 0 0-8.5 0l-6 6a6 6 0 0 0 8.5 8.5l2-2" /></>,
+  edit: <><path d="M26 7l7 7-18 18H8v-7z" /><path d="M22 11l7 7" /></>,
+  trash: <><path d="M7 11h26M16 11V7h8v4M10 11l2 22h16l2-22" /><path d="M17 17v10M23 17v10" /></>,
+  clock: <><circle cx="20" cy="20" r="14" /><path d="M20 12v9l6 3" /></>,
+  location: <><path d="M20 35s11-9.5 11-19a11 11 0 0 0-22 0c0 9.5 11 19 11 19z" /><circle cx="20" cy="16" r="4" /></>,
+  sparkle: <path d="M20 5l3.5 11.5L35 20l-11.5 3.5L20 35l-3.5-11.5L5 20l11.5-3.5z" />,
+};
+
+export type IconName = keyof typeof P;
+
+export function Icon({ name, size = 24, strokeWidth = 2.6, ...rest }: { name: IconName; size?: number; strokeWidth?: number } & SVGProps<SVGSVGElement>) {
+  return (
+    <svg
+      width={size}
+      height={size}
+      viewBox="0 0 40 40"
+      fill="none"
+      stroke="currentColor"
+      // Keep the line about `strokeWidth` px on screen whatever the icon size.
+      strokeWidth={(strokeWidth * 40) / size}
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      aria-hidden="true"
+      focusable="false"
+      {...rest}
+    >
+      {P[name]}
+    </svg>
+  );
+}

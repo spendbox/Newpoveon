@@ -1,0 +1,356 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Health check — questions</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@600;700;800&family=Nunito:wght@500;600;700;800&display=swap" rel="stylesheet">
+<style>
+body{margin:0}
+a{color:#0E2A24}a:hover{color:#1F8A70}
+@keyframes slideIn{from{opacity:0;transform:translateX(40px) scale(.97)}to{opacity:1;transform:none}}
+@keyframes rise{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:none}}
+@keyframes pop{0%{transform:scale(1)}35%{transform:scale(1.08)}70%{transform:scale(.97)}100%{transform:scale(1)}}
+@keyframes float{0%,100%{transform:translateY(0)}50%{transform:translateY(-7px)}}
+@keyframes spin{to{transform:rotate(360deg)}}
+@keyframes breathe{0%,100%{transform:scale(1)}50%{transform:scale(1.06)}}
+@keyframes zz{0%{opacity:0;transform:translate(0,10px) scale(.7)}30%{opacity:1}100%{opacity:0;transform:translate(22px,-46px) scale(1.15)}}
+@keyframes twinkle{0%,100%{opacity:.3}50%{opacity:1}}
+@keyframes dash{0%{transform:translateX(10px);opacity:0}40%{opacity:1}100%{transform:translateX(-24px);opacity:0}}
+@keyframes wobble{0%,100%{transform:rotate(-38deg)}50%{transform:rotate(22deg)}}
+@keyframes burst{0%{opacity:0;transform:scale(.3)}60%{opacity:1;transform:scale(1.2)}100%{opacity:1;transform:scale(1)}}
+@keyframes bob{0%,100%{transform:translateY(0)}50%{transform:translateY(-3px)}}
+.card{animation:slideIn .55s cubic-bezier(.2,.8,.2,1) both}
+.r1{animation:rise .5s .12s cubic-bezier(.2,.8,.2,1) both}
+.r2{animation:rise .5s .22s cubic-bezier(.2,.8,.2,1) both}
+.float{animation:float 3s ease-in-out infinite}
+.spin{transform-box:fill-box;transform-origin:center;animation:spin 14s linear infinite}
+.breathe{transform-box:fill-box;transform-origin:center;animation:breathe 3.2s ease-in-out infinite}
+.z1{transform-box:fill-box;animation:zz 2.6s ease-out infinite}
+.z2{transform-box:fill-box;animation:zz 2.6s ease-out .9s infinite}
+.z3{transform-box:fill-box;animation:zz 2.6s ease-out 1.8s infinite}
+.tw{animation:twinkle 2s ease-in-out infinite}
+.tw2{animation:twinkle 2.6s ease-in-out .7s infinite}
+.dash{animation:dash 1.1s linear infinite}
+.dash2{animation:dash 1.1s linear .35s infinite}
+.needle{transform-box:view-box;transform-origin:171px 150px;animation:wobble 2.4s ease-in-out infinite}
+.burst{transform-box:fill-box;transform-origin:center;animation:burst .5s cubic-bezier(.2,.8,.2,1) both}
+.walker{animation:bob .5s ease-in-out infinite}
+.tile{transition:transform .15s ease, background .2s ease, border-color .2s ease;cursor:pointer}
+.tile:hover{transform:translateY(-2px)}
+.picked{animation:pop .4s cubic-bezier(.2,.8,.2,1)}
+.cta{transition:transform .15s ease, box-shadow .15s ease}
+.cta:active{transform:translateY(3px);box-shadow:0 3px 0 #0E2A24}
+@media (prefers-reduced-motion: reduce){*{animation:none!important;transition:none!important}}
+</style>
+</helmet>
+<div style="width: 390px; height: 844px; box-sizing: border-box; background: {{ground}}; font-family: 'Nunito', system-ui, sans-serif; color: #0E2A24; display: flex; flex-direction: column; padding: 24px 24px 28px; overflow: hidden">
+
+  <div style="display: flex; align-items: center; justify-content: space-between; height: 44px">
+    <sc-if value="{{isFirst}}" hint-placeholder-val="{{ true }}">
+      <a href="Main.dc.html" aria-label="Back to start" style="width: 44px; height: 44px; border-radius: 14px; background: #FFFFFF; display: flex; align-items: center; justify-content: center; text-decoration: none">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#0E2A24" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M19 12H5M11 6l-6 6 6 6"/></svg>
+      </a>
+    </sc-if>
+    <sc-if value="{{notFirst}}" hint-placeholder-val="{{ false }}">
+      <button type="button" onClick="{{back}}" aria-label="Previous question" style="width: 44px; height: 44px; border-radius: 14px; background: #FFFFFF; border: none; display: flex; align-items: center; justify-content: center; cursor: pointer">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#0E2A24" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M19 12H5M11 6l-6 6 6 6"/></svg>
+      </button>
+    </sc-if>
+    <span style="font-weight: 800; font-size: 15px; color: #35514A">Question {{num}} of 5</span>
+    <div style="width: 44px"></div>
+  </div>
+
+  <div style="position: relative; height: 46px; margin-top: 12px">
+    <div style="position: absolute; left: 6px; right: 30px; top: 30px; border-top: 3px dashed #B7D6CA"></div>
+    <div style="position: absolute; left: 6px; top: 30px; height: 3px; width: calc({{pct}}% - {{pctPx}}px); background: #1F8A70; border-radius: 3px; transition: width .5s cubic-bezier(.2,.8,.2,1)"></div>
+    <div style="position: absolute; top: 0; left: calc({{pct}}% - {{figPx}}px); transition: left .5s cubic-bezier(.2,.8,.2,1)">
+      <svg class="walker" width="30" height="30" viewBox="0 0 30 30" role="img" aria-label="Your progress">
+        <circle cx="15" cy="15" r="13" fill="#FF7A59" stroke="#0E2A24" stroke-width="2.5"/>
+        <circle cx="11" cy="13" r="1.8" fill="#0E2A24"/>
+        <circle cx="19" cy="13" r="1.8" fill="#0E2A24"/>
+        <path d="M10.5 18 Q15 22 19.5 18" fill="none" stroke="#0E2A24" stroke-width="2" stroke-linecap="round"/>
+      </svg>
+    </div>
+    <svg style="position: absolute; right: 0; top: 6px" width="26" height="30" viewBox="0 0 26 30" aria-hidden="true"><path d="M5 28V3" stroke="#0E2A24" stroke-width="2.6" stroke-linecap="round"/><path d="M6 4h15l-4 5 4 5H6z" fill="#FFC845" stroke="#0E2A24" stroke-width="2.2" stroke-linejoin="round"/></svg>
+  </div>
+
+  <div style="display: flex; align-items: center; justify-content: space-between; margin-top: 14px">
+    <span style="font-size: 13px; font-weight: 800; letter-spacing: .6px; text-transform: uppercase; color: #1F6B58">{{topic}}</span>
+    <span style="font-size: 14px; font-weight: 800; color: #0E2A24; background: #FFFFFF; padding: 5px 12px; border-radius: 999px">{{cheer}}</span>
+  </div>
+
+  <!-- STEP 1: MOVING -->
+  <sc-if value="{{s0}}" hint-placeholder-val="{{ true }}">
+    <div style="display: flex; flex-direction: column">
+      <div class="card" style="margin-top: 12px; height: 196px; border-radius: 28px; background: #FFF1C9; overflow: hidden">
+        <svg width="342" height="196" viewBox="0 0 342 196" role="img" aria-label="A running shoe in the sunshine">
+          <g class="spin"><circle cx="282" cy="52" r="24" fill="#FFC845"/><path d="M282 14v10M282 80v10M244 52h10M310 52h10M255 25l7 7M302 72l7 7M255 79l7-7M302 32l7-7" stroke="#F2A93B" stroke-width="4" stroke-linecap="round"/></g>
+          <path d="M0 168 Q171 150 342 168 V196 H0Z" fill="#F7DE9A"/>
+          <g class="dash"><path d="M58 112h34" stroke="#0E2A24" stroke-width="4" stroke-linecap="round"/></g>
+          <g class="dash2"><path d="M42 132h40" stroke="#0E2A24" stroke-width="4" stroke-linecap="round"/></g>
+          <g class="dash"><path d="M62 152h26" stroke="#0E2A24" stroke-width="4" stroke-linecap="round"/></g>
+          <g class="float">
+            <path d="M110 128 C108 104 124 92 140 96 L162 104 C172 108 180 118 198 120 L228 124 C242 126 248 138 246 150 L110 150 Z" fill="#FF7A59" stroke="#0E2A24" stroke-width="4" stroke-linejoin="round"/>
+            <rect x="104" y="148" width="148" height="16" rx="8" fill="#FFFFFF" stroke="#0E2A24" stroke-width="4"/>
+            <path d="M150 108l10 6M158 102l10 6M144 116l10 6" stroke="#FFFFFF" stroke-width="4" stroke-linecap="round"/>
+            <circle cx="214" cy="136" r="5" fill="#FFFFFF"/>
+          </g>
+        </svg>
+      </div>
+      <h2 class="r1" style="margin: 18px 0 0; font-family: 'Baloo 2', sans-serif; font-weight: 800; font-size: 27px; line-height: 1.1">How often do you get moving for 30 minutes or more?</h2>
+      <div class="r2" style="display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px; margin-top: 16px">
+        <button type="button" class="{{a00.cls}}" onClick="{{a00.pick}}" style="position: relative; height: 112px; border-radius: 20px; border: 2.5px solid {{a00.border}}; background: {{a00.bg}}; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 8px; font-family: 'Nunito', sans-serif; font-weight: 800; font-size: 15px; color: #0E2A24">
+          <svg width="40" height="40" viewBox="0 0 40 40" fill="none" stroke="#0E2A24" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 22v-6a4 4 0 0 1 4-4h18a4 4 0 0 1 4 4v6"/><path d="M4 21h32v8H4z"/><path d="M8 29v4M32 29v4"/></svg>
+          Rarely
+          <sc-if value="{{a00.on}}" hint-placeholder-val="{{ false }}"><span class="burst" style="position: absolute; top: -8px; right: -6px; width: 26px; height: 26px; border-radius: 50%; background: #1F8A70; display: flex; align-items: center; justify-content: center"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#FFFFFF" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12l5 5 9-10"/></svg></span></sc-if>
+        </button>
+        <button type="button" class="{{a01.cls}}" onClick="{{a01.pick}}" style="position: relative; height: 112px; border-radius: 20px; border: 2.5px solid {{a01.border}}; background: {{a01.bg}}; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 8px; font-family: 'Nunito', sans-serif; font-weight: 800; font-size: 15px; color: #0E2A24">
+          <svg width="40" height="40" viewBox="0 0 40 40" fill="none" stroke="#0E2A24" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="21" cy="7" r="3.5"/><path d="M20 12l-2 10-5 11M18 22l6 5 1 6M19.5 15l-6 4M19.5 15l6 3"/></svg>
+          Some days
+          <sc-if value="{{a01.on}}" hint-placeholder-val="{{ false }}"><span class="burst" style="position: absolute; top: -8px; right: -6px; width: 26px; height: 26px; border-radius: 50%; background: #1F8A70; display: flex; align-items: center; justify-content: center"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#FFFFFF" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12l5 5 9-10"/></svg></span></sc-if>
+        </button>
+        <button type="button" class="{{a02.cls}}" onClick="{{a02.pick}}" style="position: relative; height: 112px; border-radius: 20px; border: 2.5px solid {{a02.border}}; background: {{a02.bg}}; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 8px; font-family: 'Nunito', sans-serif; font-weight: 800; font-size: 15px; color: #0E2A24">
+          <svg width="40" height="40" viewBox="0 0 40 40" fill="none" stroke="#0E2A24" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="27" cy="7" r="3.5"/><path d="M25 12l-5 9-8 2M20 21l5 6-4 8M24 14l7 4M24 14l-7-1M3 17h6M2 24h7"/></svg>
+          Most days
+          <sc-if value="{{a02.on}}" hint-placeholder-val="{{ false }}"><span class="burst" style="position: absolute; top: -8px; right: -6px; width: 26px; height: 26px; border-radius: 50%; background: #1F8A70; display: flex; align-items: center; justify-content: center"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#FFFFFF" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12l5 5 9-10"/></svg></span></sc-if>
+        </button>
+      </div>
+    </div>
+  </sc-if>
+
+  <!-- STEP 2: SMOKING -->
+  <sc-if value="{{s1}}" hint-placeholder-val="{{ false }}">
+    <div style="display: flex; flex-direction: column">
+      <div class="card" style="margin-top: 12px; height: 196px; border-radius: 28px; background: #FFE3D9; overflow: hidden; position: relative">
+        <svg width="342" height="196" viewBox="0 0 342 196" role="img" aria-label="A pair of lungs breathing">
+          <path d="M171 26V100M171 90l-12 14M171 90l12 14" stroke="#0E2A24" stroke-width="5" stroke-linecap="round" fill="none"/>
+          <g class="breathe">
+            <path d="M162 74 C128 72 108 112 110 150 C112 174 140 178 156 166 C164 160 166 142 166 120 Z" fill="#FF9E86" stroke="#0E2A24" stroke-width="4" stroke-linejoin="round"/>
+            <path d="M180 74 C214 72 234 112 232 150 C230 174 202 178 186 166 C178 160 176 142 176 120 Z" fill="#FF9E86" stroke="#0E2A24" stroke-width="4" stroke-linejoin="round"/>
+            <circle cx="138" cy="128" r="3.5" fill="#0E2A24"/>
+            <circle cx="204" cy="128" r="3.5" fill="#0E2A24"/>
+            <path d="M130 142 Q138 148 146 142M196 142 Q204 148 212 142" stroke="#0E2A24" stroke-width="3" stroke-linecap="round" fill="none"/>
+          </g>
+          <sc-if value="{{smokeHappy}}" hint-placeholder-val="{{ false }}">
+            <g class="burst"><path d="M70 60l5 12 12 5-12 5-5 12-5-12-12-5 12-5z" fill="#FFC845" stroke="#0E2A24" stroke-width="2.5" stroke-linejoin="round"/></g>
+            <g class="burst"><path d="M276 110l4 9 9 4-9 4-4 9-4-9-9-4 9-4z" fill="#FFC845" stroke="#0E2A24" stroke-width="2.5" stroke-linejoin="round"/></g>
+            <g class="burst"><circle cx="262" cy="52" r="6" fill="#1F8A70"/></g>
+            <g class="burst"><circle cx="84" cy="146" r="5" fill="#1F8A70"/></g>
+          </sc-if>
+        </svg>
+        <sc-if value="{{smokeHappy}}" hint-placeholder-val="{{ false }}">
+          <span class="burst" style="position: absolute; left: 16px; bottom: 14px; background: #0E2A24; color: #FFFFFF; font-weight: 800; font-size: 13px; padding: 6px 12px; border-radius: 999px">Your lungs say thank you</span>
+        </sc-if>
+      </div>
+      <h2 class="r1" style="margin: 18px 0 0; font-family: 'Baloo 2', sans-serif; font-weight: 800; font-size: 27px; line-height: 1.1">Do you smoke or use tobacco?</h2>
+      <p class="r1" style="margin: 6px 0 0; font-size: 15px; font-weight: 600; color: #4A615B">Cigarettes, shisha, snuff or chewing tobacco.</p>
+      <div class="r2" style="display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px; margin-top: 14px">
+        <button type="button" class="{{a10.cls}}" onClick="{{a10.pick}}" style="position: relative; height: 112px; border-radius: 20px; border: 2.5px solid {{a10.border}}; background: {{a10.bg}}; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 8px; font-family: 'Nunito', sans-serif; font-weight: 800; font-size: 15px; color: #0E2A24">
+          <svg width="40" height="40" viewBox="0 0 40 40" fill="none" stroke="#0E2A24" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 5l12 5v9c0 8-5 13-12 16C13 32 8 27 8 19v-9z"/><path d="M14 20l4 4 8-9"/></svg>
+          Never
+          <sc-if value="{{a10.on}}" hint-placeholder-val="{{ false }}"><span class="burst" style="position: absolute; top: -8px; right: -6px; width: 26px; height: 26px; border-radius: 50%; background: #1F8A70; display: flex; align-items: center; justify-content: center"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#FFFFFF" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12l5 5 9-10"/></svg></span></sc-if>
+        </button>
+        <button type="button" class="{{a11.cls}}" onClick="{{a11.pick}}" style="position: relative; height: 112px; border-radius: 20px; border: 2.5px solid {{a11.border}}; background: {{a11.bg}}; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 8px; font-family: 'Nunito', sans-serif; font-weight: 800; font-size: 15px; color: #0E2A24">
+          <svg width="40" height="40" viewBox="0 0 40 40" fill="none" stroke="#0E2A24" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="5" y="18" width="28" height="7" rx="1.5"/><path d="M28 18v7M6 34L34 6"/></svg>
+          I quit
+          <sc-if value="{{a11.on}}" hint-placeholder-val="{{ false }}"><span class="burst" style="position: absolute; top: -8px; right: -6px; width: 26px; height: 26px; border-radius: 50%; background: #1F8A70; display: flex; align-items: center; justify-content: center"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#FFFFFF" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12l5 5 9-10"/></svg></span></sc-if>
+        </button>
+        <button type="button" class="{{a12.cls}}" onClick="{{a12.pick}}" style="position: relative; height: 112px; border-radius: 20px; border: 2.5px solid {{a12.border}}; background: {{a12.bg}}; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 8px; font-family: 'Nunito', sans-serif; font-weight: 800; font-size: 15px; color: #0E2A24">
+          <svg width="40" height="40" viewBox="0 0 40 40" fill="none" stroke="#0E2A24" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="22" width="28" height="7" rx="1.5"/><path d="M27 22v7M34 18c2-2 0-4 0-6s2-3 0-5"/></svg>
+          Yes
+          <sc-if value="{{a12.on}}" hint-placeholder-val="{{ false }}"><span class="burst" style="position: absolute; top: -8px; right: -6px; width: 26px; height: 26px; border-radius: 50%; background: #1F8A70; display: flex; align-items: center; justify-content: center"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#FFFFFF" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12l5 5 9-10"/></svg></span></sc-if>
+        </button>
+      </div>
+    </div>
+  </sc-if>
+
+  <!-- STEP 3: SLEEP -->
+  <sc-if value="{{s2}}" hint-placeholder-val="{{ false }}">
+    <div style="display: flex; flex-direction: column">
+      <div class="card" style="margin-top: 12px; height: 196px; border-radius: 28px; background: #2D2A5C; overflow: hidden">
+        <svg width="342" height="196" viewBox="0 0 342 196" role="img" aria-label="A sleepy moon with floating Zs">
+          <circle class="tw" cx="48" cy="40" r="3" fill="#FFFFFF"/>
+          <circle class="tw2" cx="300" cy="34" r="2.5" fill="#FFFFFF"/>
+          <circle class="tw" cx="270" cy="160" r="3" fill="#FFFFFF"/>
+          <circle class="tw2" cx="70" cy="150" r="2" fill="#FFFFFF"/>
+          <circle class="tw2" cx="110" cy="30" r="2" fill="#FFFFFF"/>
+          <g class="float">
+            <path d="M178 40 A62 62 0 1 0 214 150 A50 50 0 1 1 178 40 Z" fill="#FFC845" stroke="#0E2A24" stroke-width="4" stroke-linejoin="round"/>
+            <path d="M136 100 Q144 106 152 100M164 112 Q172 118 180 112" stroke="#0E2A24" stroke-width="3.5" stroke-linecap="round" fill="none"/>
+            <circle cx="150" cy="122" r="6" fill="#FF7A59" opacity="0.5"/>
+          </g>
+          <text class="z1" x="214" y="84" font-family="Baloo 2, sans-serif" font-weight="800" font-size="26" fill="#B9A8FF">Z</text>
+          <text class="z2" x="226" y="78" font-family="Baloo 2, sans-serif" font-weight="800" font-size="32" fill="#E6E0FF">Z</text>
+          <text class="z3" x="210" y="88" font-family="Baloo 2, sans-serif" font-weight="800" font-size="22" fill="#B9A8FF">z</text>
+        </svg>
+      </div>
+      <h2 class="r1" style="margin: 18px 0 0; font-family: 'Baloo 2', sans-serif; font-weight: 800; font-size: 27px; line-height: 1.1">Do you snore loudly?</h2>
+      <p class="r1" style="margin: 6px 0 0; font-size: 15px; font-weight: 600; color: #4A615B">Loud enough to be heard through a closed door.</p>
+      <div class="r2" style="display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px; margin-top: 14px">
+        <button type="button" class="{{a20.cls}}" onClick="{{a20.pick}}" style="position: relative; height: 112px; border-radius: 20px; border: 2.5px solid {{a20.border}}; background: {{a20.bg}}; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 8px; font-family: 'Nunito', sans-serif; font-weight: 800; font-size: 15px; color: #0E2A24">
+          <svg width="40" height="40" viewBox="0 0 40 40" fill="none" stroke="#0E2A24" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 16v8h6l8 7V9l-8 7z"/><path d="M26 15c2 3 2 7 0 10M30 11c4 5 4 13 0 18"/></svg>
+          Yes
+          <sc-if value="{{a20.on}}" hint-placeholder-val="{{ false }}"><span class="burst" style="position: absolute; top: -8px; right: -6px; width: 26px; height: 26px; border-radius: 50%; background: #1F8A70; display: flex; align-items: center; justify-content: center"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#FFFFFF" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12l5 5 9-10"/></svg></span></sc-if>
+        </button>
+        <button type="button" class="{{a21.cls}}" onClick="{{a21.pick}}" style="position: relative; height: 112px; border-radius: 20px; border: 2.5px solid {{a21.border}}; background: {{a21.bg}}; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 8px; font-family: 'Nunito', sans-serif; font-weight: 800; font-size: 15px; color: #0E2A24">
+          <svg width="40" height="40" viewBox="0 0 40 40" fill="none" stroke="#0E2A24" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M31 23A13 13 0 0 1 17 9a13 13 0 1 0 14 14z"/></svg>
+          No
+          <sc-if value="{{a21.on}}" hint-placeholder-val="{{ false }}"><span class="burst" style="position: absolute; top: -8px; right: -6px; width: 26px; height: 26px; border-radius: 50%; background: #1F8A70; display: flex; align-items: center; justify-content: center"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#FFFFFF" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12l5 5 9-10"/></svg></span></sc-if>
+        </button>
+        <button type="button" class="{{a22.cls}}" onClick="{{a22.pick}}" style="position: relative; height: 112px; border-radius: 20px; border: 2.5px solid {{a22.border}}; background: {{a22.bg}}; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 8px; font-family: 'Nunito', sans-serif; font-weight: 800; font-size: 15px; color: #0E2A24">
+          <svg width="40" height="40" viewBox="0 0 40 40" fill="none" stroke="#0E2A24" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="20" cy="20" r="14"/><path d="M15.5 16a4.5 4.5 0 1 1 6.5 4c-1.4.7-2 1.6-2 3M20 28h.01"/></svg>
+          Not sure
+          <sc-if value="{{a22.on}}" hint-placeholder-val="{{ false }}"><span class="burst" style="position: absolute; top: -8px; right: -6px; width: 26px; height: 26px; border-radius: 50%; background: #1F8A70; display: flex; align-items: center; justify-content: center"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#FFFFFF" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12l5 5 9-10"/></svg></span></sc-if>
+        </button>
+      </div>
+    </div>
+  </sc-if>
+
+  <!-- STEP 4: FAMILY -->
+  <sc-if value="{{s3}}" hint-placeholder-val="{{ false }}">
+    <div style="display: flex; flex-direction: column">
+      <div class="card" style="margin-top: 12px; height: 196px; border-radius: 28px; background: #E6E0FF; overflow: hidden">
+        <svg width="342" height="196" viewBox="0 0 342 196" role="img" aria-label="A family of three with a floating heart">
+          <path d="M0 176 Q171 160 342 176 V196 H0Z" fill="#D3C9FF"/>
+          <g class="float"><path d="M171 52 C155 40 151 30 157 23 C162 17 169 18 171 24 C173 18 180 17 185 23 C191 30 187 40 171 52 Z" fill="#FF7A59" stroke="#0E2A24" stroke-width="3" stroke-linejoin="round"/></g>
+          <path d="M84 196 C84 150 100 134 122 134 C144 134 160 150 160 196Z" fill="#1F8A70" stroke="#0E2A24" stroke-width="4" stroke-linejoin="round"/>
+          <circle cx="122" cy="104" r="28" fill="#8A5530" stroke="#0E2A24" stroke-width="4"/>
+          <path d="M98 96 C100 76 144 76 146 96 C136 88 108 88 98 96Z" fill="#E8E8E8" stroke="#0E2A24" stroke-width="3" stroke-linejoin="round"/>
+          <path d="M113 112 Q122 119 131 112" stroke="#0E2A24" stroke-width="3" stroke-linecap="round" fill="none"/>
+          <path d="M182 196 C182 150 198 134 220 134 C242 134 258 150 258 196Z" fill="#FF7A59" stroke="#0E2A24" stroke-width="4" stroke-linejoin="round"/>
+          <circle cx="220" cy="104" r="28" fill="#74462A" stroke="#0E2A24" stroke-width="4"/>
+          <path d="M192 104 C186 72 254 72 248 104 C244 86 232 82 220 82 C208 82 196 86 192 104Z" fill="#1E1410"/>
+          <path d="M211 112 Q220 119 229 112" stroke="#0E2A24" stroke-width="3" stroke-linecap="round" fill="none"/>
+          <path d="M146 196 C146 168 156 158 171 158 C186 158 196 168 196 196Z" fill="#FFC845" stroke="#0E2A24" stroke-width="4" stroke-linejoin="round"/>
+          <circle cx="171" cy="138" r="20" fill="#9A6136" stroke="#0E2A24" stroke-width="4"/>
+          <path d="M164 144 Q171 149 178 144" stroke="#0E2A24" stroke-width="3" stroke-linecap="round" fill="none"/>
+        </svg>
+      </div>
+      <h2 class="r1" style="margin: 18px 0 0; font-family: 'Baloo 2', sans-serif; font-weight: 800; font-size: 27px; line-height: 1.1">Has anyone in your family had diabetes?</h2>
+      <div class="r2" style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; margin-top: 16px">
+        <button type="button" class="{{a30.cls}}" onClick="{{a30.pick}}" style="position: relative; height: 62px; border-radius: 18px; border: 2.5px solid {{a30.border}}; background: {{a30.bg}}; display: flex; align-items: center; gap: 10px; padding: 0 12px; font-family: 'Nunito', sans-serif; font-weight: 800; font-size: 14px; color: #0E2A24; text-align: left">
+          <svg width="28" height="28" viewBox="0 0 40 40" fill="none" stroke="#0E2A24" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="14" cy="12" r="5"/><circle cx="28" cy="14" r="4"/><path d="M4 34c0-7 4-11 10-11s10 4 10 11M24 34c0-5 2-9 6-9s6 4 6 9"/></svg>
+          Parent or sibling
+          <sc-if value="{{a30.on}}" hint-placeholder-val="{{ false }}"><span class="burst" style="position: absolute; top: -8px; right: -6px; width: 24px; height: 24px; border-radius: 50%; background: #1F8A70; display: flex; align-items: center; justify-content: center"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#FFFFFF" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12l5 5 9-10"/></svg></span></sc-if>
+        </button>
+        <button type="button" class="{{a31.cls}}" onClick="{{a31.pick}}" style="position: relative; height: 62px; border-radius: 18px; border: 2.5px solid {{a31.border}}; background: {{a31.bg}}; display: flex; align-items: center; gap: 10px; padding: 0 12px; font-family: 'Nunito', sans-serif; font-weight: 800; font-size: 14px; color: #0E2A24; text-align: left">
+          <svg width="28" height="28" viewBox="0 0 40 40" fill="none" stroke="#0E2A24" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="10" cy="13" r="4"/><circle cx="20" cy="10" r="4"/><circle cx="30" cy="13" r="4"/><path d="M3 32c0-6 3-10 7-10M37 32c0-6-3-10-7-10M12 32c0-8 3-13 8-13s8 5 8 13"/></svg>
+          Grandparent, aunt or uncle
+          <sc-if value="{{a31.on}}" hint-placeholder-val="{{ false }}"><span class="burst" style="position: absolute; top: -8px; right: -6px; width: 24px; height: 24px; border-radius: 50%; background: #1F8A70; display: flex; align-items: center; justify-content: center"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#FFFFFF" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12l5 5 9-10"/></svg></span></sc-if>
+        </button>
+        <button type="button" class="{{a32.cls}}" onClick="{{a32.pick}}" style="position: relative; height: 62px; border-radius: 18px; border: 2.5px solid {{a32.border}}; background: {{a32.bg}}; display: flex; align-items: center; gap: 10px; padding: 0 12px; font-family: 'Nunito', sans-serif; font-weight: 800; font-size: 14px; color: #0E2A24; text-align: left">
+          <svg width="28" height="28" viewBox="0 0 40 40" fill="none" stroke="#0E2A24" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="20" cy="20" r="14"/><path d="M14 14l12 12M26 14L14 26"/></svg>
+          No one
+          <sc-if value="{{a32.on}}" hint-placeholder-val="{{ false }}"><span class="burst" style="position: absolute; top: -8px; right: -6px; width: 24px; height: 24px; border-radius: 50%; background: #1F8A70; display: flex; align-items: center; justify-content: center"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#FFFFFF" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12l5 5 9-10"/></svg></span></sc-if>
+        </button>
+        <button type="button" class="{{a33.cls}}" onClick="{{a33.pick}}" style="position: relative; height: 62px; border-radius: 18px; border: 2.5px solid {{a33.border}}; background: {{a33.bg}}; display: flex; align-items: center; gap: 10px; padding: 0 12px; font-family: 'Nunito', sans-serif; font-weight: 800; font-size: 14px; color: #0E2A24; text-align: left">
+          <svg width="28" height="28" viewBox="0 0 40 40" fill="none" stroke="#0E2A24" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="20" cy="20" r="14"/><path d="M15.5 16a4.5 4.5 0 1 1 6.5 4c-1.4.7-2 1.6-2 3M20 28h.01"/></svg>
+          Not sure
+          <sc-if value="{{a33.on}}" hint-placeholder-val="{{ false }}"><span class="burst" style="position: absolute; top: -8px; right: -6px; width: 24px; height: 24px; border-radius: 50%; background: #1F8A70; display: flex; align-items: center; justify-content: center"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#FFFFFF" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12l5 5 9-10"/></svg></span></sc-if>
+        </button>
+      </div>
+    </div>
+  </sc-if>
+
+  <!-- STEP 5: BLOOD PRESSURE -->
+  <sc-if value="{{s4}}" hint-placeholder-val="{{ false }}">
+    <div style="display: flex; flex-direction: column">
+      <div class="card" style="margin-top: 12px; height: 196px; border-radius: 28px; background: #D2EFE3; overflow: hidden">
+        <svg width="342" height="196" viewBox="0 0 342 196" role="img" aria-label="A blood pressure gauge with a moving needle">
+          <path d="M91 150 A80 80 0 0 1 131 81" fill="none" stroke="#2FB67C" stroke-width="22"/>
+          <path d="M131 81 A80 80 0 0 1 211 81" fill="none" stroke="#FFC845" stroke-width="22"/>
+          <path d="M211 81 A80 80 0 0 1 251 150" fill="none" stroke="#FF7A59" stroke-width="22"/>
+          <path d="M80 150 A91 91 0 0 1 262 150" fill="none" stroke="#0E2A24" stroke-width="4"/>
+          <path d="M102 150 A69 69 0 0 1 240 150" fill="none" stroke="#0E2A24" stroke-width="4"/>
+          <g class="needle"><path d="M171 150 L171 92" stroke="#0E2A24" stroke-width="7" stroke-linecap="round"/></g>
+          <circle cx="171" cy="150" r="13" fill="#0E2A24"/>
+          <circle cx="171" cy="150" r="5" fill="#FFFFFF"/>
+          <rect x="128" y="170" width="86" height="18" rx="9" fill="#FFFFFF" stroke="#0E2A24" stroke-width="3"/>
+          <text x="171" y="184" text-anchor="middle" font-family="Nunito, sans-serif" font-weight="800" font-size="12" fill="#0E2A24">mmHg</text>
+        </svg>
+      </div>
+      <h2 class="r1" style="margin: 18px 0 0; font-family: 'Baloo 2', sans-serif; font-weight: 800; font-size: 27px; line-height: 1.1">Do you know your blood pressure numbers?</h2>
+      <div class="r2" style="display: flex; flex-direction: column; gap: 10px; margin-top: 16px">
+        <button type="button" class="{{a40.cls}}" onClick="{{a40.pick}}" style="position: relative; height: 62px; border-radius: 18px; border: 2.5px solid {{a40.border}}; background: {{a40.bg}}; display: flex; align-items: center; gap: 12px; padding: 0 16px; font-family: 'Nunito', sans-serif; font-weight: 800; font-size: 16px; color: #0E2A24; text-align: left">
+          <svg width="28" height="28" viewBox="0 0 40 40" fill="none" stroke="#0E2A24" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 32l4-1 18-18-3-3L9 28zM24 13l3 3"/><path d="M6 36h28"/></svg>
+          Yes, I'll type them in
+          <sc-if value="{{a40.on}}" hint-placeholder-val="{{ false }}"><span class="burst" style="position: absolute; top: -8px; right: -6px; width: 24px; height: 24px; border-radius: 50%; background: #1F8A70; display: flex; align-items: center; justify-content: center"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#FFFFFF" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12l5 5 9-10"/></svg></span></sc-if>
+        </button>
+        <button type="button" class="{{a41.cls}}" onClick="{{a41.pick}}" style="position: relative; height: 62px; border-radius: 18px; border: 2.5px solid {{a41.border}}; background: {{a41.bg}}; display: flex; align-items: center; gap: 12px; padding: 0 16px; font-family: 'Nunito', sans-serif; font-weight: 800; font-size: 16px; color: #0E2A24; text-align: left">
+          <svg width="28" height="28" viewBox="0 0 40 40" fill="none" stroke="#0E2A24" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 36s11-9.5 11-19a11 11 0 0 0-22 0c0 9.5 11 19 11 19z"/><circle cx="20" cy="17" r="4"/></svg>
+          No, find me a free check nearby
+          <sc-if value="{{a41.on}}" hint-placeholder-val="{{ false }}"><span class="burst" style="position: absolute; top: -8px; right: -6px; width: 24px; height: 24px; border-radius: 50%; background: #1F8A70; display: flex; align-items: center; justify-content: center"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#FFFFFF" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12l5 5 9-10"/></svg></span></sc-if>
+        </button>
+      </div>
+    </div>
+  </sc-if>
+
+  <div style="flex-grow: 1"></div>
+
+  <sc-if value="{{notLast}}" hint-placeholder-val="{{ true }}">
+    <button type="button" class="cta" onClick="{{next}}" disabled="{{locked}}" style="width: 100%; height: 60px; border-radius: 20px; background: #FF7A59; color: #0E2A24; border: 2.5px solid #0E2A24; box-shadow: 0 6px 0 #0E2A24; font-family: 'Baloo 2', sans-serif; font-weight: 800; font-size: 21px; display: flex; align-items: center; justify-content: center; gap: 10px; cursor: pointer; opacity: {{ctaOpacity}}">
+      Continue
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#0E2A24" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+    </button>
+  </sc-if>
+  <sc-if value="{{isLast}}" hint-placeholder-val="{{ false }}">
+    <a href="Results.dc.html" class="cta" style="height: 60px; border-radius: 20px; background: #0E2A24; color: #FFFFFF; border: 2.5px solid #0E2A24; box-shadow: 0 6px 0 #FF7A59; font-family: 'Baloo 2', sans-serif; font-weight: 800; font-size: 21px; display: flex; align-items: center; justify-content: center; gap: 10px; text-decoration: none">
+      See my results
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#FFC845" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3l2.4 5.6L20 9.5l-4.3 3.9 1.2 5.9L12 16.4l-4.9 2.9 1.2-5.9L4 9.5l5.6-.9z"/></svg>
+    </a>
+  </sc-if>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"ground":{"editor":"color","default":"#EEF8F4","options":["#EEF8F4","#FFF6EC","#F1F0FF"]},"$preview":{"width":390,"height":844}}'>
+class Component extends DCLogic {
+  renderVals() {
+    const st = this.state || {};
+    const step = st.step ?? 0;
+    const answers = st.answers || {};
+    const mk = (q, i) => {
+      const on = answers[q] === i;
+      return {
+        on: on,
+        cls: on ? 'tile picked' : 'tile',
+        border: on ? '#0E2A24' : '#CFE3DA',
+        bg: on ? '#FFE3D9' : '#FFFFFF',
+        pick: () => this.setState({ answers: Object.assign({}, answers, { [q]: i }) })
+      };
+    };
+    const topics = ['Moving', 'Breathing', 'Sleep', 'Family', 'Blood pressure'];
+    const cheers = ['Easy start', 'Nice, keep going', 'Halfway there!', 'Almost done', 'Last one!'];
+    const answered = answers[step] !== undefined;
+    const pct = (step / 4) * 100;
+    return {
+      ground: this.props.ground ?? '#EEF8F4',
+      s0: step === 0, s1: step === 1, s2: step === 2, s3: step === 3, s4: step === 4,
+      isFirst: step === 0, notFirst: step > 0,
+      isLast: step === 4, notLast: step < 4,
+      num: step + 1,
+      topic: topics[step],
+      cheer: cheers[step],
+      pct: pct,
+      pctPx: Math.round(pct * 0.36),
+      figPx: Math.round(pct * 0.3),
+      locked: !answered,
+      ctaOpacity: answered ? '1' : '0.45',
+      smokeHappy: answers[1] === 0,
+      a00: mk(0, 0), a01: mk(0, 1), a02: mk(0, 2),
+      a10: mk(1, 0), a11: mk(1, 1), a12: mk(1, 2),
+      a20: mk(2, 0), a21: mk(2, 1), a22: mk(2, 2),
+      a30: mk(3, 0), a31: mk(3, 1), a32: mk(3, 2), a33: mk(3, 3),
+      a40: mk(4, 0), a41: mk(4, 1),
+      next: () => { if (answered) this.setState({ step: Math.min(step + 1, 4) }); },
+      back: () => this.setState({ step: Math.max(step - 1, 0) })
+    };
+  }
+}
+</script>
+</body>
+</html>

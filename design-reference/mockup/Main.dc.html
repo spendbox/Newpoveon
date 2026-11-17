@@ -1,0 +1,114 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Health check — welcome</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@600;700;800&family=Nunito:wght@500;600;700;800&display=swap" rel="stylesheet">
+<style>
+body{margin:0}
+a{color:#0E2A24}a:hover{color:#1F8A70}
+@keyframes float{0%,100%{transform:translateY(0)}50%{transform:translateY(-8px)}}
+@keyframes beat{0%,100%{transform:scale(1)}14%{transform:scale(1.14)}28%{transform:scale(1)}42%{transform:scale(1.09)}56%{transform:scale(1)}}
+@keyframes rise{from{opacity:0;transform:translateY(22px)}to{opacity:1;transform:none}}
+@keyframes twinkle{0%,100%{opacity:.25;transform:scale(.8)}50%{opacity:1;transform:scale(1.1)}}
+@keyframes wave{0%,100%{transform:rotate(0)}50%{transform:rotate(-14deg)}}
+.float{animation:float 3.2s ease-in-out infinite}
+.float2{animation:float 4s ease-in-out .6s infinite}
+.beat{transform-box:fill-box;transform-origin:center;animation:beat 1.5s ease-in-out infinite}
+.tw{transform-box:fill-box;transform-origin:center;animation:twinkle 2.2s ease-in-out infinite}
+.tw2{transform-box:fill-box;transform-origin:center;animation:twinkle 2.6s ease-in-out .8s infinite}
+.rise{animation:rise .7s cubic-bezier(.2,.8,.2,1) both}
+.d1{animation-delay:.12s}.d2{animation-delay:.24s}.d3{animation-delay:.36s}.d4{animation-delay:.48s}
+.cta{transition:transform .15s ease, box-shadow .15s ease}
+.cta:hover{transform:translateY(-2px);box-shadow:0 10px 0 #0E2A24}
+.cta:active{transform:translateY(3px);box-shadow:0 3px 0 #0E2A24}
+@media (prefers-reduced-motion: reduce){*{animation:none!important;transition:none!important}}
+</style>
+</helmet>
+<div style="width: 390px; height: 844px; box-sizing: border-box; background: {{ground}}; font-family: 'Nunito', system-ui, sans-serif; color: #0E2A24; display: flex; flex-direction: column; padding: 28px 24px 30px; overflow: hidden; position: relative">
+
+  <div style="display: flex; align-items: center; justify-content: space-between">
+    <div style="display: flex; align-items: center; gap: 10px">
+      <div style="width: 36px; height: 36px; border-radius: 12px; background: #0E2A24; display: flex; align-items: center; justify-content: center">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#FF7A59" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 12h4l2-5 4 10 2-5h6"/></svg>
+      </div>
+      <span style="font-family: 'Baloo 2', sans-serif; font-weight: 800; font-size: 21px; letter-spacing: -0.2px">HealthCheck</span>
+    </div>
+    <span style="font-size: 13px; font-weight: 700; color: #35514A; background: #FFFFFF; border-radius: 999px; padding: 6px 12px">Free · Private</span>
+  </div>
+
+  <div class="rise" style="display: flex; justify-content: center; margin-top: 14px">
+    <svg width="320" height="280" viewBox="0 0 300 262" role="img" aria-label="A smiling person holding a beating heart">
+      <circle cx="150" cy="142" r="112" fill="#D2EFE3"/>
+      <circle cx="150" cy="142" r="84" fill="#E4F6EE"/>
+      <g class="tw"><path d="M48 66l4 10 10 4-10 4-4 10-4-10-10-4 10-4z" fill="#FFC845"/></g>
+      <g class="tw2"><path d="M252 112l3 7 7 3-7 3-3 7-3-7-7-3 7-3z" fill="#FFC845"/></g>
+      <g class="tw2"><circle cx="70" cy="190" r="5" fill="#B9A8FF"/></g>
+      <g class="float2">
+        <rect x="200" y="40" width="74" height="40" rx="14" fill="#FFFFFF"/>
+        <polyline points="210,62 222,62 228,50 238,72 244,60 264,60" fill="none" stroke="#FF7A59" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"/>
+      </g>
+      <g class="float">
+        <path d="M78 262 C78 200 108 178 150 178 C192 178 222 200 222 262 Z" fill="#1F8A70"/>
+        <path d="M128 180 L150 204 L172 180" fill="none" stroke="#17705A" stroke-width="4" stroke-linejoin="round"/>
+        <rect x="139" y="152" width="22" height="30" rx="9" fill="#74462A"/>
+        <circle cx="150" cy="120" r="44" fill="#8A5530"/>
+        <path d="M105 116 C104 82 128 70 150 70 C174 70 197 82 195 116 C186 98 170 92 150 94 C130 92 114 98 105 116 Z" fill="#1E1410"/>
+        <circle cx="135" cy="122" r="4" fill="#0E2A24"/>
+        <circle cx="165" cy="122" r="4" fill="#0E2A24"/>
+        <circle cx="124" cy="136" r="7" fill="#FF7A59" opacity="0.35"/>
+        <circle cx="176" cy="136" r="7" fill="#FF7A59" opacity="0.35"/>
+        <path d="M137 137 Q150 149 163 137" fill="none" stroke="#0E2A24" stroke-width="3.5" stroke-linecap="round"/>
+        <path d="M98 222 Q118 236 134 218" fill="none" stroke="#8A5530" stroke-width="15" stroke-linecap="round"/>
+        <path d="M202 222 Q182 236 166 218" fill="none" stroke="#8A5530" stroke-width="15" stroke-linecap="round"/>
+        <g class="beat"><path d="M150 240 C118 218 110 200 120 187 C129 176 144 178 150 189 C156 178 171 176 180 187 C190 200 182 218 150 240 Z" fill="#FF7A59"/></g>
+      </g>
+    </svg>
+  </div>
+
+  <h1 class="rise d1" style="margin: 6px 0 0; font-family: 'Baloo 2', sans-serif; font-weight: 800; font-size: 38px; line-height: 1.02; letter-spacing: -0.5px">Let's check in<br>on you</h1>
+  <p class="rise d2" style="margin: 10px 0 0; font-size: 17px; line-height: 1.45; color: #35514A; font-weight: 600">A few friendly questions, about 10 minutes. Find out your heart age and more.</p>
+
+  <div class="rise d3" style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; margin-top: 18px">
+    <div style="display: flex; align-items: center; gap: 10px; background: #FFFFFF; border-radius: 16px; padding: 12px">
+      <div style="width: 34px; height: 34px; border-radius: 11px; background: #FFE3D9; display: flex; align-items: center; justify-content: center"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#0E2A24" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 20s-7-4.4-7-10a4 4 0 0 1 7-2.6A4 4 0 0 1 19 10c0 5.6-7 10-7 10z"/></svg></div>
+      <span style="font-weight: 800; font-size: 14px">Heart age</span>
+    </div>
+    <div style="display: flex; align-items: center; gap: 10px; background: #FFFFFF; border-radius: 16px; padding: 12px">
+      <div style="width: 34px; height: 34px; border-radius: 11px; background: #FFF1C9; display: flex; align-items: center; justify-content: center"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#0E2A24" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3s6 6.5 6 11a6 6 0 0 1-12 0c0-4.5 6-11 6-11z"/></svg></div>
+      <span style="font-weight: 800; font-size: 14px">Diabetes risk</span>
+    </div>
+    <div style="display: flex; align-items: center; gap: 10px; background: #FFFFFF; border-radius: 16px; padding: 12px">
+      <div style="width: 34px; height: 34px; border-radius: 11px; background: #E6E0FF; display: flex; align-items: center; justify-content: center"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#0E2A24" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 14.5A8 8 0 0 1 9.5 4a8 8 0 1 0 10.5 10.5z"/></svg></div>
+      <span style="font-weight: 800; font-size: 14px">Sleep</span>
+    </div>
+    <div style="display: flex; align-items: center; gap: 10px; background: #FFFFFF; border-radius: 16px; padding: 12px">
+      <div style="width: 34px; height: 34px; border-radius: 11px; background: #D2EFE3; display: flex; align-items: center; justify-content: center"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#0E2A24" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="8"/><path d="M9 14c.8 1 1.8 1.5 3 1.5s2.2-.5 3-1.5M9.5 10h.01M14.5 10h.01"/></svg></div>
+      <span style="font-weight: 800; font-size: 14px">Mood</span>
+    </div>
+  </div>
+
+  <div style="flex-grow: 1"></div>
+
+  <a href="Questions.dc.html" class="cta rise d4" style="display: flex; align-items: center; justify-content: center; gap: 10px; height: 60px; border-radius: 20px; background: #FF7A59; color: #0E2A24; text-decoration: none; font-family: 'Baloo 2', sans-serif; font-weight: 800; font-size: 21px; border: 2.5px solid #0E2A24; box-shadow: 0 6px 0 #0E2A24">
+    Let's start
+    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#0E2A24" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+  </a>
+  <p style="margin: 16px 0 0; text-align: center; font-size: 13px; color: #4A615B; font-weight: 600">Not a diagnosis. A doctor reviews anything worrying.</p>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"ground":{"editor":"color","default":"#EEF8F4","options":["#EEF8F4","#FFF6EC","#F1F0FF"]},"$preview":{"width":390,"height":844}}'>
+class Component extends DCLogic {
+  renderVals() {
+    return { ground: this.props.ground ?? '#EEF8F4' };
+  }
+}
+</script>
+</body>
+</html>

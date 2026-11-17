@@ -1,0 +1,11 @@
+<svg viewBox="0 0 342 196" role="img" aria-label="A heart with a stethoscope listening">
+<path d="M58 30 C58 90 98 108 128 108" fill="none" stroke="#0E2A24" stroke-width="5" stroke-linecap="round"/>
+<path d="M96 30 C96 70 108 92 128 108" fill="none" stroke="#0E2A24" stroke-width="5" stroke-linecap="round"/>
+<circle cx="58" cy="26" r="6" fill="#0E2A24"/><circle cx="96" cy="26" r="6" fill="#0E2A24"/>
+<path d="M128 108 C140 150 120 170 140 170" fill="none" stroke="#0E2A24" stroke-width="5" stroke-linecap="round"/>
+<circle cx="146" cy="170" r="12" fill="#B9A8FF" stroke="#0E2A24" stroke-width="4"/>
+<g class="beat"><path d="M230 170 C182 140 168 112 178 90 C188 70 216 70 230 92 C244 70 272 70 282 90 C292 112 278 140 230 170 Z" fill="#FF7A59" stroke="#0E2A24" stroke-width="4" stroke-linejoin="round"/>
+<circle cx="216" cy="112" r="3.5" fill="#0E2A24"/><circle cx="244" cy="112" r="3.5" fill="#0E2A24"/>
+<path d="M220 124 Q230 132 240 124" fill="none" stroke="#0E2A24" stroke-width="3.5" stroke-linecap="round"/></g>
+<path class="tw" d="M300 40l4 10 10 4-10 4-4 10-4-10-10-4 10-4z" fill="#FFC845" stroke="#0E2A24" stroke-width="2"/>
+</svg>

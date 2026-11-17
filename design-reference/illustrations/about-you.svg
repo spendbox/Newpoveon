@@ -1,0 +1,11 @@
+<svg viewBox="0 0 342 196" role="img" aria-label="A smiling person waving hello">
+<circle class="tw" cx="60" cy="46" r="5" fill="#FFC845"/>
+<g class="float"><rect x="214" y="30" width="86" height="44" rx="18" fill="#FFFFFF" stroke="#0E2A24" stroke-width="3.5"/><path d="M232 74l-6 14 18-14" fill="#FFFFFF" stroke="#0E2A24" stroke-width="3.5" stroke-linejoin="round"/><text x="257" y="60" text-anchor="middle" font-family="Baloo 2, sans-serif" font-weight="800" font-size="22" fill="#0E2A24">Hi!</text></g>
+<path d="M112 196 C112 150 132 132 166 132 C200 132 220 150 220 196Z" fill="#1F8A70" stroke="#0E2A24" stroke-width="4" stroke-linejoin="round"/>
+<g class="sway"><path d="M206 150 C222 130 226 108 222 92" fill="none" stroke="#0E2A24" stroke-width="19" stroke-linecap="round"/><path d="M206 150 C222 130 226 108 222 92" fill="none" stroke="#8A5530" stroke-width="12" stroke-linecap="round"/><circle cx="222" cy="86" r="11" fill="#8A5530" stroke="#0E2A24" stroke-width="3.5"/></g>
+<circle cx="166" cy="92" r="34" fill="#8A5530" stroke="#0E2A24" stroke-width="4"/>
+<path d="M132 88 C130 60 202 60 200 88 C192 74 178 70 166 70 C154 70 140 74 132 88Z" fill="#1E1410" stroke="#0E2A24" stroke-width="3" stroke-linejoin="round"/>
+<circle cx="154" cy="96" r="3.5" fill="#0E2A24"/><circle cx="178" cy="96" r="3.5" fill="#0E2A24"/>
+<path d="M155 108 Q166 117 177 108" fill="none" stroke="#0E2A24" stroke-width="3.5" stroke-linecap="round"/>
+<circle cx="146" cy="106" r="5" fill="#FF7A59" opacity=".4"/><circle cx="186" cy="106" r="5" fill="#FF7A59" opacity=".4"/>
+</svg>

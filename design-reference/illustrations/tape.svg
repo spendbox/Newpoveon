@@ -1,0 +1,11 @@
+<svg viewBox="0 0 342 196" role="img" aria-label="A measuring tape curling around">
+<g class="float">
+<path d="M70 120 C70 70 130 52 180 62 C236 72 272 102 272 132" fill="none" stroke="#0E2A24" stroke-width="30" stroke-linecap="round"/>
+<path d="M70 120 C70 70 130 52 180 62 C236 72 272 102 272 132" fill="none" stroke="#FFC845" stroke-width="22" stroke-linecap="round"/>
+<path d="M82 100l9 5M98 80l7 7M118 68l5 8M140 61l3 9M162 59l1 9M184 62l-1 9M206 67l-3 9M226 76l-4 8M244 88l-6 7M258 104l-7 5" stroke="#0E2A24" stroke-width="3" stroke-linecap="round"/>
+<circle cx="272" cy="150" r="26" fill="#FF7A59" stroke="#0E2A24" stroke-width="4"/>
+<circle cx="272" cy="150" r="8" fill="#FFFFFF" stroke="#0E2A24" stroke-width="3"/>
+</g>
+<text x="120" y="160" font-family="Baloo 2, sans-serif" font-weight="800" font-size="30" fill="#0E2A24">cm</text>
+<circle class="tw" cx="44" cy="40" r="5" fill="#1F8A70"/>
+</svg>

@@ -1,0 +1,11 @@
+<svg viewBox="0 0 342 196" role="img" aria-label="A house with a test tube">
+<path d="M0 182 Q171 170 342 182 V196 H0Z" fill="#F7DE9A"/>
+<path d="M70 104 L146 44 L222 104" fill="#FF7A59" stroke="#0E2A24" stroke-width="4" stroke-linejoin="round"/>
+<rect x="88" y="98" width="116" height="84" fill="#FFFFFF" stroke="#0E2A24" stroke-width="4"/>
+<rect x="132" y="132" width="30" height="50" rx="6" fill="#1F8A70" stroke="#0E2A24" stroke-width="4"/>
+<rect x="100" y="114" width="22" height="22" rx="4" fill="#D2EFE3" stroke="#0E2A24" stroke-width="3"/>
+<g class="float"><rect x="250" y="40" width="34" height="112" rx="17" fill="#FFFFFF" stroke="#0E2A24" stroke-width="4"/>
+<path d="M254 96 H280 V136 A13 13 0 0 1 254 136Z" fill="#FF7A59"/><rect x="250" y="40" width="34" height="112" rx="17" fill="none" stroke="#0E2A24" stroke-width="4"/>
+<rect x="244" y="30" width="46" height="16" rx="6" fill="#B9A8FF" stroke="#0E2A24" stroke-width="3.5"/></g>
+<circle class="tw" cx="312" cy="70" r="5" fill="#1F8A70"/>
+</svg>

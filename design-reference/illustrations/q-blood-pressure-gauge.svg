@@ -1,0 +1,12 @@
+<svg width="342" height="196" viewBox="0 0 342 196" role="img" aria-label="A blood pressure gauge with a moving needle">
+          <path d="M91 150 A80 80 0 0 1 131 81" fill="none" stroke="#2FB67C" stroke-width="22"/>
+          <path d="M131 81 A80 80 0 0 1 211 81" fill="none" stroke="#FFC845" stroke-width="22"/>
+          <path d="M211 81 A80 80 0 0 1 251 150" fill="none" stroke="#FF7A59" stroke-width="22"/>
+          <path d="M80 150 A91 91 0 0 1 262 150" fill="none" stroke="#0E2A24" stroke-width="4"/>
+          <path d="M102 150 A69 69 0 0 1 240 150" fill="none" stroke="#0E2A24" stroke-width="4"/>
+          <g class="needle"><path d="M171 150 L171 92" stroke="#0E2A24" stroke-width="7" stroke-linecap="round"/></g>
+          <circle cx="171" cy="150" r="13" fill="#0E2A24"/>
+          <circle cx="171" cy="150" r="5" fill="#FFFFFF"/>
+          <rect x="128" y="170" width="86" height="18" rx="9" fill="#FFFFFF" stroke="#0E2A24" stroke-width="3"/>
+          <text x="171" y="184" text-anchor="middle" font-family="Nunito, sans-serif" font-weight="800" font-size="12" fill="#0E2A24">mmHg</text>
+        </svg>

@@ -1,0 +1,172 @@
+{
+ "pythonReference2017": [
+  {
+   "age": 40,
+   "sex": "male",
+   "sbp": 120,
+   "bmi": 22,
+   "smoker": false,
+   "risk": 0.011926171291735455
+  },
+  {
+   "age": 45,
+   "sex": "male",
+   "sbp": 140,
+   "bmi": 27,
+   "smoker": true,
+   "risk": 0.05773524435255917
+  },
+  {
+   "age": 50,
+   "sex": "female",
+   "sbp": 130,
+   "bmi": 30,
+   "smoker": false,
+   "risk": 0.026737023752938294
+  },
+  {
+   "age": 55,
+   "sex": "female",
+   "sbp": 160,
+   "bmi": 24,
+   "smoker": true,
+   "risk": 0.11181282200030995
+  },
+  {
+   "age": 60,
+   "sex": "male",
+   "sbp": 150,
+   "bmi": 31,
+   "smoker": false,
+   "risk": 0.09115376592651758
+  },
+  {
+   "age": 65,
+   "sex": "female",
+   "sbp": 170,
+   "bmi": 28,
+   "smoker": false,
+   "risk": 0.11752391723386624
+  },
+  {
+   "age": 70,
+   "sex": "male",
+   "sbp": 180,
+   "bmi": 26,
+   "smoker": true,
+   "risk": 0.2727726764327334
+  },
+  {
+   "age": 74,
+   "sex": "female",
+   "sbp": 120,
+   "bmi": 20,
+   "smoker": false,
+   "risk": 0.11632462682831013
+  },
+  {
+   "age": 52,
+   "sex": "male",
+   "sbp": 118,
+   "bmi": 23,
+   "smoker": false,
+   "risk": 0.027733104973325484
+  },
+  {
+   "age": 48,
+   "sex": "female",
+   "sbp": 145,
+   "bmi": 35,
+   "smoker": true,
+   "risk": 0.07645023797544803
+  },
+  {
+   "age": 80,
+   "sex": "male",
+   "sbp": 200,
+   "bmi": 35,
+   "smoker": true,
+   "risk": 0.47172426632270115
+  },
+  {
+   "age": 42,
+   "sex": "female",
+   "sbp": 110,
+   "bmi": 19,
+   "smoker": false,
+   "risk": 0.009214615735591458
+  }
+ ],
+ "whoRiskCalculatorRegion": [
+  {
+   "age": 56.9,
+   "sex": "male",
+   "sbp": 135.0,
+   "bmi": 22.6,
+   "smoker": false,
+   "year": 2002,
+   "country": "LBR",
+   "risk": 0.0555365075617
+  },
+  {
+   "age": 69.1,
+   "sex": "male",
+   "sbp": 170.0,
+   "bmi": 38.5,
+   "smoker": true,
+   "year": 1998,
+   "country": "STP",
+   "risk": 0.342222234035
+  },
+  {
+   "age": 76.7,
+   "sex": "female",
+   "sbp": 155.0,
+   "bmi": 32.0,
+   "smoker": true,
+   "year": 1991,
+   "country": "BEN",
+   "risk": 0.342662305854
+  },
+  {
+   "age": 67.6,
+   "sex": "male",
+   "sbp": 142.0,
+   "bmi": 36.3,
+   "smoker": true,
+   "year": 1998,
+   "country": "NER",
+   "risk": 0.232126677853
+  },
+  {
+   "age": 45.3,
+   "sex": "male",
+   "sbp": 131.0,
+   "bmi": 34.4,
+   "smoker": true,
+   "year": 1990,
+   "country": "GIN",
+   "risk": 0.0740345669553
+  },
+  {
+   "age": 60.2,
+   "sex": "male",
+   "sbp": 117.0,
+   "bmi": 23.3,
+   "smoker": false,
+   "year": 2011,
+   "country": "LBR",
+   "risk": 0.0525842595448
+  },
+  {
+   "age": 65.0,
+   "sex": "female",
+   "sbp": 110.0,
+   "bmi": 20.0,
+   "smoker": false,
+   "year": 2002,
+   "country": "BFA",
+   "risk": 0.0646553408707
+  }
+ ]
+}

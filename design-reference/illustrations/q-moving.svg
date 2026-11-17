@@ -1,0 +1,13 @@
+<svg width="342" height="196" viewBox="0 0 342 196" role="img" aria-label="A running shoe in the sunshine">
+          <g class="spin"><circle cx="282" cy="52" r="24" fill="#FFC845"/><path d="M282 14v10M282 80v10M244 52h10M310 52h10M255 25l7 7M302 72l7 7M255 79l7-7M302 32l7-7" stroke="#F2A93B" stroke-width="4" stroke-linecap="round"/></g>
+          <path d="M0 168 Q171 150 342 168 V196 H0Z" fill="#F7DE9A"/>
+          <g class="dash"><path d="M58 112h34" stroke="#0E2A24" stroke-width="4" stroke-linecap="round"/></g>
+          <g class="dash2"><path d="M42 132h40" stroke="#0E2A24" stroke-width="4" stroke-linecap="round"/></g>
+          <g class="dash"><path d="M62 152h26" stroke="#0E2A24" stroke-width="4" stroke-linecap="round"/></g>
+          <g class="float">
+            <path d="M110 128 C108 104 124 92 140 96 L162 104 C172 108 180 118 198 120 L228 124 C242 126 248 138 246 150 L110 150 Z" fill="#FF7A59" stroke="#0E2A24" stroke-width="4" stroke-linejoin="round"/>
+            <rect x="104" y="148" width="148" height="16" rx="8" fill="#FFFFFF" stroke="#0E2A24" stroke-width="4"/>
+            <path d="M150 108l10 6M158 102l10 6M144 116l10 6" stroke="#FFFFFF" stroke-width="4" stroke-linecap="round"/>
+            <circle cx="214" cy="136" r="5" fill="#FFFFFF"/>
+          </g>
+        </svg>

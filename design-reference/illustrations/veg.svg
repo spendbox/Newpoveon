@@ -1,0 +1,13 @@
+<svg viewBox="0 0 342 196" role="img" aria-label="A bowl of fresh vegetables and fruit">
+<g class="float">
+<path d="M142 96 C132 62 150 40 174 34 C176 62 164 84 142 96Z" fill="#1F8A70" stroke="#0E2A24" stroke-width="4" stroke-linejoin="round"/>
+<circle cx="132" cy="104" r="26" fill="#FF7A59" stroke="#0E2A24" stroke-width="4"/>
+<path d="M126 80 q6-8 12 0" fill="none" stroke="#1F8A70" stroke-width="4" stroke-linecap="round"/>
+<path d="M196 112 L232 46" stroke="#0E2A24" stroke-width="22" stroke-linecap="round"/><path d="M196 112 L232 46" stroke="#FFA94D" stroke-width="14" stroke-linecap="round"/>
+<path d="M232 46 l6-14M232 46 l14-6M232 46 l-2-14" stroke="#1F8A70" stroke-width="5" stroke-linecap="round"/>
+<circle cx="182" cy="94" r="18" fill="#FFC845" stroke="#0E2A24" stroke-width="4"/>
+</g>
+<path d="M78 110 H264 C264 158 224 182 171 182 C118 182 78 158 78 110Z" fill="#FFFFFF" stroke="#0E2A24" stroke-width="4" stroke-linejoin="round"/>
+<path d="M100 136 Q171 150 242 136" fill="none" stroke="#D2EFE3" stroke-width="8" stroke-linecap="round"/>
+<circle class="tw" cx="296" cy="50" r="5" fill="#FF7A59"/>
+</svg>

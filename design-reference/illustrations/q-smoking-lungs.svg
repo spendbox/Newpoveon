@@ -1,0 +1,16 @@
+<svg width="342" height="196" viewBox="0 0 342 196" role="img" aria-label="A pair of lungs breathing">
+          <path d="M171 26V100M171 90l-12 14M171 90l12 14" stroke="#0E2A24" stroke-width="5" stroke-linecap="round" fill="none"/>
+          <g class="breathe">
+            <path d="M162 74 C128 72 108 112 110 150 C112 174 140 178 156 166 C164 160 166 142 166 120 Z" fill="#FF9E86" stroke="#0E2A24" stroke-width="4" stroke-linejoin="round"/>
+            <path d="M180 74 C214 72 234 112 232 150 C230 174 202 178 186 166 C178 160 176 142 176 120 Z" fill="#FF9E86" stroke="#0E2A24" stroke-width="4" stroke-linejoin="round"/>
+            <circle cx="138" cy="128" r="3.5" fill="#0E2A24"/>
+            <circle cx="204" cy="128" r="3.5" fill="#0E2A24"/>
+            <path d="M130 142 Q138 148 146 142M196 142 Q204 148 212 142" stroke="#0E2A24" stroke-width="3" stroke-linecap="round" fill="none"/>
+          </g>
+<g class="sparkles">
+            <g class="burst"><path d="M70 60l5 12 12 5-12 5-5 12-5-12-12-5 12-5z" fill="#FFC845" stroke="#0E2A24" stroke-width="2.5" stroke-linejoin="round"/></g>
+            <g class="burst"><path d="M276 110l4 9 9 4-9 4-4 9-4-9-9-4 9-4z" fill="#FFC845" stroke="#0E2A24" stroke-width="2.5" stroke-linejoin="round"/></g>
+            <g class="burst"><circle cx="262" cy="52" r="6" fill="#1F8A70"/></g>
+            <g class="burst"><circle cx="84" cy="146" r="5" fill="#1F8A70"/></g>
+          </g>
+        </svg>
