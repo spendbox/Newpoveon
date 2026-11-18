@@ -2,12 +2,16 @@
 import { useEffect, useState } from "react";
 import { AnswerTile } from "./client";
 import { Icon } from "./icons";
-import { Button, ButtonLink, Field, inputCls, Notice } from "./ui";
+import { ButtonLink, Field, inputCls, Notice } from "./ui";
+import { Steps, type Step } from "./steps";
 import { loadSaved } from "@/lib/storage";
 import { whatsappLink } from "@/lib/whatsapp";
 
 type Test = { id: string; code: string; name: string; description: string | null; price_naira: number | null; is_bundle: boolean; includes: string[] };
 
+const price = (t: Test) => (t.price_naira != null ? `₦${t.price_naira.toLocaleString("en-NG")}` : "price confirmed when we call");
+
+/** Lab test and medication requests, one short step at a time. */
 export function RequestForm({ kind, tests, preselect, hideTestPicker = false }: { kind: "home_test" | "medication"; tests: Test[]; preselect: string | null; hideTestPicker?: boolean }) {
   const [testId, setTestId] = useState<string | null>(tests.find((t) => t.code === preselect)?.id ?? null);
   // Free-text need when the test list is empty.
@@ -34,14 +38,10 @@ export function RequestForm({ kind, tests, preselect, hideTestPicker = false }: 
     /* eslint-enable react-hooks/set-state-in-effect */
   }, []);
 
+  const test = tests.find((t) => t.id === testId) ?? null;
   const needsConsult = kind === "medication" && (rx === "yes" || rx === "unsure") && consultRef.trim().length < 4;
-  const ready =
-    name.trim().length > 1 && phone.trim().length > 6 && address.trim().length > 5 &&
-    (kind === "home_test" ? !!testId || tests.length === 0 : medicines.trim().length > 2 && rx !== null && !needsConsult);
 
-  async function submit(e: React.FormEvent) {
-    e.preventDefault();
-    if (!ready) return;
+  async function submit() {
     setBusy(true);
     setError(null);
     const r = await fetch("/api/requests", {
@@ -61,8 +61,8 @@ export function RequestForm({ kind, tests, preselect, hideTestPicker = false }: 
       <div className="mt-6 flex flex-col gap-3">
         <Notice tone="good">Thank you, {name.split(" ")[0]}! We&apos;ve got your request and will contact you on {phone} soon.</Notice>
         {wa && (
-          <a href={wa} target="_blank" rel="noopener noreferrer" className="inline-flex min-h-[58px] items-center justify-center gap-2 rounded-[var(--radius-md)] border border-line-strong bg-[#25D366] text-[19px] font-semibold">
-            <Icon name="whatsapp" size={24} /> Chat on WhatsApp
+          <a href={wa} target="_blank" rel="noopener noreferrer" className="inline-flex min-h-[50px] items-center justify-center gap-2 rounded-[var(--radius-md)] bg-[#25D366] font-semibold text-ink">
+            <Icon name="whatsapp" size={22} /> Chat on WhatsApp
           </a>
         )}
         <ButtonLink href="/" variant="secondary">Back to home</ButtonLink>
@@ -70,63 +70,88 @@ export function RequestForm({ kind, tests, preselect, hideTestPicker = false }: 
     );
   }
 
-  return (
-    <form onSubmit={submit} className="mt-6 flex flex-col gap-4" noValidate>
-      {kind === "home_test" && !hideTestPicker && (
-        <fieldset>
-          <legend className="text-lg font-semibold">Choose a test</legend>
-          {tests.length === 0 ? (
-            <>
-              <label htmlFor="r-need" className="mt-2 block text-sm text-muted">Our test list is being updated. Tell us which test you need and we&apos;ll call you.</label>
-              <textarea id="r-need" rows={2} className={`${inputCls} mt-2 py-3`} value={need} onChange={(e) => setNeed(e.target.value)} maxLength={500} />
-            </>
-          ) : (
-            <div className="mt-2 flex flex-col gap-2.5" role="radiogroup" aria-label="Test">
-              {tests.map((t) => (
-                <AnswerTile key={t.id} layout="rows" icon={t.is_bundle ? "sparkle" : "flask"} selected={testId === t.id} onClick={() => setTestId(t.id)}
-                  label={`${t.name} · ${t.price_naira != null ? `₦${t.price_naira.toLocaleString("en-NG")}` : "price confirmed when we call"}${t.includes.length ? ` (${t.includes.join(", ")})` : ""}`} />
+  const steps: Step[] = [];
+
+  if (kind === "home_test" && !hideTestPicker) {
+    steps.push(
+      tests.length === 0
+        ? {
+            key: "need", title: "Which test do you need?", hint: "Our test list is being updated. Tell us and we'll call you.", valid: need.trim().length > 2,
+            content: <Field id="r-need" label="Test"><textarea id="r-need" rows={2} className={`${inputCls} py-3`} value={need} onChange={(e) => setNeed(e.target.value)} maxLength={500} /></Field>,
+          }
+        : {
+            key: "test", title: "Choose a test", valid: !!testId,
+            content: (
+              <div className="flex flex-col gap-2" role="radiogroup" aria-label="Test">
+                {tests.map((t) => <AnswerTile key={t.id} layout="rows" icon={t.is_bundle ? "sparkle" : "flask"} selected={testId === t.id} onClick={() => setTestId(t.id)} label={`${t.name} · ${price(t)}`} />)}
+              </div>
+            ),
+          },
+    );
+  }
+
+  if (kind === "medication") {
+    steps.push(
+      {
+        key: "meds", title: "Which medicines do you need?", hint: "Name, strength and how many, if you know.", valid: medicines.trim().length > 2,
+        content: <Field id="r-meds" label="Medicines"><textarea id="r-meds" rows={4} className={`${inputCls} py-3`} value={medicines} onChange={(e) => setMedicines(e.target.value)} maxLength={1500} placeholder="e.g. Amlodipine 10 mg, 30 tablets" /></Field>,
+      },
+      {
+        key: "rx", title: "Are any of these prescription medicines?", valid: rx !== null && !needsConsult,
+        content: (
+          <>
+            <div className="grid grid-cols-3 gap-2" role="radiogroup" aria-label="Prescription medicines">
+              {(["yes", "no", "unsure"] as const).map((x) => (
+                <AnswerTile key={x} layout="rows" label={x === "yes" ? "Yes" : x === "no" ? "No" : "Not sure"} selected={rx === x} onClick={() => setRx(x)} />
               ))}
             </div>
-          )}
-        </fieldset>
-      )}
+            {(rx === "yes" || rx === "unsure") && (
+              <div className="flex flex-col gap-3 rounded-[var(--radius-lg)] bg-check-bg p-4">
+                <p className="text-sm font-medium text-check-text">We can only supply prescription medicines after a consult with one of our doctors.</p>
+                <ButtonLink href="/doctor" icon="stethoscope">Book a doctor first</ButtonLink>
+                <Field id="r-ref" label="Already had a consult with us? Enter your booking reference">
+                  <input id="r-ref" className={inputCls} value={consultRef} onChange={(e) => setConsultRef(e.target.value)} placeholder="HC-…" />
+                </Field>
+              </div>
+            )}
+          </>
+        ),
+      },
+    );
+  }
 
-      {kind === "medication" && (
+  steps.push(
+    {
+      key: "where", title: kind === "home_test" ? "Where should we collect your sample?" : "Where should we deliver?", hint: "Include your area and a landmark.", valid: address.trim().length > 5,
+      content: (
         <>
-          <Field id="r-meds" label="Which medicines do you need?" hint="Name, strength and how many, if you know.">
-            <textarea id="r-meds" rows={3} className={`${inputCls} py-3`} value={medicines} onChange={(e) => setMedicines(e.target.value)} maxLength={1500} />
-          </Field>
-          <fieldset>
-            <legend className="text-sm font-semibold">Are any of these prescription medicines?</legend>
-            <div className="mt-2 grid grid-cols-3 gap-2" role="radiogroup">
-              {(["yes", "no", "unsure"] as const).map((v) => (
-                <AnswerTile key={v} label={v === "yes" ? "Yes" : v === "no" ? "No" : "Not sure"} selected={rx === v} onClick={() => setRx(v)} layout="rows" />
-              ))}
-            </div>
-          </fieldset>
-          {(rx === "yes" || rx === "unsure") && (
-            <div className="flex flex-col gap-3 rounded-[var(--radius-md)] bg-check-bg p-4">
-              <p className="text-sm font-medium text-check-text">We can only supply prescription medicines after a consult with one of our doctors.</p>
-              <ButtonLink href="/doctor" icon="chat">Book a doctor first</ButtonLink>
-              <Field id="r-ref" label="Already had a consult with us? Enter your booking reference">
-                <input id="r-ref" className={inputCls} value={consultRef} onChange={(e) => setConsultRef(e.target.value)} placeholder="HC-…" />
-              </Field>
-            </div>
-          )}
+          <Field id="r-addr" label="Address"><textarea id="r-addr" rows={3} autoComplete="street-address" className={`${inputCls} py-3`} value={address} onChange={(e) => setAddress(e.target.value)} maxLength={500} /></Field>
+          <Field id="r-when" label="Preferred day and time (optional)" hint="For example: Saturday morning."><input id="r-when" className={inputCls} value={when} onChange={(e) => setWhen(e.target.value)} maxLength={120} /></Field>
         </>
-      )}
-
-      <Field id="r-name" label="Your name"><input id="r-name" autoComplete="name" className={inputCls} value={name} onChange={(e) => setName(e.target.value)} /></Field>
-      <Field id="r-phone" label="Phone or WhatsApp number"><input id="r-phone" type="tel" autoComplete="tel" className={inputCls} value={phone} onChange={(e) => setPhone(e.target.value)} /></Field>
-      <Field id="r-email" label="Email (optional)"><input id="r-email" type="email" autoComplete="email" className={inputCls} value={email} onChange={(e) => setEmail(e.target.value)} /></Field>
-      <Field id="r-addr" label="Address" hint="Include your area and a landmark.">
-        <textarea id="r-addr" rows={2} autoComplete="street-address" className={`${inputCls} py-3`} value={address} onChange={(e) => setAddress(e.target.value)} maxLength={500} />
-      </Field>
-      <Field id="r-when" label="Preferred day and time" hint="For example: Saturday morning.">
-        <input id="r-when" className={inputCls} value={when} onChange={(e) => setWhen(e.target.value)} maxLength={120} />
-      </Field>
-      {error && <Notice tone="warn">{error}</Notice>}
-      <Button type="submit" disabled={!ready || busy} iconRight="arrowRight">{busy ? "Sending…" : "Send my request"}</Button>
-    </form>
+      ),
+    },
+    {
+      key: "you", title: "Your details", hint: "So we can confirm with you.", valid: name.trim().length > 1 && phone.trim().length > 6,
+      content: (
+        <>
+          <Field id="r-name" label="Your name"><input id="r-name" autoComplete="name" className={inputCls} value={name} onChange={(e) => setName(e.target.value)} /></Field>
+          <Field id="r-phone" label="Phone or WhatsApp number"><input id="r-phone" type="tel" autoComplete="tel" className={inputCls} value={phone} onChange={(e) => setPhone(e.target.value)} /></Field>
+          <Field id="r-email" label="Email (optional)"><input id="r-email" type="email" autoComplete="email" className={inputCls} value={email} onChange={(e) => setEmail(e.target.value)} /></Field>
+        </>
+      ),
+    },
+    {
+      key: "send", title: "Check and send", hint: "Nothing is charged now. We confirm the price and time with you first.", valid: true,
+      content: (
+        <dl className="grid gap-2 rounded-[var(--radius-lg)] bg-surface-2 p-4 text-sm">
+          {kind === "home_test" && <div className="flex justify-between gap-4"><dt className="text-muted">Test</dt><dd className="text-right font-medium">{test ? `${test.name} · ${price(test)}` : need}</dd></div>}
+          {kind === "medication" && <div className="flex justify-between gap-4"><dt className="text-muted">Medicines</dt><dd className="text-right font-medium">{medicines}</dd></div>}
+          <div className="flex justify-between gap-4"><dt className="text-muted">{kind === "home_test" ? "Collection" : "Delivery"}</dt><dd className="text-right font-medium">{address}{when ? ` · ${when}` : ""}</dd></div>
+          <div className="flex justify-between gap-4"><dt className="text-muted">Contact</dt><dd className="text-right font-medium">{name} · {phone}</dd></div>
+        </dl>
+      ),
+    },
   );
+
+  return <Steps className="mt-6" steps={steps} onSubmit={submit} submitLabel="Send my request" busy={busy} error={error} />;
 }

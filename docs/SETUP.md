@@ -39,12 +39,8 @@ the app works without them, and that feature just shows a friendly "not switched
    - Redirect URLs: add `https://YOUR-DOMAIN/auth/callback` and `https://*-YOUR-VERCEL-TEAM.vercel.app/auth/callback` (for preview links)
 5. **Authentication → Providers → Email**: make sure Email is on. Set **Minimum password length** to 10.
    New people confirm their email with a **one-time code**, choose a password, and from then on log in with email + password.
-   **Authentication → Emails → Templates**: in both **Confirm signup** and **Magic Link**, replace the body with a code version, for example:
-   `<h2>Your HealthCheck code</h2><p>Enter this code to confirm your email: <strong>{{ .Token }}</strong></p><p>It expires in 1 hour. If you didn't ask for it, ignore this email.</p>`
-   (`{{ .Token }}` is what makes Supabase send a code instead of a link.)
-6. **Important: login code emails.** Supabase's built-in email only sends a few emails an hour. After step 3 below, go to
-   **Authentication → Emails → SMTP Settings** and switch on custom SMTP with Resend
-   (host `smtp.resend.com`, port `465`, username `resend`, password = your Resend API key, sender = your verified address).
+   Login codes are emailed by the app through **Resend** (step 3), so Supabase's email limits and templates don't matter.
+6. Supabase only sends emails as a fallback if Resend isn't set up yet. Nothing to change here.
 7. Add `TEAM_NOTIFICATION_EMAIL` in Vercel, then redeploy.
 
 ## 3. Resend (emails)

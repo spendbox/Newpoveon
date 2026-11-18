@@ -48,6 +48,18 @@ ${body}
 const button = (href: string, label: string) =>
   `<a href="${href}" style="display:inline-block;background:#136F58;color:#FFFFFF;border-radius:12px;padding:14px 22px;font-weight:600;text-decoration:none;font-size:16px">${esc(label)}</a>`;
 
+/* ------------------------------------------------------------------ Login code */
+
+export function codeEmail(code: string) {
+  const html = layout(
+    "Your login code",
+    `<p style="margin:0 0 16px;font-size:15px;color:#4A5D57">Enter this code to confirm your email. It expires in 1 hour.</p>
+<p style="margin:0 0 16px;font-size:34px;font-weight:700;letter-spacing:8px;background:#E3F2EC;color:#136F58;border-radius:14px;padding:16px;text-align:center">${esc(code)}</p>
+<p style="margin:0;font-size:13px;color:#5E706A">If you didn't ask for this code, you can ignore this email. Nobody can use it without access to your inbox.</p>`,
+  );
+  return { subject: `Your ${site.appName} code: ${code}`, html, text: `Your ${site.appName} code is ${code}. It expires in 1 hour. If you didn't ask for it, ignore this email.` };
+}
+
 /* ------------------------------------------------------------------ Results email */
 
 export function resultsEmail(r: Results) {

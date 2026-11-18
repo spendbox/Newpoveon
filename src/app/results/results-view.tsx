@@ -8,6 +8,7 @@ import { IllustrationCard } from "@/components/illustrations";
 import { Button, ButtonLink, Field, inputCls, Notice, ResultCard, StatusLabel } from "@/components/ui";
 import { SupportScreen } from "@/components/support-screen";
 import { ShareSection } from "./share-section";
+import { Steps } from "@/components/steps";
 import { isComplete } from "@/lib/questions";
 import { computeResults, type Results } from "@/lib/scoring/results";
 import { loadProgress, loadSaved, saveSaved, type Progress, type SavedScreening } from "@/lib/storage";
@@ -70,8 +71,7 @@ function EmailGate({ progress, onDone }: { progress: Progress; onDone: (s: Saved
   const [error, setError] = useState<string | null>(null);
   const emailOk = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(email.trim());
 
-  async function submit(e: React.FormEvent) {
-    e.preventDefault();
+  async function submit() {
     if (!emailOk || !consent) return;
     setBusy(true);
     setError(null);
@@ -98,33 +98,41 @@ function EmailGate({ progress, onDone }: { progress: Progress; onDone: (s: Saved
   }
 
   return (
-    <form onSubmit={submit} className="mx-auto w-full max-w-[460px] px-5 pt-6" noValidate>
+    <div className="mx-auto w-full max-w-[460px] px-5 pt-6">
       <IllustrationCard name="checklist" compact />
       <h1 className="mt-5 text-[26px] leading-[1.15] font-semibold">All done. Where should we send your results?</h1>
       <p className="mt-2 text-[15px] text-muted">We&apos;ll show them on the next screen and email you a copy to keep.</p>
-      <div className="mt-5 flex flex-col gap-4">
-        <Field id="email" label="Email address">
-          <input id="email" type="email" autoComplete="email" required className={inputCls} value={email} onChange={(e) => setEmail(e.target.value)} placeholder="you@example.com" aria-invalid={email !== "" && !emailOk} />
-        </Field>
-        <Field id="phone" label="Phone or WhatsApp number (optional)" hint="Only used if you ask us to contact you.">
-          <input id="phone" type="tel" autoComplete="tel" className={inputCls} value={phone} onChange={(e) => setPhone(e.target.value)} placeholder="0803 000 0000" />
-        </Field>
-        <label className="flex cursor-pointer items-start gap-3 rounded-[var(--radius-lg)] border border-line bg-surface p-4">
-          <input type="checkbox" checked={consent} onChange={(e) => setConsent(e.target.checked)} className="mt-0.5 h-6 w-6 shrink-0 accent-[#136F58]" required />
-          <span className="text-sm leading-5 font-medium">
-            {CONSENT_TEXT}{" "}
-            <Link href="/privacy" target="_blank" className="underline">Privacy notice</Link>
-          </span>
-        </label>
-        {error && <Notice tone="warn">{error}</Notice>}
-        <Button type="submit" disabled={!emailOk || !consent || busy} iconRight="arrowRight">
-          {busy ? "Saving…" : "Show my results"}
-        </Button>
-        {error && (
-          <Button variant="secondary" onClick={() => onDone(null)}>Just show my results</Button>
-        )}
-      </div>
-    </form>
+      <Steps
+        className="mt-5"
+        busy={busy}
+        error={error}
+        submitLabel="Show my results"
+        onSubmit={submit}
+        steps={[
+          {
+            key: "email", title: "Your email", valid: emailOk,
+            content: <Field id="email" label="Email address"><input id="email" type="email" autoComplete="email" autoFocus className={inputCls} value={email} onChange={(e) => setEmail(e.target.value)} placeholder="you@example.com" aria-invalid={email !== "" && !emailOk} /></Field>,
+          },
+          {
+            key: "phone", title: "Phone or WhatsApp (optional)", hint: "Only used if you ask us to contact you. You can skip this.", valid: true,
+            content: <Field id="phone" label="Number"><input id="phone" type="tel" autoComplete="tel" className={inputCls} value={phone} onChange={(e) => setPhone(e.target.value)} placeholder="0803 000 0000" /></Field>,
+          },
+          {
+            key: "consent", title: "Your privacy", valid: consent,
+            content: (
+              <label className="flex cursor-pointer items-start gap-3">
+                <input type="checkbox" checked={consent} onChange={(e) => setConsent(e.target.checked)} className="mt-0.5 h-6 w-6 shrink-0 accent-[#136F58]" />
+                <span className="text-sm leading-5">
+                  {CONSENT_TEXT}{" "}
+                  <Link href="/privacy" target="_blank" className="underline">Privacy notice</Link>
+                </span>
+              </label>
+            ),
+          },
+        ]}
+      />
+      {error && <Button variant="secondary" className="mt-3 w-full" onClick={() => onDone(null)}>Just show my results</Button>}
+    </div>
   );
 }
 

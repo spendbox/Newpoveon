@@ -2,7 +2,8 @@
 import { useState } from "react";
 import { AnswerTile } from "@/components/client";
 import { Icon } from "@/components/icons";
-import { Button, Field, inputCls, Notice } from "@/components/ui";
+import { Field, inputCls, Notice } from "@/components/ui";
+import { Steps, type Step } from "@/components/steps";
 import type { Fx, PublicPlan } from "@/lib/care-plans";
 import { whatsappLink } from "@/lib/whatsapp";
 
@@ -56,6 +57,7 @@ export function FamilyPlans({ plans, fx, offered }: { plans: PublicPlan[]; fx: F
 }
 
 const CONCERNS = ["High blood pressure", "Diabetes", "Heart problems", "Had a stroke", "Memory or confusion", "Walking or falls", "Eyesight", "Not sure, just want them checked"];
+const WHO = ["My mother", "My father", "Both my parents", "Another relative"];
 
 export function FamilyForm({ plans }: { plans: string[] }) {
   const [v, setV] = useState({ name: "", email: "", phone: "", country: "", parentName: "", relationship: "", parentAge: "", location: "", plan: "", notes: "" });
@@ -65,11 +67,9 @@ export function FamilyForm({ plans }: { plans: string[] }) {
   const [done, setDone] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const set = (k: keyof typeof v) => (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => setV({ ...v, [k]: e.target.value });
-  const ready = v.name.trim().length > 1 && /\S+@\S+\.\S+/.test(v.email) && v.phone.trim().length > 6 && v.location.trim().length > 1 && v.relationship && consent;
+  const them = v.relationship === "Both my parents" ? "your parents" : v.parentName.trim() || (v.relationship === "My mother" ? "your mum" : v.relationship === "My father" ? "your dad" : "them");
 
-  async function submit(e: React.FormEvent) {
-    e.preventDefault();
-    if (!ready) return;
+  async function submit() {
     setBusy(true);
     setError(null);
     const r = await fetch("/api/requests", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ kind: "family_care", ...v, concerns, consent }) }).catch(() => null);
@@ -83,51 +83,81 @@ export function FamilyForm({ plans }: { plans: string[] }) {
   if (done) {
     return (
       <div className="mt-6 flex flex-col gap-3">
-        <Notice tone="good">Thank you, {v.name.split(" ")[0]}. We&apos;ll be in touch within one working day to talk about care for {v.parentName || "your parent"}.</Notice>
+        <Notice tone="good">Thank you, {v.name.split(" ")[0]}. We&apos;ll be in touch within one working day to talk about care for {them}.</Notice>
         {wa && <a href={wa} target="_blank" rel="noopener noreferrer" className="inline-flex min-h-[50px] items-center justify-center gap-2 rounded-[var(--radius-md)] bg-[#25D366] font-semibold text-ink"><Icon name="whatsapp" size={22} /> Chat with us on WhatsApp</a>}
       </div>
     );
   }
-  return (
-    <form onSubmit={submit} className="mt-6 flex flex-col gap-4 rounded-[var(--radius-xl)] border border-line bg-surface p-5 md:p-7" noValidate>
-      <p className="text-sm font-semibold text-primary">About you</p>
-      <div className="grid gap-4 md:grid-cols-2">
-        <Field id="f-name" label="Your name"><input id="f-name" autoComplete="name" className={inputCls} value={v.name} onChange={set("name")} /></Field>
-        <Field id="f-country" label="Country you live in"><input id="f-country" autoComplete="country-name" className={inputCls} value={v.country} onChange={set("country")} placeholder="e.g. United Kingdom" /></Field>
-        <Field id="f-email" label="Email"><input id="f-email" type="email" autoComplete="email" className={inputCls} value={v.email} onChange={set("email")} /></Field>
-        <Field id="f-phone" label="WhatsApp number" hint="With your country code, e.g. +44 7700 900123"><input id="f-phone" type="tel" autoComplete="tel" className={inputCls} value={v.phone} onChange={set("phone")} /></Field>
-      </div>
-      <p className="mt-2 text-sm font-semibold text-primary">About your parent</p>
-      <div className="grid gap-4 md:grid-cols-2">
-        <Field id="f-rel" label="Who is the care for?">
-          <select id="f-rel" className={inputCls} value={v.relationship} onChange={set("relationship")}>
-            <option value="">Choose</option><option>My mother</option><option>My father</option><option>Both my parents</option><option>Another relative</option>
-          </select>
-        </Field>
-        <Field id="f-pname" label="Their first name (optional)"><input id="f-pname" className={inputCls} value={v.parentName} onChange={set("parentName")} /></Field>
-        <Field id="f-age" label="Their age"><input id="f-age" inputMode="numeric" className={inputCls} value={v.parentAge} onChange={(e) => setV({ ...v, parentAge: e.target.value.replace(/\D/g, "").slice(0, 3) })} /></Field>
-        <Field id="f-loc" label="Where they live" hint="Town or city, and state"><input id="f-loc" className={inputCls} value={v.location} onChange={set("location")} placeholder="e.g. Ibadan, Oyo" /></Field>
-      </div>
-      <fieldset>
-        <legend className="text-sm font-semibold">Any health concerns? Tap all that apply</legend>
-        <div className="mt-2 grid gap-2 sm:grid-cols-2">
+
+  const steps: Step[] = [
+    {
+      key: "who", title: "Who is the care for?", valid: !!v.relationship,
+      content: (
+        <>
+          <div className="grid grid-cols-2 gap-2.5" role="radiogroup" aria-label="Who is the care for?">
+            {WHO.map((w) => <AnswerTile key={w} label={w} icon={w === "Both my parents" ? "family" : "user"} selected={v.relationship === w} onClick={() => setV({ ...v, relationship: w })} />)}
+          </div>
+          <div className="grid gap-4 sm:grid-cols-2">
+            <Field id="f-pname" label="Their first name (optional)"><input id="f-pname" className={inputCls} value={v.parentName} onChange={set("parentName")} /></Field>
+            <Field id="f-age" label="Their age (optional)"><input id="f-age" inputMode="numeric" className={inputCls} value={v.parentAge} onChange={(e) => setV({ ...v, parentAge: e.target.value.replace(/\D/g, "").slice(0, 3) })} /></Field>
+          </div>
+        </>
+      ),
+    },
+    {
+      key: "where", title: `Where does ${them === "them" ? "the person" : them} live?`, hint: "So we can check we can visit at home.", valid: v.location.trim().length > 1,
+      content: <Field id="f-loc" label="Town or city, and state"><input id="f-loc" autoFocus className={inputCls} value={v.location} onChange={set("location")} placeholder="e.g. Ibadan, Oyo" /></Field>,
+    },
+    {
+      key: "health", title: "Any health concerns?", hint: "Tap all that apply. You can skip this.", valid: true,
+      content: (
+        <div className="grid gap-2 sm:grid-cols-2">
           {CONCERNS.map((c) => <AnswerTile key={c} multi layout="rows" label={c} selected={concerns.includes(c)} onClick={() => setConcerns(concerns.includes(c) ? concerns.filter((x) => x !== c) : [...concerns, c])} />)}
         </div>
-      </fieldset>
-      <div className="grid gap-4 md:grid-cols-2">
-        {plans.length > 0 && (
-          <Field id="f-plan" label="Plan you're interested in (optional)">
-            <select id="f-plan" className={inputCls} value={v.plan} onChange={set("plan")}><option value="">Not sure yet</option>{plans.map((p) => <option key={p}>{p}</option>)}</select>
-          </Field>
-        )}
-        <Field id="f-notes" label="Anything else we should know? (optional)"><textarea id="f-notes" rows={2} className={`${inputCls} py-3`} value={v.notes} onChange={set("notes")} maxLength={1000} /></Field>
-      </div>
-      <label className="flex items-start gap-3 rounded-[var(--radius-lg)] bg-surface-2 p-4">
-        <input type="checkbox" className="mt-0.5 h-5 w-5 shrink-0 accent-[#136F58]" checked={consent} onChange={(e) => setConsent(e.target.checked)} />
-        <span className="text-sm">I agree that Poveon may store these details to contact me about care, under the Nigeria Data Protection Act. I understand Poveon will speak to my parent and only start care, or share their health information with me, once they agree.</span>
-      </label>
-      {error && <Notice tone="warn">{error}</Notice>}
-      <Button type="submit" disabled={!ready || busy} iconRight="arrowRight">{busy ? "Sending…" : "Send"}</Button>
-    </form>
-  );
+      ),
+    },
+    {
+      key: "plan", title: "Anything else we should know?", hint: "Both are optional.", valid: true,
+      content: (
+        <>
+          {plans.length > 0 && (
+            <Field id="f-plan" label="Plan you're interested in">
+              <select id="f-plan" className={inputCls} value={v.plan} onChange={set("plan")}><option value="">Not sure yet</option>{plans.map((p) => <option key={p}>{p}</option>)}</select>
+            </Field>
+          )}
+          <Field id="f-notes" label="Notes"><textarea id="f-notes" rows={3} className={`${inputCls} py-3`} value={v.notes} onChange={set("notes")} maxLength={1000} placeholder="e.g. She lives alone and doesn't use a smartphone" /></Field>
+        </>
+      ),
+    },
+    {
+      key: "you", title: "And about you", hint: "So we can get back to you.", valid: v.name.trim().length > 1 && /\S+@\S+\.\S+/.test(v.email) && v.phone.trim().length > 6,
+      content: (
+        <>
+          <Field id="f-name" label="Your name"><input id="f-name" autoComplete="name" className={inputCls} value={v.name} onChange={set("name")} /></Field>
+          <Field id="f-email" label="Email"><input id="f-email" type="email" autoComplete="email" className={inputCls} value={v.email} onChange={set("email")} /></Field>
+          <Field id="f-phone" label="WhatsApp number" hint="With your country code, e.g. +44 7700 900123"><input id="f-phone" type="tel" autoComplete="tel" className={inputCls} value={v.phone} onChange={set("phone")} /></Field>
+          <Field id="f-country" label="Country you live in (optional)"><input id="f-country" autoComplete="country-name" className={inputCls} value={v.country} onChange={set("country")} placeholder="e.g. United Kingdom" /></Field>
+        </>
+      ),
+    },
+    {
+      key: "send", title: "Check and send", valid: consent,
+      content: (
+        <>
+          <dl className="grid gap-2 rounded-[var(--radius-lg)] bg-surface-2 p-4 text-sm">
+            <div className="flex justify-between gap-4"><dt className="text-muted">Care for</dt><dd className="text-right font-medium">{v.relationship}{v.parentName ? ` (${v.parentName}${v.parentAge ? `, ${v.parentAge}` : ""})` : v.parentAge ? ` (${v.parentAge})` : ""}</dd></div>
+            <div className="flex justify-between gap-4"><dt className="text-muted">Lives in</dt><dd className="text-right font-medium">{v.location}</dd></div>
+            {concerns.length > 0 && <div className="flex justify-between gap-4"><dt className="text-muted">Concerns</dt><dd className="text-right font-medium">{concerns.join(", ")}</dd></div>}
+            {v.plan && <div className="flex justify-between gap-4"><dt className="text-muted">Plan</dt><dd className="text-right font-medium">{v.plan}</dd></div>}
+            <div className="flex justify-between gap-4"><dt className="text-muted">We&apos;ll contact</dt><dd className="text-right font-medium">{v.name} · {v.phone}</dd></div>
+          </dl>
+          <label className="flex items-start gap-3">
+            <input type="checkbox" className="mt-0.5 h-5 w-5 shrink-0 accent-[#136F58]" checked={consent} onChange={(e) => setConsent(e.target.checked)} />
+            <span className="text-sm">I agree that Poveon may store these details to contact me about care, under the Nigeria Data Protection Act. Poveon will speak to my parent and only start care, or share their health information with me, once they agree.</span>
+          </label>
+        </>
+      ),
+    },
+  ];
+  return <Steps className="mt-6" steps={steps} onSubmit={submit} submitLabel="Send" busy={busy} error={error} />;
 }
