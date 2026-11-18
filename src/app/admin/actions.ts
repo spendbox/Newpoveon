@@ -105,3 +105,119 @@ export async function saveContact(f: FormData) {
   else await supabaseAdmin().from("emergency_contacts").insert(row);
   revalidatePath("/admin/contacts");
 }
+
+/* ---------------- Care plan pricing ---------------- */
+const num = (f: FormData, k: string) => {
+  const v = String(f.get(k) ?? "").replace(/[^\d.]/g, "");
+  return v === "" ? null : Number(v);
+};
+const revalidatePricing = () => {
+  revalidatePath("/admin/pricing");
+  revalidatePath("/admin/plans");
+};
+
+export async function savePricingSettings(f: FormData) {
+  await requireAdmin();
+  const markup = num(f, "default_markup");
+  const q = num(f, "quarterly_premium");
+  const m = num(f, "monthly_premium");
+  const r = num(f, "round_to");
+  await supabaseAdmin().from("pricing_settings").upsert({
+    id: 1,
+    default_markup: markup && markup >= 1 ? markup : 4,
+    quarterly_premium: q != null ? Math.min(q, 100) / 100 : 0.1,
+    monthly_premium: m != null ? Math.min(m, 100) / 100 : 0.15,
+    round_to: r ?? 1000,
+    updated_at: new Date().toISOString(),
+  });
+  revalidatePricing();
+}
+
+export async function saveComponent(f: FormData) {
+  await requireAdmin();
+  const cats = ["doctor", "coordinator", "test", "visit", "medicine", "device", "delivery", "partner", "overhead", "other"];
+  const row = {
+    code: str(f, "code", 60).toLowerCase().replace(/[^a-z0-9-]/g, "-"),
+    name: str(f, "name", 120),
+    category: cats.includes(str(f, "category")) ? str(f, "category") : "other",
+    unit: str(f, "unit", 40) || "each",
+    cost_naira: num(f, "cost_naira"),
+    notes: str(f, "notes", 300) || null,
+    active: f.get("active") === "on",
+    sort: Number(f.get("sort") || 100),
+    updated_at: new Date().toISOString(),
+  };
+  if (!row.code || !row.name) throw new Error("Code and name are required");
+  const id = str(f, "id", 40);
+  if (id) await supabaseAdmin().from("care_components").update(row).eq("id", id);
+  else await supabaseAdmin().from("care_components").insert(row);
+  revalidatePricing();
+}
+
+export async function saveCareGoal(f: FormData) {
+  await requireAdmin();
+  const row = {
+    code: str(f, "code", 60).toLowerCase().replace(/[^a-z0-9-]/g, "-"),
+    name: str(f, "name", 160),
+    area: str(f, "area", 60) || "Other",
+    description: str(f, "description", 500) || null,
+    active: f.get("active") === "on",
+    sort: Number(f.get("sort") || 100),
+  };
+  if (!row.code || !row.name) throw new Error("Code and name are required");
+  const id = str(f, "id", 40);
+  if (id) await supabaseAdmin().from("care_goals").update(row).eq("id", id);
+  else await supabaseAdmin().from("care_goals").insert(row);
+  revalidatePricing();
+}
+
+export async function saveCarePlan(f: FormData) {
+  await requireAdmin();
+  const tiers = ["essential", "plus", "premium", "concierge", "custom"];
+  const markup = num(f, "markup_override");
+  const row = {
+    goal_id: uuid(f, "goal_id"),
+    tier: tiers.includes(str(f, "tier")) ? str(f, "tier") : "custom",
+    name: str(f, "name", 160),
+    summary: str(f, "summary", 500) || null,
+    markup_override: markup && markup >= 1 ? markup : null,
+    price_override_naira: num(f, "price_override_naira"),
+    active: f.get("active") === "on",
+    sort: Number(f.get("sort") || 100),
+    updated_at: new Date().toISOString(),
+  };
+  if (!row.name) throw new Error("Name is required");
+  const id = str(f, "id", 40);
+  if (id) await supabaseAdmin().from("care_plans").update(row).eq("id", id);
+  else await supabaseAdmin().from("care_plans").insert(row);
+  revalidatePricing();
+}
+
+export async function savePlanItem(f: FormData) {
+  await requireAdmin();
+  const qty = num(f, "quantity");
+  const plan = uuid(f, "plan_id");
+  const comp = uuid(f, "component_id");
+  if (!qty || qty <= 0) await supabaseAdmin().from("care_plan_items").delete().eq("plan_id", plan).eq("component_id", comp);
+  else await supabaseAdmin().from("care_plan_items").upsert({ plan_id: plan, component_id: comp, quantity: qty }, { onConflict: "plan_id,component_id" });
+  revalidatePricing();
+}
+
+export async function saveCareOption(f: FormData) {
+  await requireAdmin();
+  const row = {
+    code: str(f, "code", 60).toLowerCase().replace(/[^a-z0-9-]/g, "-"),
+    name: str(f, "name", 120),
+    description: str(f, "description", 300) || null,
+    category: str(f, "category") || null,
+    multiplier: num(f, "multiplier") || 1,
+    add_naira: num(f, "add_naira") ?? 0,
+    active: f.get("active") === "on",
+    sort: Number(f.get("sort") || 100),
+  };
+  if (!row.code || !row.name) throw new Error("Code and name are required");
+  const id = str(f, "id", 40);
+  if (id) await supabaseAdmin().from("care_options").update(row).eq("id", id);
+  else await supabaseAdmin().from("care_options").insert(row);
+  revalidatePricing();
+}

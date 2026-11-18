@@ -29,7 +29,7 @@ the app works without them, and that feature just shows a friendly "not switched
 1. Go to **supabase.com → New project**. Pick a strong database password and save it in a password manager.
    Region: Supabase has no African region, so pick **London (eu-west-2)** or **Frankfurt**. Your privacy notice must mention this (see the NDPA note in `/privacy`).
 2. **SQL Editor → New query**. Paste the whole of `supabase/migrations/20261117000000_init.sql` and press **Run**. You should see "Success".
-   Then do the same with `supabase/migrations/20261118000000_lab_packages.sql` (lab packages) and `supabase/migrations/20261118100000_password_login.sql` (email + password accounts).
+   Then do the same with `supabase/migrations/20261118000000_lab_packages.sql` (lab packages) `supabase/migrations/20261118100000_password_login.sql` (email + password accounts) and `supabase/migrations/20261118200000_care_plans.sql` (care plans and pricing).
 3. **Project Settings → API**. Copy these into Vercel's Environment Variables:
    - Project URL → `NEXT_PUBLIC_SUPABASE_URL`
    - anon / publishable key → `NEXT_PUBLIC_SUPABASE_ANON_KEY`
@@ -72,7 +72,8 @@ the app works without them, and that feature just shows a friendly "not switched
    To change the password later, change `ADMIN_PASSWORD` in Vercel and redeploy (everyone is logged out).
 2. **Availability:** add the days and times doctors can take calls (Lagos time). The booking page shows them.
 3. **Lab tests:** 16 standard packages and 10 single tests are loaded (full health checks, heart, diabetes, women, men, fertility, sexual health, pre-marital, pregnancy and more). Set a price for each (blank shows "Price on request"), edit what's included, hide what you don't offer, and add your own packages.
-4. **Emergency contacts:** replace the **mental health helpline placeholder** with a verified number. Until then it stays hidden, and only 112 shows.
+4. **Pricing and Care plans:** in **Pricing**, enter what each building block costs you and your target markup (4× = 75% margin). In **Care plans**, every plan shows its cost, price, markup and margin; type a fixed price on any plan to override the automatic one. Switch a goal on when its plans are ready.
+5. **Emergency contacts:** replace the **mental health helpline placeholder** with a verified number. Until then it stays hidden, and only 112 shows.
 
 ---
 

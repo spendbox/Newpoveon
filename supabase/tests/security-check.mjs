@@ -20,6 +20,8 @@ await db.exec(fs.readFileSync(new URL("../migrations/20261118000000_lab_packages
 await db.exec("update home_tests set price_naira = 45000 where code = 'full-health-check'");
 await db.exec(fs.readFileSync(new URL("../migrations/20261118000000_lab_packages.sql", import.meta.url), "utf8"));
 console.log("price kept after re-run:", (await db.query("select price_naira from home_tests where code='full-health-check'")).rows[0].price_naira);
+await db.exec(fs.readFileSync(new URL("../migrations/20261118200000_care_plans.sql", import.meta.url), "utf8"));
+console.log("care plans:", (await db.query("select count(*)::int n from care_plans")).rows[0].n, "plan items:", (await db.query("select count(*)::int n from care_plan_items")).rows[0].n, "components:", (await db.query("select count(*)::int n from care_components")).rows[0].n);
 console.log("packages:", (await db.query("select count(*)::int n from home_tests where is_bundle and active")).rows[0].n, "single tests:", (await db.query("select count(*)::int n from home_tests where not is_bundle and active")).rows[0].n);
 console.log("migration OK");
 const u1 = "11111111-1111-1111-1111-111111111111", u2 = "22222222-2222-2222-2222-222222222222";
@@ -42,6 +44,8 @@ async function as(role, uid, sql) {
 }
 console.log("anon screenings:", (await as("anon", null, "select id from screenings")).length);
 console.log("anon bookings:", (await as("anon", null, "select id from bookings")).length);
+console.log("anon reads component costs:", JSON.stringify(await as("anon", null, "select cost_naira from care_components")));
+console.log("authenticated reads plans:", JSON.stringify(await as("authenticated", u1, "select name from care_plans")));
 console.log("anon home tests:", (await as("anon", null, "select id from home_tests")).length);
 console.log("anon contacts (placeholder hidden):", JSON.stringify(await as("anon", null, "select label, phone from emergency_contacts")));
 console.log("u1 screenings (own only):", (await as("authenticated", u1, "select email from screenings")).map(r=>r.email));

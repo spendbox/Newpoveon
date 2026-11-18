@@ -12,6 +12,8 @@ const NAV = [
   ["/admin/bookings", "Doctor bookings"],
   ["/admin/slots", "Availability"],
   ["/admin/requests", "Requests"],
+  ["/admin/plans", "Care plans"],
+  ["/admin/pricing", "Pricing"],
   ["/admin/tests", "Lab tests"],
   ["/admin/contacts", "Emergency contacts"],
 ] as const;
