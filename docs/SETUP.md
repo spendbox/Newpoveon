@@ -6,7 +6,7 @@ the app works without them, and that feature just shows a friendly "not switched
 | Part | Switches on | Time |
 |---|---|---|
 | 1. Vercel | The website itself, with a link you can open on your phone | 10 min |
-| 2. Supabase | Saving results, accounts (magic link), bookings, requests, admin | 20 min |
+| 2. Supabase | Saving results, accounts, bookings, requests | 20 min |
 | 3. Resend | Results emails, booking confirmations, team notifications | 15 min (plus DNS wait) |
 | 4. Paystack (test mode) | ₦5,000 doctor consult payments | 10 min |
 | 5. Admin set-up | Doctor times, test prices, helpline number | 15 min |
@@ -29,7 +29,7 @@ the app works without them, and that feature just shows a friendly "not switched
 1. Go to **supabase.com → New project**. Pick a strong database password and save it in a password manager.
    Region: Supabase has no African region, so pick **London (eu-west-2)** or **Frankfurt**. Your privacy notice must mention this (see the NDPA note in `/privacy`).
 2. **SQL Editor → New query**. Paste the whole of `supabase/migrations/20261117000000_init.sql` and press **Run**. You should see "Success".
-   Then do the same with `supabase/migrations/20261118000000_lab_packages.sql` (the lab test packages).
+   Then do the same with `supabase/migrations/20261118000000_lab_packages.sql` (lab packages) and `supabase/migrations/20261118100000_password_login.sql` (email + password accounts).
 3. **Project Settings → API**. Copy these into Vercel's Environment Variables:
    - Project URL → `NEXT_PUBLIC_SUPABASE_URL`
    - anon / publishable key → `NEXT_PUBLIC_SUPABASE_ANON_KEY`
@@ -37,8 +37,12 @@ the app works without them, and that feature just shows a friendly "not switched
 4. **Authentication → URL Configuration**:
    - Site URL: your website address (for example `https://healthcheck.yourdomain.com`)
    - Redirect URLs: add `https://YOUR-DOMAIN/auth/callback` and `https://*-YOUR-VERCEL-TEAM.vercel.app/auth/callback` (for preview links)
-5. **Authentication → Providers → Email**: make sure Email is on. Passwords aren't used. People log in with the magic link.
-6. **Important: magic-link emails.** Supabase's built-in email only sends a few emails an hour. After step 3 below, go to
+5. **Authentication → Providers → Email**: make sure Email is on. Set **Minimum password length** to 10.
+   New people confirm their email with a **one-time code**, choose a password, and from then on log in with email + password.
+   **Authentication → Emails → Templates**: in both **Confirm signup** and **Magic Link**, replace the body with a code version, for example:
+   `<h2>Your HealthCheck code</h2><p>Enter this code to confirm your email: <strong>{{ .Token }}</strong></p><p>It expires in 1 hour. If you didn't ask for it, ignore this email.</p>`
+   (`{{ .Token }}` is what makes Supabase send a code instead of a link.)
+6. **Important: login code emails.** Supabase's built-in email only sends a few emails an hour. After step 3 below, go to
    **Authentication → Emails → SMTP Settings** and switch on custom SMTP with Resend
    (host `smtp.resend.com`, port `465`, username `resend`, password = your Resend API key, sender = your verified address).
 7. Add `TEAM_NOTIFICATION_EMAIL` in Vercel, then redeploy.

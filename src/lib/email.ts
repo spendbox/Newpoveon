@@ -78,7 +78,7 @@ export function resultsEmail(r: Results) {
 ${due ? `<h2 style="font-size:18px;margin:18px 0 6px">Check-ups you're due for</h2><ul style="padding-left:18px;margin:0;font-size:14px">${due}</ul>` : ""}
 <p style="margin:20px 0 8px;font-size:15px">Something worrying? A doctor can talk it through with you.</p>
 ${button(`${site.siteUrl}/doctor`, `Talk to a doctor for ₦${site.consultPriceNaira.toLocaleString("en-NG")}`)}
-<p style="margin:18px 0 0;font-size:13px;color:#5E706A">Want to track changes over time? <a href="${site.siteUrl}/account" style="color:#10221D">Log in with this email</a> (no password needed).</p>`,
+<p style="margin:18px 0 0;font-size:13px;color:#5E706A">Want to track changes over time? <a href="${site.siteUrl}/account" style="color:#10221D">Create a free account with this email</a>.</p>`,
   );
   const text = [
     `Your ${site.appName} results`,

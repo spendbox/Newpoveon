@@ -300,7 +300,7 @@ function Reveal({ results, saved }: { results: Results; saved: SavedScreening | 
 
       <section className="mt-8 rounded-[var(--radius-xl)] bg-primary-soft p-5">
         <h2 className="text-2xl font-semibold">Keep track over time</h2>
-        <p className="mt-1 text-[15px] text-muted">Log in with your email (no password) to save your profile, update your answers and see how your scores change.</p>
+        <p className="mt-1 text-[15px] text-muted">Create a free account to save your profile, update your answers and see how your scores change.</p>
         <ButtonLink href="/account" variant="secondary" icon="user" className="mt-4 w-full">Save to my account</ButtonLink>
       </section>
 

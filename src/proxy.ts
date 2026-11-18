@@ -5,7 +5,7 @@ import { NextResponse, type NextRequest } from "next/server";
  * Runs before pages:
  *  - sends anyone without an admin session cookie from /admin to /admin/login
  *    (the cookie's signature is fully checked again on the server by requireAdmin),
- *  - keeps the Supabase login session fresh for people using magic-link accounts.
+ *  - keeps the Supabase login session fresh for logged-in people.
  */
 export async function proxy(request: NextRequest) {
   const path = request.nextUrl.pathname;

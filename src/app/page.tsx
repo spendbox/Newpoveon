@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { site } from "@/config/site";
 import { Icon, type IconName } from "@/components/icons";
-import { Logo, Overline, Pill } from "@/components/ui";
+import { Logo, Overline } from "@/components/ui";
 import { StartButton } from "./start-button";
 
 const FINDINGS: { icon: IconName; title: string; text: string; tint: string }[] = [
@@ -67,8 +67,7 @@ export default function HomePage() {
       {/* ---------------- Hero ---------------- */}
       <section className="grid items-center gap-4 pt-4 pb-12 md:grid-cols-[1.05fr_1fr] md:gap-10 md:pt-10 md:pb-20">
         <div>
-          <Pill><span className="h-1.5 w-1.5 rounded-full bg-primary" /> Free · 10 minutes · Private</Pill>
-          <h1 className="mt-4 text-[40px] leading-[1.02] font-bold md:text-[64px]">
+          <h1 className="text-[40px] leading-[1.02] font-bold md:text-[64px]">
             Let&apos;s check in <span className="text-primary">on you</span>
           </h1>
           <p className="mt-4 max-w-md text-[17px] leading-relaxed text-muted md:text-lg">

@@ -50,6 +50,7 @@ console.log("admin screenings (no blanket access):", (await as("authenticated", 
 console.log("admin bookings:", (await as("authenticated", u2, "select id from bookings")).length);
 console.log("u1 tries to make self admin:", await as("authenticated", u1, `update profiles set role='admin' where id='${u1}'`));
 console.log("u1 role now:", (await db.query(`select role from profiles where id='${u1}'`)).rows[0].role);
+console.log("u1 tries to mark has_password:", await as("authenticated", u1, `update profiles set has_password=true where id='${u1}'`));
 console.log("u1 updates own name:", JSON.stringify(await as("authenticated", u1, `update profiles set full_name='Ada' where id='${u1}' returning full_name`)));
 console.log("u1 calls reserve_slot:", await as("authenticated", u1, `select reserve_slot('${slot}','${bid}',30)`));
 console.log("anon inserts screening:", await as("anon", null, ins(null, "evil@x.com")));
