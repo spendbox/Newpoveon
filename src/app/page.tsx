@@ -152,6 +152,20 @@ export default function HomePage() {
         </div>
       </section>
 
+      {/* ---------------- Family abroad ---------------- */}
+      <section className="py-6" aria-labelledby="family">
+        <Link href="/family" className="group flex flex-col gap-5 rounded-[var(--radius-xl)] border border-line bg-surface p-6 transition-shadow hover:shadow-[var(--shadow-md)] md:flex-row md:items-center md:justify-between md:p-8">
+          <div className="flex gap-4">
+            <span className="flex h-12 w-12 shrink-0 items-center justify-center rounded-[var(--radius-md)] bg-sun-soft text-check-text"><Icon name="family" size={24} strokeWidth={2} /></span>
+            <div>
+              <h2 id="family" className="text-2xl font-bold">Living abroad? Care for your parents at home</h2>
+              <p className="mt-1 max-w-xl text-[15px] text-muted">A named doctor, checks at home, medicines delivered and a monthly report, for your parents in Nigeria.</p>
+            </div>
+          </div>
+          <span className="inline-flex items-center gap-1 font-semibold text-primary">Find out more <Icon name="arrowRight" size={18} strokeWidth={2} /></span>
+        </Link>
+      </section>
+
       {/* ---------------- Privacy + last CTA ---------------- */}
       <section className="py-12" aria-labelledby="private">
         <div className="flex flex-col items-start gap-6 rounded-[var(--radius-xl)] bg-primary-soft p-6 md:flex-row md:items-center md:justify-between md:p-10">

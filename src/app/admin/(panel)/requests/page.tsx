@@ -6,7 +6,7 @@ import { aBtn, aBtnQuiet, aInput, Badge, Card, H1, Tabs } from "../../ui";
 
 export default async function RequestsPage({ searchParams }: PageProps<"/admin/requests">) {
   const sp = await searchParams;
-  const kind = sp.kind === "medication" ? "medication" : sp.kind === "home_test" ? "home_test" : "all";
+  const kind = sp.kind === "medication" ? "medication" : sp.kind === "home_test" ? "home_test" : sp.kind === "family_care" ? "family_care" : "all";
   const show = sp.show === "handled" ? "handled" : "open";
   let q = supabaseAdmin().from("service_requests").select("*").order("created_at", { ascending: false }).limit(200);
   if (kind !== "all") q = q.eq("kind", kind);
@@ -20,6 +20,7 @@ export default async function RequestsPage({ searchParams }: PageProps<"/admin/r
         { key: "all-open", label: "All open", href: "/admin/requests" },
         { key: "home_test-open", label: "Home tests", href: "/admin/requests?kind=home_test" },
         { key: "medication-open", label: "Medication", href: "/admin/requests?kind=medication" },
+        { key: "family_care-open", label: "Family care", href: "/admin/requests?kind=family_care" },
         { key: `${kind}-handled`, label: "Handled", href: `/admin/requests?show=handled${kind !== "all" ? `&kind=${kind}` : ""}` },
       ]} />
       <div className="flex flex-col gap-3">
@@ -28,7 +29,7 @@ export default async function RequestsPage({ searchParams }: PageProps<"/admin/r
           <Card key={r.id}>
             <div className="flex flex-wrap items-start justify-between gap-2">
               <div>
-                <p className="font-display text-lg font-semibold">{r.kind === "home_test" ? r.test_name ?? "Home test" : "Medication delivery"} · {r.name}</p>
+                <p className="font-display text-lg font-semibold">{r.kind === "home_test" ? r.test_name ?? "Home test" : r.kind === "family_care" ? "Family care enquiry" : "Medication delivery"} · {r.name}</p>
                 <p className="text-sm font-medium"><a className="underline" href={`tel:${r.phone}`}>{r.phone}</a>{r.email ? ` · ${r.email}` : ""}</p>
                 <p className="text-sm">{r.address}</p>
                 {r.preferred_time && <p className="text-sm">Preferred: {r.preferred_time}</p>}
@@ -38,6 +39,15 @@ export default async function RequestsPage({ searchParams }: PageProps<"/admin/r
                 <span className="text-xs text-muted">{fmt.format(new Date(r.created_at))}</span>
               </div>
             </div>
+            {r.kind === "family_care" && (
+              <div className="mt-2 rounded-lg bg-ground p-3 text-sm">
+                <p><b>Lives in:</b> {r.details?.country || "not given"} · <b>Care for:</b> {r.details?.relationship}{r.details?.parent_name ? ` (${r.details.parent_name}` : ""}{r.details?.parent_age ? `, ${r.details.parent_age})` : r.details?.parent_name ? ")" : ""}</p>
+                {r.details?.concerns?.length > 0 && <p><b>Concerns:</b> {r.details.concerns.join(", ")}</p>}
+                {r.details?.plan && <p><b>Plan:</b> {r.details.plan}</p>}
+                {r.details?.notes && <p><b>Notes:</b> {r.details.notes}</p>}
+                <p className="mt-1 font-bold text-check-text">Confirm the parent agrees before starting care or sharing anything with the family.</p>
+              </div>
+            )}
             {r.kind === "medication" && (
               <div className="mt-2 rounded-lg bg-ground p-3 text-sm">
                 <p><b>Medicines:</b> {r.details?.medicines}</p>

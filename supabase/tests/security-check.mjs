@@ -22,6 +22,11 @@ await db.exec(fs.readFileSync(new URL("../migrations/20261118000000_lab_packages
 console.log("price kept after re-run:", (await db.query("select price_naira from home_tests where code='full-health-check'")).rows[0].price_naira);
 await db.exec(fs.readFileSync(new URL("../migrations/20261118200000_care_plans.sql", import.meta.url), "utf8"));
 console.log("care plans:", (await db.query("select count(*)::int n from care_plans")).rows[0].n, "plan items:", (await db.query("select count(*)::int n from care_plan_items")).rows[0].n, "components:", (await db.query("select count(*)::int n from care_components")).rows[0].n);
+await db.exec(fs.readFileSync(new URL("../migrations/20261118300000_family_care.sql", import.meta.url), "utf8"));
+await db.exec(fs.readFileSync(new URL("../migrations/20261118300000_family_care.sql", import.meta.url), "utf8"));
+console.log("family plans:", (await db.query("select count(*)::int n from care_plans where audience='family'")).rows[0].n, "family items:", (await db.query("select count(*)::int n from care_plan_items i join care_plans p on p.id=i.plan_id where p.audience='family'")).rows[0].n);
+await db.exec("insert into service_requests (kind,name,phone,address) values ('family_care','A','+447700900000','Lagos')");
+console.log("family request stored: ok");
 console.log("packages:", (await db.query("select count(*)::int n from home_tests where is_bundle and active")).rows[0].n, "single tests:", (await db.query("select count(*)::int n from home_tests where not is_bundle and active")).rows[0].n);
 console.log("migration OK");
 const u1 = "11111111-1111-1111-1111-111111111111", u2 = "22222222-2222-2222-2222-222222222222";

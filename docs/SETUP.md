@@ -29,7 +29,7 @@ the app works without them, and that feature just shows a friendly "not switched
 1. Go to **supabase.com → New project**. Pick a strong database password and save it in a password manager.
    Region: Supabase has no African region, so pick **London (eu-west-2)** or **Frankfurt**. Your privacy notice must mention this (see the NDPA note in `/privacy`).
 2. **SQL Editor → New query**. Paste the whole of `supabase/migrations/20261117000000_init.sql` and press **Run**. You should see "Success".
-   Then do the same with `supabase/migrations/20261118000000_lab_packages.sql` (lab packages) `supabase/migrations/20261118100000_password_login.sql` (email + password accounts) and `supabase/migrations/20261118200000_care_plans.sql` (care plans and pricing).
+   Then do the same with `supabase/migrations/20261118000000_lab_packages.sql` (lab packages) `supabase/migrations/20261118100000_password_login.sql` (email + password accounts) `supabase/migrations/20261118200000_care_plans.sql` (care plans and pricing) and `supabase/migrations/20261118300000_family_care.sql` (care for your parents).
 3. **Project Settings → API**. Copy these into Vercel's Environment Variables:
    - Project URL → `NEXT_PUBLIC_SUPABASE_URL`
    - anon / publishable key → `NEXT_PUBLIC_SUPABASE_ANON_KEY`

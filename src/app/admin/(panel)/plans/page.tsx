@@ -46,14 +46,15 @@ export default async function PlansPage() {
                         {price.missingCosts.length > 0 && <p className="mt-2 rounded-lg bg-check-bg px-3 py-2 text-xs text-check-text">Missing unit costs: {price.missingCosts.join(", ")}. Add them in Pricing, or type a fixed price.</p>}
                         {price.annual && price.markup < settings.defaultMarkup && price.source === "override" && <p className="mt-2 rounded-lg bg-act-bg px-3 py-2 text-xs text-act-text">This fixed price is below your target markup of {settings.defaultMarkup}×.</p>}
 
-                        <form action={saveCarePlan} className="mt-3 grid items-end gap-2 md:grid-cols-6">
+                        <form action={saveCarePlan} className="mt-3 grid items-end gap-2 md:grid-cols-7">
                           <input type="hidden" name="id" value={p.id} /><input type="hidden" name="goal_id" value={p.goal_id} /><input type="hidden" name="sort" value={p.sort} />
                           <label className="text-sm font-semibold md:col-span-2">Name<input name="name" defaultValue={p.name} className={aInput} /></label>
                           <label className="text-sm font-semibold">Tier<select name="tier" defaultValue={p.tier} className={aInput}>{TIERS.map((t) => <option key={t}>{t}</option>)}</select></label>
+                          <label className="text-sm font-semibold">For<select name="audience" defaultValue={(p as { audience?: string }).audience ?? "self"} className={aInput}><option value="self">The member</option><option value="family">A parent (family pays)</option><option value="both">Both</option></select></label>
                           <label className="text-sm font-semibold">Fixed price (₦/yr)<input name="price_override_naira" inputMode="numeric" defaultValue={p.price_override_naira ?? ""} placeholder="automatic" className={aInput} /></label>
                           <label className="text-sm font-semibold">Markup for this plan<input name="markup_override" inputMode="decimal" defaultValue={p.markup_override ?? ""} placeholder={`${settings.defaultMarkup}× (default)`} className={aInput} /></label>
                           <div className="flex items-center gap-3"><label className="flex items-center gap-1 text-sm font-semibold"><input type="checkbox" name="active" defaultChecked={p.active} /> Show</label><button className={aBtn}>Save plan</button></div>
-                          <label className="text-sm font-semibold md:col-span-6">Summary<input name="summary" defaultValue={p.summary ?? ""} className={aInput} /></label>
+                          <label className="text-sm font-semibold md:col-span-7">Summary<input name="summary" defaultValue={p.summary ?? ""} className={aInput} /></label>
                         </form>
 
                         <details className="mt-3">

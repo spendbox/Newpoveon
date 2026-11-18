@@ -112,6 +112,7 @@ const num = (f: FormData, k: string) => {
   return v === "" ? null : Number(v);
 };
 const revalidatePricing = () => {
+  revalidatePath("/family");
   revalidatePath("/admin/pricing");
   revalidatePath("/admin/plans");
 };
@@ -128,8 +129,14 @@ export async function savePricingSettings(f: FormData) {
     quarterly_premium: q != null ? Math.min(q, 100) / 100 : 0.1,
     monthly_premium: m != null ? Math.min(m, 100) / 100 : 0.15,
     round_to: r ?? 1000,
+    fx_gbp: num(f, "fx_gbp"),
+    fx_usd: num(f, "fx_usd"),
+    fx_eur: num(f, "fx_eur"),
+    fx_cad: num(f, "fx_cad"),
+    fx_updated_at: new Date().toISOString(),
     updated_at: new Date().toISOString(),
   });
+  revalidatePath("/family");
   revalidatePricing();
 }
 
@@ -182,6 +189,7 @@ export async function saveCarePlan(f: FormData) {
     summary: str(f, "summary", 500) || null,
     markup_override: markup && markup >= 1 ? markup : null,
     price_override_naira: num(f, "price_override_naira"),
+    audience: ["self", "family", "both"].includes(str(f, "audience")) ? str(f, "audience") : "self",
     active: f.get("active") === "on",
     sort: Number(f.get("sort") || 100),
     updated_at: new Date().toISOString(),

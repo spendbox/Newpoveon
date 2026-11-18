@@ -1,11 +1,13 @@
 export const dynamic = "force-dynamic";
-import { COMPONENT_CATEGORIES, loadCatalogue, naira } from "@/lib/care-plans";
+import { COMPONENT_CATEGORIES, loadCatalogue, loadFx, naira } from "@/lib/care-plans";
 import { marginFromMarkup } from "@/lib/pricing";
 import { saveCareOption, saveComponent, savePricingSettings } from "../../actions";
 import { aBtn, aInput, Badge, Card, H1 } from "../../ui";
 
 export default async function PricingPage() {
   const { settings, components, options, plans } = await loadCatalogue();
+  const fx = await loadFx();
+  const rate = (c: string) => fx.find((f) => f.code === c)?.rate ?? "";
   const missing = components.filter((c) => c.active && c.cost_naira == null).length;
   return (
     <>
@@ -19,6 +21,12 @@ export default async function PricingPage() {
           <label className="text-sm font-semibold">Quarterly payment premium (%)<input name="quarterly_premium" inputMode="decimal" defaultValue={Math.round(settings.quarterlyPremium * 1000) / 10} className={aInput} /></label>
           <label className="text-sm font-semibold">Monthly payment premium (%)<input name="monthly_premium" inputMode="decimal" defaultValue={Math.round(settings.monthlyPremium * 1000) / 10} className={aInput} /></label>
           <label className="text-sm font-semibold">Round yearly prices up to (₦)<input name="round_to" inputMode="numeric" defaultValue={settings.roundTo} className={aInput} /></label>
+          <p className="text-sm font-semibold md:col-span-5">Exchange rates for prices shown abroad (naira for 1 unit; leave empty to hide that currency)</p>
+          <label className="text-sm font-semibold">₦ per £1<input name="fx_gbp" inputMode="decimal" defaultValue={rate("GBP")} className={aInput} /></label>
+          <label className="text-sm font-semibold">₦ per $1<input name="fx_usd" inputMode="decimal" defaultValue={rate("USD")} className={aInput} /></label>
+          <label className="text-sm font-semibold">₦ per €1<input name="fx_eur" inputMode="decimal" defaultValue={rate("EUR")} className={aInput} /></label>
+          <label className="text-sm font-semibold">₦ per CA$1<input name="fx_cad" inputMode="decimal" defaultValue={rate("CAD")} className={aInput} /></label>
+          <p className="text-xs text-muted md:pb-2">Update these weekly. Prices are charged in naira; the foreign amount is shown as a guide.</p>
           <div className="md:col-span-5"><button className={aBtn}>Save rules</button></div>
         </form>
       </Card>
