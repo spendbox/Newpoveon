@@ -1,7 +1,8 @@
 export const dynamic = "force-dynamic";
 import type { Metadata } from "next";
 import Link from "next/link";
-import { site } from "@/config/site";
+import { notFound } from "next/navigation";
+import { features, site } from "@/config/site";
 import { Icon, type IconName } from "@/components/icons";
 import { Logo, Overline } from "@/components/ui";
 import { loadFx, publicPlansForGoal, type Fx, type PublicPlan } from "@/lib/care-plans";
@@ -23,6 +24,8 @@ const INCLUDED: { icon: IconName; title: string; text: string }[] = [
 ];
 
 export default async function FamilyPage() {
+  // Hidden until the next launch (NEXT_PUBLIC_FEATURE_FAMILY_CARE=true switches it on).
+  if (!features.familyCare) notFound();
   let plans: PublicPlan[] = [];
   let offered = false;
   let fx: Fx = [];

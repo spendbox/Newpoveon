@@ -1,4 +1,4 @@
-import { site } from "@/config/site";
+import { features, site } from "@/config/site";
 import { sendEmail, teamEmail } from "@/lib/email";
 import { cleanText, handleError, isEmail, isPhone, json, readJson } from "@/lib/http";
 import { currentUser, supabaseAdmin, supabaseConfigured } from "@/lib/supabase/server";
@@ -8,7 +8,7 @@ export async function POST(req: Request) {
   try {
     if (!supabaseConfigured()) return json({ error: "Requests aren't switched on yet. Please message us on WhatsApp." }, 503);
     const b = await readJson(req, 8000);
-    if (b.kind === "family_care") return familyCare(b);
+    if (b.kind === "family_care") return features.familyCare ? familyCare(b) : json({ error: "Not available yet." }, 404);
     const kind = b.kind === "home_test" || b.kind === "medication" ? b.kind : null;
     if (!kind) return json({ error: "Unknown request" }, 400);
     const name = cleanText(b.name, 120);

@@ -28,6 +28,15 @@ export const site = {
   timeZone: "Africa/Lagos",
 } as const;
 
+/**
+ * Features that are built but switched off until a later launch.
+ * To switch one on, set its variable to "true" in Vercel and redeploy.
+ */
+export const features = {
+  /** "Care for your parents" (/family) for Nigerians abroad. Next major launch. */
+  familyCare: process.env.NEXT_PUBLIC_FEATURE_FAMILY_CARE === "true",
+};
+
 /** Comma-separated admin emails (env: ADMIN_EMAILS). Server only. */
 export function adminEmails(): string[] {
   return (process.env.ADMIN_EMAILS || "")

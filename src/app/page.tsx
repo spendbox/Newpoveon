@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { features } from "@/config/site";
 import { Icon, type IconName } from "@/components/icons";
 import { Logo, Overline } from "@/components/ui";
 import { StartButton } from "./start-button";
@@ -89,7 +90,7 @@ export default function HomePage() {
           { href: "/doctor", icon: "stethoscope" as const, title: "Get help with a health concern", text: "We match you with the right doctor", tint: "bg-primary-soft text-primary" },
           { href: "/home-tests", icon: "flask" as const, title: "Lab tests and packages", text: "Samples collected at home", tint: "bg-lavender-soft text-lavender" },
           { href: "/medication", icon: "box" as const, title: "Medication delivery", text: "Your regular medicines, delivered", tint: "bg-sun-soft text-check-text" },
-          { href: "/family", icon: "family" as const, title: "Care for parents in Nigeria", text: "For family living abroad", tint: "bg-coral-soft text-act-text" },
+          ...(features.familyCare ? [{ href: "/family", icon: "family" as const, title: "Care for parents in Nigeria", text: "For family living abroad", tint: "bg-coral-soft text-act-text" }] : []),
         ].map((x) => (
           <Link key={x.href} href={x.href} className="flex items-center gap-3.5 px-4 py-3.5 active:bg-surface-2">
             <span className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-[var(--radius-md)] ${x.tint}`}><Icon name={x.icon} size={20} strokeWidth={2} /></span>
@@ -176,6 +177,7 @@ export default function HomePage() {
       </section>
 
       {/* ---------------- Family abroad ---------------- */}
+{features.familyCare && (
       <section className="py-6" aria-labelledby="family">
         <Link href="/family" className="group flex flex-col gap-5 rounded-[var(--radius-xl)] border border-line bg-surface p-6 transition-shadow hover:shadow-[var(--shadow-md)] md:flex-row md:items-center md:justify-between md:p-8">
           <div className="flex gap-4">
@@ -188,6 +190,7 @@ export default function HomePage() {
           <span className="inline-flex items-center gap-1 font-semibold text-primary">Find out more <Icon name="arrowRight" size={18} strokeWidth={2} /></span>
         </Link>
       </section>
+      )}
 
       {/* ---------------- Privacy + last CTA ---------------- */}
       </div>
