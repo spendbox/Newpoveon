@@ -2,6 +2,7 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { Button, Field, inputCls, Notice } from "@/components/ui";
+import { PasswordInput } from "@/components/client";
 
 type Step = "email" | "password" | "code";
 const MIN = 10;
@@ -66,7 +67,7 @@ export function LoginForm({ next }: { next: string }) {
         <form onSubmit={login} className="flex flex-col gap-4">
           <p className="text-sm text-muted">Welcome back, <span className="font-medium text-ink">{email}</span>. <button type="button" onClick={back} className="text-primary hover:underline">Not you?</button></p>
           <Field id="l-pass" label="Password">
-            <input id="l-pass" type="password" autoComplete="current-password" required autoFocus className={inputCls} value={password} onChange={(e) => setPassword(e.target.value)} />
+            <PasswordInput id="l-pass" autoComplete="current-password" required autoFocus className={inputCls} value={password} onChange={(e) => setPassword(e.target.value)} />
           </Field>
           {error && <Notice tone="warn">{error}</Notice>}
           <Button type="submit" disabled={busy || !password} iconRight="arrowRight">{busy ? "Logging in…" : "Log in"}</Button>
@@ -81,7 +82,7 @@ export function LoginForm({ next }: { next: string }) {
             <input id="l-code" inputMode="numeric" autoComplete="one-time-code" required autoFocus maxLength={10} className={`${inputCls} text-xl tracking-[0.3em] tabular`} value={code} onChange={(e) => setCode(e.target.value.replace(/\D/g, ""))} />
           </Field>
           <Field id="l-new" label={forgot ? "Choose a new password" : "Choose a password"} hint={`At least ${MIN} characters. A short sentence is easy to remember.`}>
-            <input id="l-new" type="password" autoComplete="new-password" required className={inputCls} value={newPass} onChange={(e) => setNewPass(e.target.value)} />
+            <PasswordInput id="l-new" autoComplete="new-password" required className={inputCls} value={newPass} onChange={(e) => setNewPass(e.target.value)} />
           </Field>
           {error && <Notice tone="warn">{error}</Notice>}
           <Button type="submit" disabled={busy || code.length < 6 || newPass.length < MIN} iconRight="arrowRight">{busy ? "Saving…" : forgot ? "Save new password" : "Create my account"}</Button>

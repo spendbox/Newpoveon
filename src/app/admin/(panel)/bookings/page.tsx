@@ -1,5 +1,4 @@
 export const dynamic = "force-dynamic";
-import { site } from "@/config/site";
 import { formatWhen } from "@/lib/email";
 import type { Results } from "@/lib/scoring/results";
 import { STATUS_LABEL } from "@/lib/scoring/results";
@@ -20,7 +19,7 @@ export default async function BookingsPage({ searchParams }: PageProps<"/admin/b
   const { data: rows } = await q;
   return (
     <>
-      <H1 sub={`₦${site.consultPriceNaira.toLocaleString("en-NG")} consults. Payments are confirmed by Paystack on the server.`}>Doctor bookings</H1>
+      <H1 sub={`Consult fees are set per type in Consults. Payments are confirmed by Paystack on the server.`}>Doctor bookings</H1>
       <Tabs active={view} items={Object.entries(VIEWS).map(([k, label]) => ({ key: k, label, href: `/admin/bookings?view=${k}` }))} />
       <div className="flex flex-col gap-3">
         {(rows ?? []).length === 0 && <Card>Nothing here yet.</Card>}
@@ -39,7 +38,8 @@ export default async function BookingsPage({ searchParams }: PageProps<"/admin/b
                   {b.needs_reschedule && <Badge tone="warn">needs new time</Badge>}
                 </div>
               </div>
-              <p className="mt-2 text-sm"><span className="font-semibold">Reason:</span> {b.reason}</p>
+              <p className="mt-2 text-sm"><span className="font-semibold">Needs help with:</span> {b.consult_type_name ?? "General consult"}{b.doctor_type ? ` · ${b.doctor_type}` : ""} · ₦{(b.amount_kobo / 100).toLocaleString("en-NG")}</p>
+              <p className="text-sm"><span className="font-semibold">In their words:</span> {b.reason}</p>
               <p className="text-xs text-muted">Ref {b.paystack_reference}{b.paid_at ? ` · paid ${formatWhen(b.paid_at)}` : ""}</p>
               {shared && (
                 <details className="mt-2 rounded-lg bg-ground p-3 text-sm">

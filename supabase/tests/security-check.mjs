@@ -27,6 +27,19 @@ await db.exec(fs.readFileSync(new URL("../migrations/20261118300000_family_care.
 console.log("family plans:", (await db.query("select count(*)::int n from care_plans where audience='family'")).rows[0].n, "family items:", (await db.query("select count(*)::int n from care_plan_items i join care_plans p on p.id=i.plan_id where p.audience='family'")).rows[0].n);
 await db.exec("insert into service_requests (kind,name,phone,address) values ('family_care','A','+447700900000','Lagos')");
 console.log("family request stored: ok");
+await db.exec(fs.readFileSync(new URL("../migrations/20261119000000_consults_and_schedule.sql", import.meta.url), "utf8"));
+await db.exec(fs.readFileSync(new URL("../migrations/20261119000000_consults_and_schedule.sql", import.meta.url), "utf8"));
+console.log("consult types:", (await db.query("select count(*)::int n from consult_types")).rows[0].n, "rules:", (await db.query("select count(*)::int n from availability_rules")).rows[0].n);
+{
+  const t = "2030-01-07 10:00:00+01";
+  const mk = async (ref) => (await db.query(`insert into bookings (name,phone,email,reason,amount_kobo,paystack_reference) values ('X','0803','x@y.z','r',500000,'${ref}') returning id`)).rows[0].id;
+  const b1 = await mk("HC-cap1"), b2 = await mk("HC-cap2");
+  const r1 = (await db.query(`select book_time('${b1}', '${t}', 1, 30) ok`)).rows[0].ok;
+  const r2 = (await db.query(`select book_time('${b2}', '${t}', 1, 30) ok`)).rows[0].ok;
+  const r3 = (await db.query(`select book_time('${b2}', '${t}', 2, 30) ok`)).rows[0].ok;
+  console.log("book_time capacity 1:", r1, r2, "capacity 2:", r3);
+  console.log("new-style paid, no reschedule flag:", JSON.stringify((await db.query(`select status, needs_reschedule from mark_booking_paid('HC-cap1', 500000)`)).rows));
+}
 console.log("packages:", (await db.query("select count(*)::int n from home_tests where is_bundle and active")).rows[0].n, "single tests:", (await db.query("select count(*)::int n from home_tests where not is_bundle and active")).rows[0].n);
 console.log("migration OK");
 const u1 = "11111111-1111-1111-1111-111111111111", u2 = "22222222-2222-2222-2222-222222222222";
@@ -51,6 +64,7 @@ console.log("anon screenings:", (await as("anon", null, "select id from screenin
 console.log("anon bookings:", (await as("anon", null, "select id from bookings")).length);
 console.log("anon reads component costs:", JSON.stringify(await as("anon", null, "select cost_naira from care_components")));
 console.log("authenticated reads plans:", JSON.stringify(await as("authenticated", u1, "select name from care_plans")));
+console.log("anon consult types (priced only):", (await as("anon", null, "select code from consult_types")).length);
 console.log("anon home tests:", (await as("anon", null, "select id from home_tests")).length);
 console.log("anon contacts (placeholder hidden):", JSON.stringify(await as("anon", null, "select label, phone from emergency_contacts")));
 console.log("u1 screenings (own only):", (await as("authenticated", u1, "select email from screenings")).map(r=>r.email));

@@ -2,6 +2,7 @@ import "server-only";
 import { createHmac, timingSafeEqual } from "node:crypto";
 import { site } from "@/config/site";
 import { bookingEmail, sendEmail, teamEmail, formatWhen } from "@/lib/email";
+import { availableSlots } from "@/lib/consults";
 import { supabaseAdmin } from "@/lib/supabase/server";
 import { whatsappLink } from "@/lib/whatsapp";
 
@@ -22,7 +23,6 @@ export function paystackConfigured() {
 }
 export const paystackTestMode = () => secret().startsWith("sk_test_");
 
-export const consultAmountKobo = () => site.consultPriceNaira * 100;
 
 async function call<T>(path: string, init?: RequestInit): Promise<T> {
   const res = await fetch(`${API}${path}`, {
@@ -72,7 +72,17 @@ export async function confirmBookingPayment(reference: string, source: "webhook"
 
   const { data: rows, error } = await sb.rpc("mark_booking_paid", { p_reference: reference, p_amount: tx.amount });
   if (error) throw error;
-  const booking = Array.isArray(rows) ? rows[0] : null;
+  let booking = Array.isArray(rows) ? rows[0] : null;
+  if (booking && !booking.slot_id && booking.slot_starts_at) {
+    // New-style booking: if the hold ran out and the time filled up meanwhile, flag it for the team.
+    const { data: same } = await sb.from("bookings").select("id").eq("slot_starts_at", booking.slot_starts_at).in("status", ["paid", "completed"]);
+    const { slots } = await availableSlots().catch(() => ({ slots: [] as { startsAt: string; capacity: number }[] }));
+    const cap = slots.find((x) => x.startsAt === new Date(booking.slot_starts_at).toISOString())?.capacity ?? 1;
+    if ((same?.length ?? 0) > cap) {
+      const { data: flagged } = await sb.from("bookings").update({ needs_reschedule: true }).eq("id", booking.id).select("*").single();
+      booking = flagged ?? booking;
+    }
+  }
   if (booking) {
     // First confirmation: send emails.
     const wa = whatsappLink(`Hello, I just booked a doctor consult. My reference is ${reference}.`);
@@ -82,6 +92,8 @@ export async function confirmBookingPayment(reference: string, source: "webhook"
     if (site.teamEmail) {
       const t = teamEmail("New paid doctor consult", {
         Name: booking.name, Phone: booking.phone, Email: booking.email,
+        Consult: booking.consult_type_name ? `${booking.consult_type_name} (${booking.doctor_type ?? "doctor"})` : undefined,
+        Paid: `₦${(booking.amount_kobo / 100).toLocaleString("en-NG")}`,
         When: booking.slot_starts_at ? formatWhen(booking.slot_starts_at) : "No slot chosen: call to agree a time",
         "Needs a new time": booking.needs_reschedule ? "YES" : "no",
         "Shared results": booking.share_results && booking.screening_id ? "Yes (see admin)" : "No",

@@ -67,14 +67,19 @@ export function StatusLabel({ status }: { status: Status }) {
   );
 }
 
-export function nextStepHref(next: ResultCardData["next"]): string | null {
-  if (next.kind === "doctor") return "/doctor";
+/** Result cards open the "Get help" page with the most fitting concern already chosen. */
+const CARD_TO_CONSULT: Record<string, string> = {
+  heart: "condition-review", bp: "condition-review", diabetes: "results-review", body: "weight", sleep: "new-symptom",
+  mood: "mental-health", anxiety: "mental-health", alcohol: "quick-question", smoking: "quick-question", activity: "quick-question",
+};
+export function nextStepHref(next: ResultCardData["next"], cardId?: string): string | null {
+  if (next.kind === "doctor") return cardId && CARD_TO_CONSULT[cardId] ? `/doctor?type=${CARD_TO_CONSULT[cardId]}` : "/doctor";
   if (next.kind === "test") return `/home-tests?test=${encodeURIComponent(next.testCode)}`;
   return null;
 }
 
 export function ResultCard({ card }: { card: ResultCardData }) {
-  const href = nextStepHref(card.next);
+  const href = nextStepHref(card.next, card.id);
   return (
     <article className="flex flex-col gap-2 rounded-[var(--radius-lg)] border border-line bg-surface p-4">
       <div className="flex items-center justify-between gap-2">

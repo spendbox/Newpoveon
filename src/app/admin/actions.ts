@@ -26,29 +26,85 @@ export async function saveBookingNotes(f: FormData) {
   revalidatePath("/admin/bookings");
 }
 
-/* ---------------- Slots ---------------- */
-/** Lagos is UTC+1 all year (no daylight saving), so local times convert with a fixed offset. */
-export async function addSlots(f: FormData) {
-  await requireAdmin();
-  const date = str(f, "date", 10);
-  const from = str(f, "from", 5);
-  const to = str(f, "to", 5);
-  const every = Math.max(10, Math.min(120, Number(f.get("every") || 20)));
-  if (!/^\d{4}-\d{2}-\d{2}$/.test(date) || !/^\d{2}:\d{2}$/.test(from) || !/^\d{2}:\d{2}$/.test(to)) throw new Error("bad input");
-  const start = new Date(`${date}T${from}:00+01:00`).getTime();
-  const end = new Date(`${date}T${to}:00+01:00`).getTime();
-  const rows = [];
-  for (let t = start; t + every * 60000 <= end && rows.length < 60; t += every * 60000) rows.push({ starts_at: new Date(t).toISOString(), duration_min: every });
-  if (rows.length) await supabaseAdmin().from("availability_slots").upsert(rows, { onConflict: "starts_at", ignoreDuplicates: true });
+/* ---------------- Weekly schedule ---------------- */
+const hhmm = (f: FormData, k: string) => {
+  const v = str(f, k, 5);
+  if (!/^\d{2}:\d{2}$/.test(v)) throw new Error("bad time");
+  return v;
+};
+const revalidateSchedule = () => {
   revalidatePath("/admin/slots");
+  revalidatePath("/doctor");
+};
+
+export async function saveBookingSettings(f: FormData) {
+  await requireAdmin();
+  const n = (k: string, lo: number, hi: number, d: number) => Math.max(lo, Math.min(hi, Number(f.get(k) || d)));
+  await supabaseAdmin().from("booking_settings").upsert({
+    id: 1, slot_minutes: n("slot_minutes", 5, 180, 20), min_notice_hours: n("min_notice_hours", 0, 168, 2),
+    horizon_days: n("horizon_days", 1, 120, 21), hold_minutes: n("hold_minutes", 5, 120, 30), updated_at: new Date().toISOString(),
+  });
+  revalidateSchedule();
 }
-export async function setSlotStatus(f: FormData) {
+
+export async function addRule(f: FormData) {
   await requireAdmin();
-  const status = str(f, "status");
-  const id = uuid(f, "id");
-  if (status === "delete") await supabaseAdmin().from("availability_slots").delete().eq("id", id).in("status", ["open", "blocked"]);
-  else if (status === "open" || status === "blocked") await supabaseAdmin().from("availability_slots").update({ status }).eq("id", id).in("status", ["open", "blocked"]);
-  revalidatePath("/admin/slots");
+  const days = f.getAll("weekday").map(Number).filter((d) => d >= 0 && d <= 6);
+  const start = hhmm(f, "start_time");
+  const end = hhmm(f, "end_time");
+  if (end <= start) throw new Error("End must be after start");
+  const capacity = Math.max(1, Math.min(50, Number(f.get("capacity") || 1)));
+  if (days.length) await supabaseAdmin().from("availability_rules").insert(days.map((weekday) => ({ weekday, start_time: start, end_time: end, capacity })));
+  revalidateSchedule();
+}
+
+export async function deleteRule(f: FormData) {
+  await requireAdmin();
+  await supabaseAdmin().from("availability_rules").delete().eq("id", uuid(f, "id"));
+  revalidateSchedule();
+}
+
+export async function addException(f: FormData) {
+  await requireAdmin();
+  const date = str(f, "on_date", 10);
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(date)) throw new Error("bad date");
+  const kind = str(f, "kind") === "extra" ? "extra" : "closed";
+  const row: Record<string, unknown> = { on_date: date, kind, note: str(f, "note", 120) || null };
+  if (kind === "extra") Object.assign(row, { start_time: hhmm(f, "start_time"), end_time: hhmm(f, "end_time"), capacity: Math.max(1, Number(f.get("capacity") || 1)) });
+  await supabaseAdmin().from("availability_exceptions").insert(row);
+  revalidateSchedule();
+}
+
+export async function deleteException(f: FormData) {
+  await requireAdmin();
+  await supabaseAdmin().from("availability_exceptions").delete().eq("id", uuid(f, "id"));
+  revalidateSchedule();
+}
+
+/* ---------------- Consult types ---------------- */
+export async function saveConsultType(f: FormData) {
+  await requireAdmin();
+  const priceRaw = str(f, "price_naira", 12).replace(/[^\d]/g, "");
+  const row = {
+    code: str(f, "code", 60).toLowerCase().replace(/[^a-z0-9-]/g, "-"),
+    name: str(f, "name", 160),
+    description: str(f, "description", 300) || null,
+    grp: str(f, "grp", 40) || "Common",
+    doctor_type: str(f, "doctor_type", 60) || "General physician",
+    duration_min: Math.max(5, Math.min(180, Number(f.get("duration_min") || 20))),
+    price_naira: priceRaw ? Number(priceRaw) : null,
+    urgent_check: f.get("urgent_check") === "on",
+    credit_to_plan: f.get("credit_to_plan") === "on",
+    active: f.get("active") === "on",
+    sort: Number(f.get("sort") || 100),
+    updated_at: new Date().toISOString(),
+  };
+  if (!row.code || !row.name) throw new Error("Code and name are required");
+  const id = str(f, "id", 40);
+  if (id) await supabaseAdmin().from("consult_types").update(row).eq("id", id);
+  else await supabaseAdmin().from("consult_types").insert(row);
+  revalidatePath("/admin/consults");
+  revalidatePath("/doctor");
 }
 
 /* ---------------- Requests ---------------- */

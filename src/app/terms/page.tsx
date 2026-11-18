@@ -15,7 +15,7 @@ export default function TermsPage() {
         <h2>Not a diagnosis</h2>
         <p>{site.appName} gives estimates based on published screening tools. It is not a diagnosis and does not replace a doctor. If you feel unwell, see a doctor. In an emergency call 112 or go to the nearest hospital.</p>
         <h2>Doctor consults</h2>
-        <p>Consults cost ₦{site.consultPriceNaira.toLocaleString("en-NG")}, paid through Paystack. [CANCELLATION, RESCHEDULING AND REFUND POLICY.] Doctors are registered with the Medical and Dental Council of Nigeria. [CONFIRM.]</p>
+        <p>Consult fees depend on what you need help with and are always shown before you pay, through Paystack. [CANCELLATION, RESCHEDULING AND REFUND POLICY.] Doctors are registered with the Medical and Dental Council of Nigeria. [CONFIRM.]</p>
         <h2>Home tests and medication</h2>
         <p>Requests are confirmed by our team before anything is charged. Prescription medicines are only supplied after a consult with one of our doctors. [PRICING, DELIVERY AREAS AND PHARMACY LICENCE DETAILS.]</p>
         <h2>Your account</h2>

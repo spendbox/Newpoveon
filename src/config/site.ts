@@ -15,10 +15,6 @@ export const site = {
   /** Business WhatsApp number in international format, digits only, e.g. 2348012345678 (env). */
   whatsappNumber: process.env.NEXT_PUBLIC_WHATSAPP_NUMBER || "",
 
-  /** Doctor consult price in naira. Paystack charges in kobo (naira × 100). */
-  consultPriceNaira: 5000,
-  consultMinutes: 20,
-
   /** How long an unpaid booking holds a time slot before it is released. */
   slotHoldMinutes: 30,
 

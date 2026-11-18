@@ -1,6 +1,7 @@
 "use client";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { useState, type ComponentProps } from "react";
 import { motion, useReducedMotion } from "framer-motion";
 import { Icon, type IconName } from "./icons";
 
@@ -70,13 +71,32 @@ export function FloatingDoctor() {
     <Link
       href="/doctor"
       className="fixed right-4 bottom-4 z-40 inline-flex min-h-[48px] items-center gap-2 rounded-full border border-line bg-surface/95 py-1.5 pr-4 pl-1.5 text-[14px] font-semibold text-ink shadow-[var(--shadow-lg)] backdrop-blur transition-transform hover:-translate-y-0.5"
-      aria-label="Talk to a doctor for ₦5,000"
+      aria-label="Get help from a doctor"
       style={{ marginBottom: "env(safe-area-inset-bottom, 0px)" }}
     >
       <span className="flex h-9 w-9 items-center justify-center rounded-full bg-primary text-white">
         <Icon name="stethoscope" size={18} strokeWidth={2} />
       </span>
-      <span>Talk to a doctor</span>
+      <span>Get help</span>
     </Link>
+  );
+}
+
+/* ---------------- Password field with a show / hide eye ---------------- */
+export function PasswordInput({ className = "", ...rest }: Omit<ComponentProps<"input">, "type">) {
+  const [show, setShow] = useState(false);
+  return (
+    <div className="relative">
+      <input {...rest} type={show ? "text" : "password"} className={`${className} pr-12`} autoCapitalize="none" autoCorrect="off" spellCheck={false} />
+      <button
+        type="button"
+        onClick={() => setShow(!show)}
+        aria-label={show ? "Hide password" : "Show password"}
+        aria-pressed={show}
+        className="absolute top-1/2 right-1.5 flex h-10 w-10 -translate-y-1/2 items-center justify-center rounded-[var(--radius-sm)] text-muted hover:bg-surface-2 hover:text-ink"
+      >
+        <Icon name={show ? "eyeOff" : "eye"} size={20} strokeWidth={2} />
+      </button>
+    </div>
   );
 }

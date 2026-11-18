@@ -258,7 +258,7 @@ function Reveal({ results, saved }: { results: Results; saved: SavedScreening | 
 
       {/* Main actions */}
       <motion.section initial={reduce ? false : { opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: cardDelay(results.cards.length) }} className="mt-6 flex flex-col gap-3.5">
-        <ButtonLink href="/doctor" icon="chat">Talk to a doctor</ButtonLink>
+        <ButtonLink href="/doctor?type=results-review" icon="stethoscope">Get help from a doctor</ButtonLink>
         {testCard && testCard.next.kind === "test" && (
           <ButtonLink href={`/home-tests?test=${testCard.next.testCode}`} variant="secondary" icon="home">{testCard.next.label}</ButtonLink>
         )}

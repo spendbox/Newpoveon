@@ -51,7 +51,7 @@ export function Steps({
   }
 
   return (
-    <form onSubmit={next} noValidate className={`rounded-[var(--radius-xl)] border border-line bg-surface p-5 md:p-7 ${className}`}>
+    <form onSubmit={next} noValidate className={`min-w-0 overflow-hidden rounded-[var(--radius-xl)] border border-line bg-surface p-5 md:p-7 ${className}`}>
       <div className="flex items-center justify-between text-[13px] font-medium text-muted">
         <span className="tabular">Step {idx + 1} of {steps.length}</span>
       </div>

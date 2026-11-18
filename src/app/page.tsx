@@ -1,5 +1,4 @@
 import Link from "next/link";
-import { site } from "@/config/site";
 import { Icon, type IconName } from "@/components/icons";
 import { Logo, Overline } from "@/components/ui";
 import { StartButton } from "./start-button";
@@ -58,30 +57,55 @@ export default function HomePage() {
       <header className="flex items-center justify-between gap-3 py-5">
         <Logo />
         <nav className="flex items-center gap-1" aria-label="Main">
-          <Link href="/doctor" className="hidden rounded-full px-3 py-2 text-[15px] font-medium text-muted hover:text-ink sm:inline-block">Doctors</Link>
-          <Link href="/home-tests" className="hidden rounded-full px-3 py-2 text-[15px] font-medium text-muted hover:text-ink sm:inline-block">Lab tests</Link>
+          <Link href="/doctor" className="hidden rounded-full px-3 py-2 text-[15px] font-medium text-muted hover:text-ink md:inline-block">Get help</Link>
+          <Link href="/home-tests" className="hidden rounded-full px-3 py-2 text-[15px] font-medium text-muted hover:text-ink md:inline-block">Lab tests</Link>
           <Link href="/account" className="whitespace-nowrap rounded-full border border-line bg-surface px-4 py-2 text-[15px] font-medium hover:border-line-strong">Log in</Link>
         </nav>
       </header>
 
       {/* ---------------- Hero ---------------- */}
-      <section className="grid items-center gap-4 pt-4 pb-12 md:grid-cols-[1.05fr_1fr] md:gap-10 md:pt-10 md:pb-20">
+      <section className="grid items-center gap-4 pt-6 pb-8 md:grid-cols-[1.05fr_1fr] md:gap-10 md:pt-10 md:pb-20">
         <div>
           <h1 className="text-[40px] leading-[1.02] font-bold md:text-[64px]">
             Let&apos;s check in <span className="text-primary">on you</span>
           </h1>
           <p className="mt-4 max-w-md text-[17px] leading-relaxed text-muted md:text-lg">
-            Answer a few quick questions and find out your heart age, diabetes risk, sleep and more. No sign-up needed.
+            <span className="md:hidden">Find out your heart age and more in 10 minutes. Free.</span>
+            <span className="hidden md:inline">Answer a few quick questions and find out your heart age, diabetes risk, sleep and more. No sign-up needed.</span>
           </p>
           <div className="mt-7 max-w-sm">
             <StartButton />
           </div>
-          <p className="mt-4 flex items-center gap-2 text-[13px] text-subtle">
+          <p className="mt-4 hidden items-center gap-2 text-[13px] text-subtle md:flex">
             <Icon name="shield" size={16} strokeWidth={2} /> Built on WHO and other validated screening tools. Not a diagnosis.
           </p>
         </div>
-        <HeroPreview />
+        <div className="hidden md:block"><HeroPreview /></div>
       </section>
+
+      {/* ---------------- Phone: four simple choices ---------------- */}
+      <nav className="flex flex-col divide-y divide-line overflow-hidden rounded-[var(--radius-xl)] border border-line bg-surface md:hidden" aria-label="What would you like to do?">
+        {[
+          { href: "/doctor", icon: "stethoscope" as const, title: "Get help with a health concern", text: "We match you with the right doctor", tint: "bg-primary-soft text-primary" },
+          { href: "/home-tests", icon: "flask" as const, title: "Lab tests and packages", text: "Samples collected at home", tint: "bg-lavender-soft text-lavender" },
+          { href: "/medication", icon: "box" as const, title: "Medication delivery", text: "Your regular medicines, delivered", tint: "bg-sun-soft text-check-text" },
+          { href: "/family", icon: "family" as const, title: "Care for parents in Nigeria", text: "For family living abroad", tint: "bg-coral-soft text-act-text" },
+        ].map((x) => (
+          <Link key={x.href} href={x.href} className="flex items-center gap-3.5 px-4 py-3.5 active:bg-surface-2">
+            <span className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-[var(--radius-md)] ${x.tint}`}><Icon name={x.icon} size={20} strokeWidth={2} /></span>
+            <span className="flex-1">
+              <span className="block text-[15px] font-semibold">{x.title}</span>
+              <span className="block text-[13px] text-muted">{x.text}</span>
+            </span>
+            <Icon name="arrowRight" size={18} strokeWidth={2} className="text-subtle" />
+          </Link>
+        ))}
+      </nav>
+      <p className="mt-5 flex items-center justify-center gap-2 text-center text-[12px] text-subtle md:hidden">
+        <Icon name="shield" size={14} strokeWidth={2} /> Built on WHO screening tools. Private. Not a diagnosis.
+      </p>
+
+      <div className="hidden md:block">
 
       {/* ---------------- What you'll find out ---------------- */}
       <section className="py-12" aria-labelledby="find-out">
@@ -132,10 +156,9 @@ export default function HomePage() {
         <div className="mt-8 grid gap-4 md:grid-cols-3">
           <Link href="/doctor" className="group flex flex-col rounded-[var(--radius-xl)] bg-ink p-6 text-white shadow-[var(--shadow-md)] transition-transform hover:-translate-y-0.5">
             <span className="flex h-11 w-11 items-center justify-center rounded-[var(--radius-md)] bg-white/10"><Icon name="stethoscope" size={22} strokeWidth={2} /></span>
-            <h3 className="mt-5 text-2xl font-semibold">Talk to a doctor</h3>
-            <p className="mt-1 text-[15px] text-white/70">A phone consult with a Nigerian physician, at a time that suits you. Share your results in one tap.</p>
-            <p className="mt-auto pt-6 font-display text-2xl font-bold text-sun">₦{site.consultPriceNaira.toLocaleString("en-NG")}</p>
-            <span className="mt-2 inline-flex items-center gap-1 text-sm font-semibold">Book a consult <Icon name="arrowRight" size={16} strokeWidth={2} /></span>
+            <h3 className="mt-5 text-2xl font-semibold">Get help with a health concern</h3>
+            <p className="mt-1 text-[15px] text-white/70">Tell us what&apos;s going on and we&apos;ll match you with the right doctor, at a time that suits you.</p>
+            <span className="mt-auto inline-flex items-center gap-1 pt-6 text-sm font-semibold">Get help now <Icon name="arrowRight" size={16} strokeWidth={2} /></span>
           </Link>
           <Link href="/home-tests" className="group flex flex-col rounded-[var(--radius-xl)] border border-line bg-surface p-6 transition-[transform,box-shadow] hover:-translate-y-0.5 hover:shadow-[var(--shadow-md)]">
             <span className="flex h-11 w-11 items-center justify-center rounded-[var(--radius-md)] bg-lavender-soft text-lavender"><Icon name="flask" size={22} strokeWidth={2} /></span>
@@ -167,7 +190,8 @@ export default function HomePage() {
       </section>
 
       {/* ---------------- Privacy + last CTA ---------------- */}
-      <section className="py-12" aria-labelledby="private">
+      </div>
+      <section className="hidden py-12 md:block" aria-labelledby="private">
         <div className="flex flex-col items-start gap-6 rounded-[var(--radius-xl)] bg-primary-soft p-6 md:flex-row md:items-center md:justify-between md:p-10">
           <div className="max-w-xl">
             <h2 id="private" className="text-2xl font-bold md:text-3xl">Private by design</h2>

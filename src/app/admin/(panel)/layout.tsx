@@ -10,6 +10,7 @@ export const metadata: Metadata = { title: "Admin", robots: { index: false, foll
 const NAV = [
   ["/admin", "Overview"],
   ["/admin/bookings", "Doctor bookings"],
+  ["/admin/consults", "Consults and fees"],
   ["/admin/slots", "Availability"],
   ["/admin/requests", "Requests"],
   ["/admin/plans", "Care plans"],

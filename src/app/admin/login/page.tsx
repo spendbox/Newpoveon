@@ -3,6 +3,7 @@ import { redirect } from "next/navigation";
 import { site } from "@/config/site";
 import { adminLoginConfigured, currentAdminSession } from "@/lib/admin-auth";
 import { adminLogin } from "./actions";
+import { PasswordInput } from "@/components/client";
 
 export const metadata: Metadata = { title: "Admin login", robots: { index: false, follow: false } };
 export const dynamic = "force-dynamic";
@@ -25,7 +26,7 @@ export default async function AdminLogin({ searchParams }: PageProps<"/admin/log
         <label htmlFor="a-email" className="mt-5 block text-sm font-semibold">Email</label>
         <input id="a-email" name="email" type="email" autoComplete="username" required className="mt-1.5 min-h-[46px] w-full rounded-[var(--radius-md)] border border-line-strong px-3.5 focus:border-primary focus:outline-none" />
         <label htmlFor="a-pass" className="mt-4 block text-sm font-semibold">Password</label>
-        <input id="a-pass" name="password" type="password" autoComplete="current-password" required className="mt-1.5 min-h-[46px] w-full rounded-[var(--radius-md)] border border-line-strong px-3.5 focus:border-primary focus:outline-none" />
+        <div className="mt-1.5"><PasswordInput id="a-pass" name="password" autoComplete="current-password" required className="min-h-[46px] w-full rounded-[var(--radius-md)] border border-line-strong px-3.5 focus:border-primary focus:outline-none" /></div>
         <button disabled={!configured} className="mt-6 min-h-[48px] w-full rounded-[var(--radius-md)] bg-primary font-semibold text-white hover:bg-primary-hover disabled:opacity-40">Log in</button>
         <p className="mt-4 text-xs text-subtle">The password is set in Vercel (ADMIN_PASSWORD). Change it there to reset it.</p>
       </form>

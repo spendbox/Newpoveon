@@ -89,7 +89,7 @@ export function resultsEmail(r: Results) {
     `${heart}<table role="presentation" width="100%">${cards}</table>
 ${due ? `<h2 style="font-size:18px;margin:18px 0 6px">Check-ups you're due for</h2><ul style="padding-left:18px;margin:0;font-size:14px">${due}</ul>` : ""}
 <p style="margin:20px 0 8px;font-size:15px">Something worrying? A doctor can talk it through with you.</p>
-${button(`${site.siteUrl}/doctor`, `Talk to a doctor for ₦${site.consultPriceNaira.toLocaleString("en-NG")}`)}
+${button(`${site.siteUrl}/doctor`, "Get help from a doctor")}
 <p style="margin:18px 0 0;font-size:13px;color:#5E706A">Want to track changes over time? <a href="${site.siteUrl}/account" style="color:#10221D">Create a free account with this email</a>.</p>`,
   );
   const text = [
@@ -104,14 +104,14 @@ ${button(`${site.siteUrl}/doctor`, `Talk to a doctor for ₦${site.consultPriceN
 
 /* ------------------------------------------------------------------ Booking confirmation */
 
-export function bookingEmail(b: { name: string; slot_starts_at: string | null; reason: string; paystack_reference: string; needs_reschedule: boolean }, whatsappUrl: string | null) {
+export function bookingEmail(b: { name: string; slot_starts_at: string | null; reason: string; paystack_reference: string; needs_reschedule: boolean; amount_kobo: number; consult_type_name?: string | null; doctor_type?: string | null }, whatsappUrl: string | null) {
   const when = b.slot_starts_at ? formatWhen(b.slot_starts_at) : "We'll call you to agree a time";
   const html = layout(
     "Your doctor consult is booked",
-    `<p style="font-size:16px">Hi ${esc(b.name)}, thank you. Your payment of ₦${site.consultPriceNaira.toLocaleString("en-NG")} was received.</p>
+    `<p style="font-size:16px">Hi ${esc(b.name)}, thank you. Your payment of ₦${(b.amount_kobo / 100).toLocaleString("en-NG")} was received${b.consult_type_name ? ` for: ${esc(b.consult_type_name)}` : ""}.</p>
 <p style="background:#E6F4EE;border-radius:16px;padding:12px 14px;font-weight:800">${esc(when)}</p>
 ${b.needs_reschedule ? `<p style="background:#FFF4DC;border-radius:16px;padding:12px 14px;color:#7A4A00;font-weight:700">That time was taken while you were paying, so our team will call you to pick a new one. Sorry about that.</p>` : ""}
-<p style="font-size:15px">A doctor will call you on your phone number. Reason you gave: ${esc(b.reason)}</p>
+<p style="font-size:15px">${b.doctor_type ? `A ${esc(b.doctor_type.toLowerCase())}` : "A doctor"} will call you on your phone number. Reason you gave: ${esc(b.reason)}</p>
 <p style="font-size:13px;color:#5E706A">Reference: ${esc(b.paystack_reference)}</p>
 ${whatsappUrl ? button(whatsappUrl, "Chat on WhatsApp") : ""}
 <p style="font-size:13px;color:#5E706A;margin-top:16px">If you feel very unwell before your consult, call 112 or go to the nearest hospital.</p>`,
