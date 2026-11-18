@@ -80,26 +80,26 @@ export function ShareSection({ results, saved }: { results: Results; saved: Save
   const waText = link ? `I just did my free ${site.appName}. Here's my summary: ${link}` : `I just did a free ${site.appName} in 10 minutes. Check your heart age: ${site.siteUrl}`;
 
   return (
-    <section className="mt-8 rounded-[var(--radius-lg)] bg-surface p-5" aria-labelledby="share">
-      <h2 id="share" className="text-2xl">Share your results</h2>
-      <p className="mt-1 text-sm font-bold text-muted-soft">Cards and links never show your mood, worry or alcohol answers.</p>
+    <section className="mt-8 rounded-[var(--radius-xl)] border border-line bg-surface p-5" aria-labelledby="share">
+      <h2 id="share" className="text-2xl font-semibold">Share your results</h2>
+      <p className="mt-1 text-sm font-medium text-subtle">Cards and links never show your mood, worry or alcohol answers.</p>
 
       {img ? (
         // eslint-disable-next-line @next/next/no-img-element
-        <img src={img} alt={summary.heartAge ? `Share card: my heart age is ${summary.heartAge.value}. I'm ${summary.age}.` : "Share card"} className="mx-auto mt-4 w-[220px] rounded-[var(--radius-md)] border-[2.5px] border-ink" />
+        <img src={img} alt={summary.heartAge ? `Share card: my heart age is ${summary.heartAge.value}. I'm ${summary.age}.` : "Share card"} className="mx-auto mt-4 w-[200px] rounded-[var(--radius-lg)] border border-line shadow-[var(--shadow-md)]" />
       ) : (
-        <div className="mx-auto mt-4 h-[391px] w-[220px] animate-pulse rounded-[var(--radius-md)] bg-ground" aria-hidden="true" />
+        <div className="mx-auto mt-4 h-[356px] w-[200px] animate-pulse rounded-[var(--radius-md)] bg-ground" aria-hidden="true" />
       )}
 
       <div className="mt-4 flex flex-col gap-3">
         <Button variant="secondary" icon="download" onClick={shareImage} disabled={!blob}>Share my image</Button>
-        <a href={whatsappShareLink(waText)} target="_blank" rel="noopener noreferrer" className="inline-flex min-h-[52px] items-center justify-center gap-2 rounded-[18px] border-[2.5px] border-ink bg-[#25D366] px-5 text-base font-extrabold text-ink">
+        <a href={whatsappShareLink(waText)} target="_blank" rel="noopener noreferrer" className="inline-flex min-h-[50px] items-center justify-center gap-2 rounded-[var(--radius-md)] bg-[#25D366] px-5 text-base font-semibold text-ink hover:brightness-95">
           <Icon name="whatsapp" size={22} /> Share on WhatsApp
         </a>
 
         {saved ? (
-          <div className="rounded-[var(--radius-md)] bg-ground p-4">
-            <p className="font-extrabold">Share link</p>
+          <div className="rounded-[var(--radius-lg)] bg-surface-2 p-4">
+            <p className="font-semibold">Share link</p>
             {link ? (
               <>
                 <p className="mt-1 text-sm break-all text-muted">{link}</p>

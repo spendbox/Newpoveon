@@ -25,6 +25,7 @@ export async function POST(req: Request) {
     }
     const details: Record<string, string> = {};
     let hasPrescription: boolean | null = null;
+    if (kind === "home_test" && !test && b.need) details.need = cleanText(b.need, 500);
     if (kind === "medication") {
       details.medicines = cleanText(b.medicines, 1500);
       details.prescription_answer = String(b.prescription ?? "");
@@ -46,7 +47,7 @@ export async function POST(req: Request) {
     if (site.teamEmail) {
       const t = teamEmail(kind === "home_test" ? "New home test request" : "New medication delivery request", {
         Name: name, Phone: phone, Email: email, Address: address, "Preferred time": b.preferredTime,
-        Test: test?.name, Price: test?.price_naira != null ? `₦${test.price_naira.toLocaleString("en-NG")}` : undefined,
+        Test: test?.name ?? details.need, Price: test?.price_naira != null ? `₦${test.price_naira.toLocaleString("en-NG")}` : undefined,
         Medicines: details.medicines, "Prescription medicine": kind === "medication" ? String(b.prescription) : undefined,
         "Consult reference": details.consult_reference,
       });

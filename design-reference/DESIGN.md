@@ -1,126 +1,82 @@
-# HealthCheck design reference
+# HealthCheck design guide (v2 · "Calm vitality")
 
-> Copied from the HealthCheck design system (https://claude.ai/artifact/8CLdFZpEXcsQ4mBx5a8XRS) and the clickable mockup (https://claude.ai/artifact/2D2vZpEqQEVh9QB5atxQEE) on 17 Nov 2026. The app's colours live in `src/app/globals.css` and must match `tokens.json` here.
+Modern, clean and quietly fun. It should feel like a well-made product, not a hospital form and not a cartoon.
+v1 (thick outlines, chunky shadows, cartoon characters) is kept for reference in [`archive-v1/`](archive-v1/).
 
+The live tokens are in [`src/app/globals.css`](../src/app/globals.css) and [`tokens.json`](tokens.json). Keep the two in sync.
 
-Friendly health screening for Nigerians: fun, warm and professional. HealthCheck is Poveon's
-public self-screening app. People answer a short set of questions and get their heart age,
-diabetes risk, sleep and mood results, then can book a ₦5,000 doctor consult, order a home test or
-request medication delivery.
+## Principles
 
-The clickable mockup (welcome → questions → results) is on the design canvas:
-https://claude.ai/artifact/2D2vZpEqQEVh9QB5atxQEE
+1. **Calm first.** One main action per screen. Plenty of white space. If a screen feels busy, remove something.
+2. **Fun in the details, not everywhere.** Personality comes from a few moments: the heart-age reveal, the answer tick, the progress marker, soft floating shapes. Everything else stays quiet.
+3. **Professional and trustworthy.** Real data shown plainly, sources named, no exaggeration, no emoji.
+4. **Warm and Nigerian.** Plain, friendly English ("Let's check in on you"). Prices in naira. Talk like a kind doctor, not a form.
 
-## Content fundamentals
+## Colour
 
-- **Talk like a friendly nurse, not a hospital form.** "Let's talk about sleep", not "Section 3: Sleep Assessment".
-- **One question per screen.** Short, plain words a secondary-school leaver understands.
-- **Encourage, never scare.** Use "Halfway there!", "Nice, keep going". Bad news is framed with a next step:
-  "This can come down. Book a doctor."
-- **Be honest about limits.** Every result says it's an **estimate, not a diagnosis**, and names the tool
-  it's based on (for example, "Estimate based on WHO risk charts").
-- **No emoji in the UI.** Use drawn icons and illustrations instead.
-- Examples:
-  - Heading: "Let's check in on you"
-  - Subtext: "A few friendly questions, about 10 minutes."
-  - Result: "You're 35, but your heart is working like it's 7 years older."
-  - Reaction: "Your lungs say thank you"
+| Token | Hex | Use |
+|---|---|---|
+| `ground` | #F6F8F7 | Page background (near-white with a hint of green) |
+| `surface` | #FFFFFF | Cards, inputs, answer tiles |
+| `surface-2` | #EFF4F2 | Quiet fills: chips, secondary buttons, notes |
+| `line` / `line-strong` | #E1E9E5 / #C9D6D0 | Hairline borders (cards) / input and button borders |
+| `ink` | #10221D | Text, and the dark hero cards |
+| `muted` | #4A5D57 | Secondary text (6.7:1 on white) |
+| `subtle` | #5E706A | Captions and disclaimers (5.2:1 on white) |
+| `primary` | #136F58 | **The one action colour.** Primary buttons, selected states, links, progress. White text on it (5.9:1) |
+| `primary-soft` | #E3F2EC | Selected tiles, soft panels |
+| `coral` | #FF6B4A | The heart, the progress marker, small highlights. **Fill only, never small text** |
+| `sun`, `lavender` | #FFC23D, #7C6CF0 | Accents in topic art and the share card |
+| Status | good #E6F4EE/#116149 · check #FFF4DC/#7A4A00 · act #FDE9E4/#9A2E14 | Result status pills |
 
-## Visual foundations
+Rules: one primary button per screen. Status is always **word + icon** ("Looking good" ✓, "Worth checking" ⚠, "Act on this" ⓘ), never colour alone.
 
-**Colour.** `ground` (mint) is the page. `surface` (white) holds cards and tiles. `ink` is for
-text and the thick outlines that give everything its character. `coral` is the one action colour:
-primary buttons, hearts and selected states. Always put **ink text on coral**, never white. `sun`,
-`leaf` and `lavender` are accents, and each question topic gets its own tint background:
-- Moving: `sun-tint`
-- Smoking: `coral-tint`
-- Sleep: `night`
-- Family: `lavender-tint`
-- Blood pressure: `leaf-tint`
+## Type
 
-**Status.** Results use `good-bg` with `good-text` ("Looking good") and `caution-bg` with
-`caution-text` ("Act on this" or "Worth checking"). Status is never colour alone: always pair it
-with a word and an icon.
+- **Headings and numbers:** Bricolage Grotesque, weight 600–700, letter-spacing −0.02em. Characterful but grown-up.
+- **Everything else:** Inter, weight 400–600. Body 15–17px, line height 1.5.
+- Question titles 26px/1.15 semibold. Hero 40px (phone) / 64px (desktop) bold.
+- Overlines: 13px, semibold, uppercase, +0.06em, in `primary`.
+- Numbers that line up use tabular figures (`.tabular`).
+- Both fonts are self-hosted (no Google requests), from `@fontsource-variable/*`.
 
-**Type.** **Baloo 2** (800) for headings, numbers and buttons, with tight leading. **Nunito**
-(600–800) for everything else. Question titles use `question` (27px). Overlines use `overline`
-(13px, uppercase, letter-spaced).
+## Shape, depth and spacing
 
-**Shape.** Big, soft radii: `radius-md` (20px) for buttons and tiles, `radius-lg` (28px) for
-illustration and hero cards, and pills for badges. Borders are thick (2.5px) in `ink` on interactive
-elements. The primary button sits on a chunky `shadow-press` that presses down when tapped.
-
-**Spacing.** Phone screens are 390px wide with `space-6` (24px) side padding, `space-3` (12px)
-between tiles, and `space-4` (16px) inside cards.
-
-**Motion.** Motion makes it fun, but stays gentle:
-- Question cards slide in from the right (~0.55s ease-out).
-- A chosen tile pops, and a green tick badge bursts in.
-- Illustrations idle softly: floating, breathing lungs, rising Z's, a swinging gauge needle.
-- Results count up to the heart age, then the cards rise in one by one.
-- A smiley progress character walks along a dashed path to a finish flag.
-- Always respect `prefers-reduced-motion`: switch all of it off.
-
-## Illustration and iconography
-
-- **Illustrations** (see the Illustrations assets) use flat shapes, thick `ink` outlines (3–4px),
-  rounded joins and the palette above. People are drawn with dark-brown skin tones for Nigerian
-  users. Each sits on its topic's tint inside a `radius-lg` card, 196px tall on phones.
-- **Icons** are stroke icons, 2.6px `ink` lines with round caps, at 18–40px. Answer tiles use 40px
-  picture icons (a couch, someone walking, someone running) so answers can be read at a glance.
+- Radii: `sm` 10 · `md` 14 (buttons, inputs) · `lg` 20 (cards, tiles) · `xl` 28 (hero and feature cards).
+- Borders are 1px hairlines (`line`). No thick outlines.
+- Shadows are soft and rare: `shadow-sm` on buttons, `shadow-md` on hover and floating cards, `shadow-lg` for the results hero and floating doctor button.
+- Phone screens: 20px side padding, 8–10px between tiles, 16–20px inside cards. Phone-width flows are max 460px. On desktop they sit in a white card with a large shadow.
 
 ## Components
 
-- **Button:** the coral primary action and the white outline secondary action.
-- **AnswerTile:** a big tappable answer with an icon, plus its selected state.
-- **ResultCard:** a status card for one screening result.
+- **Primary button:** `primary` fill, white text, 54px tall, radius `md`, presses down 1px. Secondary: white with `line-strong` border.
+- **Answer tile:** white card, 1px `line` border, radius `lg`. A round icon well (`surface-2`). Selected: `primary` border and ring, `primary-soft` fill, with a small green tick that springs in. Long answers use rows with a radio or checkbox on the right.
+- **Progress:** a 6px track with a `primary` fill and a glowing coral marker. Topic name above ("YOUR HEART"), "7 of 24" and a short cheer ("Halfway there!").
+- **Result card:** white card with the topic, a status pill, the value (display font), a summary, the source line and one next-step link in `primary`.
+- **Heart-age hero:** dark `ink` card, coral heart that beats gently, number counting up, soft drifting dots. The one big "wow" moment.
+- **Topic art:** each question topic gets a soft colour field (its tint), two quiet floating shapes, and one icon in a white rounded tile. No people, no faces. 104–136px tall.
+- **Floating doctor button:** white pill with a `primary` stethoscope circle, bottom-right. In the top bar on question screens instead.
+- **Lab package card:** name, price (or "Price on request"), badges (Popular, number of tests, Women/Men), sample · results time · fasting, "What's included" expander, then "Choose this".
+
+## Topic tints
+
+About you, blood pressure, heart, check-ups, doctor: `primary-soft` · Body, moving, drink, mood: `sun-soft` · Waist, smoking, heart history: `coral-soft` · Sugar, family, sleep, labs: `lavender-soft`.
+
+## Icons
+
+Stroke icons, 2px lines with round caps, drawn on a 40px grid (`src/components/icons.tsx`). 16–22px in UI, 28–34px in topic art. Decorative icons are `aria-hidden`.
+
+## Motion
+
+- Question cards slide 28px and fade (0.32s). Tiles spring 3% when chosen.
+- The heart counts up to the heart age, then result cards rise in one by one (0.15s apart).
+- Idle motion is slow and small (floating 6px over 5–9s).
+- Everything switches off for people who prefer reduced motion.
 
 ## Accessibility
 
-- Text meets 4.5:1 contrast on its background. Coral is a fill colour; never use it for small text.
-- Use real buttons and links, with touch targets of 44px or more.
-- Give icon-only buttons an `aria-label`. Decorative SVGs get `aria-hidden`.
-- Every illustration with meaning has a short label.
+Text meets 4.5:1 (3:1 for text 24px and larger). Touch targets are 44px or more. Real buttons, links and labels. Visible focus ring (2.5px `primary`). Coral is never used for text.
 
-## Components
+## Voice
 
-### Button
-The coral primary button that moves people forward, and a white outline secondary button.
-
-- **Primary:** coral fill, 2.5px ink border, ink text in Baloo 2 (800, 20–21px), 56–60px tall, `radius-md`, `shadow-press`. On press it moves down 3px and the shadow shrinks to `0 3px 0`. Use one per screen for the main step: "Let's start", "Continue", "Talk to a doctor".
-- **Secondary:** white fill, 2.5px ink border, Nunito 800 at 16px, 52px tall, no shadow. Use for the alternative step: "Find a blood pressure check near you".
-- **Disabled:** 45% opacity until the question is answered.
-- **You provide:** the label, an optional trailing arrow icon, and the action.
-
-### AnswerTile
-A big tappable answer with a picture icon, used for every multiple-choice question.
-
-- **Unselected:** white `surface`, 2.5px `border`-colour outline, `radius-md`, a 40px stroke icon above a Nunito 800 label at 15px. 112px tall in a 3-column grid, or 62px tall in rows for longer labels.
-- **Selected:** `ink` outline, `coral-tint` fill, a quick "pop" (scale 1 → 1.08 → 1), and a 26px `leaf` tick badge bursting in at the top-right corner.
-- **Hover:** lifts 2px.
-- **You provide:** the icon, the label, whether it's selected, and the tap handler. Always use a real `<button>`.
-
-### ResultCard
-A small card for one screening result, shown in a 2-column grid under the heart age reveal.
-
-- **Looking good:** `good-bg` with a `good-text` tick label.
-- **Act on this / Worth checking:** `caution-bg` with a `caution-text` warning-triangle label.
-- Layout: the status label (12px, 800), then the topic (14px `muted`), then the value in Baloo 2 (20px, 800). Padding is 12px by 14px with `radius-md`.
-- Cards rise in one by one (~0.15s apart) after the heart age finishes counting.
-- **You provide:** the status, the topic, the value, and optionally a next-step link ("Book a doctor", "Order the test", "Retest in 3 months"). Never show status by colour alone.
-
-## Illustrations
-
-Topic illustrations for the questionnaire, the welcome screen and the results reveal. They are flat shapes with thick ink outlines and gentle idle animations.
-
-- `welcome-character.svg`: the welcome screen hero, a smiling person holding a beating heart.
-- `q-moving.svg`: physical activity, on `sun-tint`.
-- `q-smoking-lungs.svg`: smoking, on `coral-tint`.
-- `q-sleep.svg`: sleep and snoring, on `night`.
-- `q-family.svg`: family history, on `lavender-tint`.
-- `q-blood-pressure-gauge.svg`: blood pressure, on `leaf-tint`.
-- `results-heart.svg`: the heart age reveal.
-
-Question illustrations are 342 × 196 and sit in a `radius-lg` card. Make new topics in the same style: dark-brown skin tones, 3–4px ink outlines, and at most three palette colours per scene.
-
-New topic illustrations drawn for the app in the same style: about-you, scale, tape, heart-history, sugar, veg, drink, mood, calm, checklist, support, doctor, home-test, delivery. After editing any SVG here, run `npm run illustrations`.
+Short sentences. Encourage, never scare: "This can come down." Every result says it's an estimate, not a diagnosis, and names its tool.

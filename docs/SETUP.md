@@ -29,6 +29,7 @@ the app works without them, and that feature just shows a friendly "not switched
 1. Go to **supabase.com → New project**. Pick a strong database password and save it in a password manager.
    Region: Supabase has no African region, so pick **London (eu-west-2)** or **Frankfurt**. Your privacy notice must mention this (see the NDPA note in `/privacy`).
 2. **SQL Editor → New query**. Paste the whole of `supabase/migrations/20261117000000_init.sql` and press **Run**. You should see "Success".
+   Then do the same with `supabase/migrations/20261118000000_lab_packages.sql` (the lab test packages).
 3. **Project Settings → API**. Copy these into Vercel's Environment Variables:
    - Project URL → `NEXT_PUBLIC_SUPABASE_URL`
    - anon / publishable key → `NEXT_PUBLIC_SUPABASE_ANON_KEY`
@@ -40,7 +41,7 @@ the app works without them, and that feature just shows a friendly "not switched
 6. **Important: magic-link emails.** Supabase's built-in email only sends a few emails an hour. After step 3 below, go to
    **Authentication → Emails → SMTP Settings** and switch on custom SMTP with Resend
    (host `smtp.resend.com`, port `465`, username `resend`, password = your Resend API key, sender = your verified address).
-7. Add `ADMIN_EMAILS` (your email) and `TEAM_NOTIFICATION_EMAIL` in Vercel, then redeploy.
+7. Add `TEAM_NOTIFICATION_EMAIL` in Vercel, then redeploy.
 
 ## 3. Resend (emails)
 
@@ -62,9 +63,11 @@ the app works without them, and that feature just shows a friendly "not switched
 
 ## 5. Admin set-up
 
-1. Go to `https://YOUR-DOMAIN/admin`, enter an email from `ADMIN_EMAILS`, and click the magic link.
+1. In Vercel, set `ADMIN_EMAILS` (your email) and `ADMIN_PASSWORD` (at least 12 characters), and redeploy.
+   Then go to `https://YOUR-DOMAIN/admin` and log in with that email and password.
+   To change the password later, change `ADMIN_PASSWORD` in Vercel and redeploy (everyone is logged out).
 2. **Availability:** add the days and times doctors can take calls (Lagos time). The booking page shows them.
-3. **Home tests:** set a price for each test (blank shows "price confirmed when we call"). Add or hide tests here.
+3. **Lab tests:** 16 standard packages and 10 single tests are loaded (full health checks, heart, diabetes, women, men, fertility, sexual health, pre-marital, pregnancy and more). Set a price for each (blank shows "Price on request"), edit what's included, hide what you don't offer, and add your own packages.
 4. **Emergency contacts:** replace the **mental health helpline placeholder** with a verified number. Until then it stays hidden, and only 112 shows.
 
 ---

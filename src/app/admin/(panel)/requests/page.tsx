@@ -1,8 +1,8 @@
 export const dynamic = "force-dynamic";
 import { site } from "@/config/site";
 import { supabaseAdmin } from "@/lib/supabase/server";
-import { setRequestStatus } from "../actions";
-import { aBtn, aBtnQuiet, aInput, Badge, Card, H1, Tabs } from "../ui";
+import { setRequestStatus } from "../../actions";
+import { aBtn, aBtnQuiet, aInput, Badge, Card, H1, Tabs } from "../../ui";
 
 export default async function RequestsPage({ searchParams }: PageProps<"/admin/requests">) {
   const sp = await searchParams;
@@ -28,8 +28,8 @@ export default async function RequestsPage({ searchParams }: PageProps<"/admin/r
           <Card key={r.id}>
             <div className="flex flex-wrap items-start justify-between gap-2">
               <div>
-                <p className="font-display text-lg font-extrabold">{r.kind === "home_test" ? r.test_name ?? "Home test" : "Medication delivery"} · {r.name}</p>
-                <p className="text-sm font-bold"><a className="underline" href={`tel:${r.phone}`}>{r.phone}</a>{r.email ? ` · ${r.email}` : ""}</p>
+                <p className="font-display text-lg font-semibold">{r.kind === "home_test" ? r.test_name ?? "Home test" : "Medication delivery"} · {r.name}</p>
+                <p className="text-sm font-medium"><a className="underline" href={`tel:${r.phone}`}>{r.phone}</a>{r.email ? ` · ${r.email}` : ""}</p>
                 <p className="text-sm">{r.address}</p>
                 {r.preferred_time && <p className="text-sm">Preferred: {r.preferred_time}</p>}
               </div>
@@ -42,7 +42,7 @@ export default async function RequestsPage({ searchParams }: PageProps<"/admin/r
               <div className="mt-2 rounded-lg bg-ground p-3 text-sm">
                 <p><b>Medicines:</b> {r.details?.medicines}</p>
                 <p><b>Prescription medicine:</b> {r.details?.prescription_answer}{r.details?.consult_reference ? ` · consult ref ${r.details.consult_reference}` : ""}</p>
-                {r.has_prescription && <p className="mt-1 font-bold text-caution-text">Check the doctor consult before supplying prescription medicines.</p>}
+                {r.has_prescription && <p className="mt-1 font-medium text-check-text">Check the doctor consult before supplying prescription medicines.</p>}
               </div>
             )}
             {r.amount_kobo != null && <p className="mt-1 text-sm">Price: ₦{(r.amount_kobo / 100).toLocaleString("en-NG")} (pay on confirmation)</p>}

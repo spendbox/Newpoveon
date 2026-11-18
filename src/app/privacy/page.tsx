@@ -10,7 +10,7 @@ export default function PrivacyPage() {
     <main className="mx-auto w-full max-w-2xl px-6 pt-7">
       <Logo />
       <article className="mt-6 flex flex-col gap-4 text-[16px] leading-relaxed [&_h2]:mt-4 [&_h2]:text-2xl">
-        <p className="rounded-[var(--radius-md)] bg-caution-bg px-4 py-3 text-sm font-extrabold text-caution-text">Draft for review. [POVEON TO REVIEW WITH A DATA PROTECTION ADVISER BEFORE LAUNCH]</p>
+        <p className="rounded-[var(--radius-md)] bg-check-bg px-4 py-3 text-sm font-semibold text-check-text">Draft for review. [POVEON TO REVIEW WITH A DATA PROTECTION ADVISER BEFORE LAUNCH]</p>
         <h1 className="text-[34px] leading-tight">Privacy notice</h1>
         <p>This notice explains how {site.companyName} ([COMPANY LEGAL NAME], [REGISTERED ADDRESS], RC [NUMBER]) uses your information when you use {site.appName}. We follow the Nigeria Data Protection Act 2023 (NDPA).</p>
         <h2>What we collect</h2>
@@ -37,7 +37,7 @@ export default function PrivacyPage() {
         <p>Data is encrypted in transit, access is restricted so people only ever see their own results, and only authorised staff can see bookings and requests.</p>
         <h2>Contact</h2>
         <p>Data protection officer: [NAME], [EMAIL], [PHONE].</p>
-        <p className="text-sm text-muted-soft">Last updated: [DATE]</p>
+        <p className="text-sm text-subtle">Last updated: [DATE]</p>
       </article>
     </main>
   );

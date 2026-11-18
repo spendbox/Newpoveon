@@ -3,8 +3,8 @@ import { useEffect, useState } from "react";
 import { ButtonLink } from "@/components/ui";
 import { loadProgress } from "@/lib/storage";
 
-/** "Let's start", or "Carry on" if there's saved progress in this browser. */
-export function StartButton() {
+/** "Start my free check", or "Carry on" if there's saved progress in this browser. */
+export function StartButton({ compact = false }: { compact?: boolean }) {
   const [resume, setResume] = useState<"none" | "progress" | "finished">("none");
   useEffect(() => {
     const p = loadProgress();
@@ -13,12 +13,12 @@ export function StartButton() {
     if (p) setResume(p.finished ? "finished" : Object.keys(p.answers).length ? "progress" : "none");
   }, []);
   return (
-    <div className="flex flex-col gap-3">
-      <ButtonLink href="/check" iconRight="arrowRight" className="w-full">
-        {resume === "progress" ? "Carry on where I left off" : "Let's start"}
+    <div className={`flex gap-3 ${compact ? "flex-col" : "flex-col sm:flex-row"}`}>
+      <ButtonLink href="/check" iconRight="arrowRight" className="flex-1">
+        {resume === "progress" ? "Carry on" : "Start my free check"}
       </ButtonLink>
-      {resume === "finished" && (
-        <ButtonLink href="/results" variant="secondary" className="w-full">See my last results</ButtonLink>
+      {resume === "finished" && !compact && (
+        <ButtonLink href="/results" variant="secondary" className="flex-1">My last results</ButtonLink>
       )}
     </div>
   );

@@ -4,8 +4,8 @@ import { formatWhen } from "@/lib/email";
 import type { Results } from "@/lib/scoring/results";
 import { STATUS_LABEL } from "@/lib/scoring/results";
 import { supabaseAdmin } from "@/lib/supabase/server";
-import { saveBookingNotes, setBookingStatus } from "../actions";
-import { aBtn, aBtnQuiet, aInput, Badge, Card, H1, Tabs } from "../ui";
+import { saveBookingNotes, setBookingStatus } from "../../actions";
+import { aBtn, aBtnQuiet, aInput, Badge, Card, H1, Tabs } from "../../ui";
 
 const VIEWS = { upcoming: "Paid · upcoming", done: "Done", unpaid: "Unpaid", all: "All" } as const;
 
@@ -30,8 +30,8 @@ export default async function BookingsPage({ searchParams }: PageProps<"/admin/b
             <Card key={b.id}>
               <div className="flex flex-wrap items-start justify-between gap-2">
                 <div>
-                  <p className="font-display text-lg font-extrabold">{b.name}</p>
-                  <p className="text-sm font-bold"><a className="underline" href={`tel:${b.phone}`}>{b.phone}</a> · {b.email}</p>
+                  <p className="font-display text-lg font-semibold">{b.name}</p>
+                  <p className="text-sm font-medium"><a className="underline" href={`tel:${b.phone}`}>{b.phone}</a> · {b.email}</p>
                   <p className="mt-1 text-sm">{b.slot_starts_at ? formatWhen(b.slot_starts_at) : "No slot: call to agree a time"}</p>
                 </div>
                 <div className="flex flex-wrap gap-1.5">
@@ -39,11 +39,11 @@ export default async function BookingsPage({ searchParams }: PageProps<"/admin/b
                   {b.needs_reschedule && <Badge tone="warn">needs new time</Badge>}
                 </div>
               </div>
-              <p className="mt-2 text-sm"><span className="font-extrabold">Reason:</span> {b.reason}</p>
+              <p className="mt-2 text-sm"><span className="font-semibold">Reason:</span> {b.reason}</p>
               <p className="text-xs text-muted">Ref {b.paystack_reference}{b.paid_at ? ` · paid ${formatWhen(b.paid_at)}` : ""}</p>
               {shared && (
                 <details className="mt-2 rounded-lg bg-ground p-3 text-sm">
-                  <summary className="cursor-pointer font-extrabold">Results shared by the patient</summary>
+                  <summary className="cursor-pointer font-semibold">Results shared by the patient</summary>
                   <p className="mt-2">Age {shared.age}, {shared.sex}. {shared.heart ? `Heart age ${shared.heart.heartAge.value}, 10-year risk ${shared.heart.riskPercent}%.` : shared.heartNote}</p>
                   <ul className="mt-1 list-disc pl-5">
                     {shared.cards.map((c) => <li key={c.id}><b>{c.topic}</b>: {STATUS_LABEL[c.status]}, {c.value}. {c.summary}</li>)}
@@ -54,7 +54,7 @@ export default async function BookingsPage({ searchParams }: PageProps<"/admin/b
                 <input type="hidden" name="id" value={b.id} />
                 <label className="sr-only" htmlFor={`n-${b.id}`}>Notes</label>
                 <textarea id={`n-${b.id}`} name="notes" defaultValue={b.admin_notes ?? ""} rows={2} className={`${aInput} py-2`} placeholder="Notes for the team" />
-                <label className="flex items-center gap-2 text-sm font-bold"><input type="checkbox" name="needs_reschedule" defaultChecked={b.needs_reschedule} /> Needs a new time</label>
+                <label className="flex items-center gap-2 text-sm font-medium"><input type="checkbox" name="needs_reschedule" defaultChecked={b.needs_reschedule} /> Needs a new time</label>
                 <div className="flex flex-wrap gap-2">
                   <button className={aBtnQuiet}>Save notes</button>
                   {b.status === "paid" && <button formAction={setBookingStatus} name="status" value="completed" className={aBtn}>Mark done</button>}

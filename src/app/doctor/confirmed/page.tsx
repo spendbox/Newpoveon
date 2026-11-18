@@ -39,10 +39,10 @@ export default async function ConfirmedPage({ searchParams }: PageProps<"/doctor
           <p className="mt-2 text-[17px] text-muted">We&apos;ve received your ₦{site.consultPriceNaira.toLocaleString("en-NG")} payment and emailed your confirmation.</p>
           <div className="mt-4 flex items-center gap-3 rounded-[var(--radius-md)] bg-good-bg p-4 text-good-text">
             <Icon name="clock" size={24} />
-            <p className="font-extrabold">{booking?.slot_starts_at ? formatWhen(booking.slot_starts_at) : "We'll call you to agree a time."}</p>
+            <p className="font-semibold">{booking?.slot_starts_at ? formatWhen(booking.slot_starts_at) : "We'll call you to agree a time."}</p>
           </div>
           {booking?.needs_reschedule && <div className="mt-3"><Notice tone="warn">That time was taken while you were paying. Our team will call you to pick a new one.</Notice></div>}
-          <p className="mt-3 text-sm font-bold text-muted-soft">Reference: {reference}</p>
+          <p className="mt-3 text-sm font-medium text-subtle">Reference: {reference}</p>
         </>
       ) : (
         <>
@@ -50,12 +50,12 @@ export default async function ConfirmedPage({ searchParams }: PageProps<"/doctor
           <p className="mt-2 text-[17px] text-muted">
             If you completed payment, your confirmation email will arrive shortly. If something went wrong, no money was taken. You can try again or message us.
           </p>
-          {reference && <p className="mt-3 text-sm font-bold text-muted-soft">Reference: {reference}</p>}
+          {reference && <p className="mt-3 text-sm font-medium text-subtle">Reference: {reference}</p>}
         </>
       )}
       <div className="mt-6 flex flex-col gap-3">
         {wa && (
-          <a href={wa} target="_blank" rel="noopener noreferrer" className="inline-flex min-h-[58px] items-center justify-center gap-2 rounded-[var(--radius-md)] border-[2.5px] border-ink bg-[#25D366] text-[19px] font-extrabold btn-press">
+          <a href={wa} target="_blank" rel="noopener noreferrer" className="inline-flex min-h-[58px] items-center justify-center gap-2 rounded-[var(--radius-md)] border border-line-strong bg-[#25D366] text-[19px] font-semibold">
             <Icon name="whatsapp" size={24} /> Chat on WhatsApp
           </a>
         )}

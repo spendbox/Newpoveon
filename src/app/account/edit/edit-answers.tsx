@@ -55,13 +55,13 @@ export function EditAnswers({ initial }: { initial: Answers }) {
           <h2 id={`t-${t}`} className="text-xl">{t}</h2>
           <ul className="mt-2 flex flex-col gap-2">
             {list.filter((q) => q.topic === t).map((q) => (
-              <li key={q.id} className="rounded-[var(--radius-md)] bg-surface p-4">
+              <li key={q.id} className="rounded-[var(--radius-md)] border border-line bg-surface p-4">
                 <div className="flex items-start justify-between gap-3">
                   <div>
-                    <p className="text-sm font-bold text-muted">{q.title}</p>
-                    <p className={`font-extrabold ${answers[q.id] === undefined ? "text-caution-text" : ""}`}>{display(q, answers[q.id])}</p>
+                    <p className="text-sm font-medium text-muted">{q.title}</p>
+                    <p className={`font-semibold ${answers[q.id] === undefined ? "text-check-text" : ""}`}>{display(q, answers[q.id])}</p>
                   </div>
-                  <button type="button" onClick={() => setOpen(open === q.id ? null : q.id)} className="min-h-[44px] shrink-0 rounded-full bg-ground px-4 text-sm font-extrabold" aria-expanded={open === q.id}>
+                  <button type="button" onClick={() => setOpen(open === q.id ? null : q.id)} className="min-h-[44px] shrink-0 rounded-full bg-ground px-4 text-sm font-semibold" aria-expanded={open === q.id}>
                     {open === q.id ? "Done" : "Change"}
                   </button>
                 </div>
@@ -111,10 +111,10 @@ function Editor({ q, value, onChange }: { q: Question; value: AnswerValue | unde
       <div className="flex items-center gap-2">
         <label className="sr-only" htmlFor={`e-sbp`}>Top number</label>
         <input id="e-sbp" inputMode="numeric" className={inputCls} placeholder="120" defaultValue={bp.sbp || ""} onChange={(e) => commit({ ...bp, sbp: Number(e.target.value) })} />
-        <span className="font-extrabold">/</span>
+        <span className="font-semibold">/</span>
         <label className="sr-only" htmlFor={`e-dbp`}>Bottom number</label>
         <input id="e-dbp" inputMode="numeric" className={inputCls} placeholder="80" defaultValue={bp.dbp || ""} onChange={(e) => commit({ ...bp, dbp: Number(e.target.value) })} />
-        <span className="text-sm font-extrabold">mmHg</span>
+        <span className="text-sm font-semibold">mmHg</span>
       </div>
     );
   }
@@ -127,7 +127,7 @@ function Editor({ q, value, onChange }: { q: Question; value: AnswerValue | unde
           const v = Number(e.target.value);
           onChange(e.target.value !== "" && v >= q.min && v <= q.max ? v : undefined);
         }} />
-        <span className="font-extrabold">{q.unit}</span>
+        <span className="font-semibold">{q.unit}</span>
       </div>
       {q.skipLabel && <AnswerTile multi layout="rows" label={q.skipLabel} selected={value === "unknown"} onClick={() => { setText(""); onChange(value === "unknown" ? undefined : "unknown"); }} />}
     </div>

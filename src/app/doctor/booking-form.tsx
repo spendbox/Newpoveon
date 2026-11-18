@@ -81,7 +81,7 @@ export function BookingForm({ defaultReason }: { defaultReason: string }) {
   }
 
   return (
-    <form onSubmit={submit} className="mt-6 flex flex-col gap-4 rounded-[var(--radius-lg)] bg-surface p-5 md:mt-0" noValidate>
+    <form onSubmit={submit} className="mt-6 flex flex-col gap-4 rounded-[var(--radius-lg)] border border-line bg-surface p-5 md:mt-0" noValidate>
       <h2 className="text-2xl">Book your consult</h2>
       {!configured && (
         <Notice tone="warn">
@@ -96,17 +96,17 @@ export function BookingForm({ defaultReason }: { defaultReason: string }) {
       </Field>
 
       <fieldset>
-        <legend className="text-sm font-extrabold">Preferred date and time</legend>
+        <legend className="text-sm font-semibold">Preferred date and time</legend>
         {slots === null ? (
           <p className="mt-2 text-sm text-muted">Loading times…</p>
         ) : slots.length === 0 ? (
-          <p className="mt-2 text-sm font-bold text-muted">No times are open online right now. Book and we&apos;ll call you to agree a time.</p>
+          <p className="mt-2 text-sm font-medium text-muted">No times are open online right now. Book and we&apos;ll call you to agree a time.</p>
         ) : (
           <>
             <div className="mt-2 flex gap-2 overflow-x-auto pb-1" role="tablist" aria-label="Day">
               {days.map((d) => (
                 <button key={d} type="button" role="tab" aria-selected={d === activeDay} onClick={() => { setDay(d); setSlotId(null); }}
-                  className={`min-h-[44px] shrink-0 rounded-full border-[2.5px] px-4 text-sm font-extrabold ${d === activeDay ? "border-ink bg-coral-tint" : "border-border bg-surface"}`}>
+                  className={`min-h-[44px] shrink-0 rounded-full border px-4 text-sm font-semibold ${d === activeDay ? "border-ink bg-coral-soft" : "border-line bg-surface"}`}>
                   {d}
                 </button>
               ))}
@@ -114,13 +114,13 @@ export function BookingForm({ defaultReason }: { defaultReason: string }) {
             <div className="mt-3 grid grid-cols-3 gap-2" role="radiogroup" aria-label="Time">
               {(activeDay ? byDay.get(activeDay) ?? [] : []).map((s) => (
                 <button key={s.id} type="button" role="radio" aria-checked={slotId === s.id} onClick={() => { setSlotId(s.id); setCallMe(false); }}
-                  className={`min-h-[48px] rounded-[var(--radius-sm)] border-[2.5px] text-[15px] font-extrabold ${slotId === s.id ? "border-ink bg-coral-tint" : "border-border bg-surface"}`}>
+                  className={`min-h-[48px] rounded-[var(--radius-sm)] border text-[15px] font-semibold ${slotId === s.id ? "border-ink bg-coral-soft" : "border-line bg-surface"}`}>
                   {timeFmt.format(new Date(s.starts_at))}
                 </button>
               ))}
             </div>
-            <label className="mt-3 flex items-center gap-2 text-sm font-bold">
-              <input type="checkbox" className="h-5 w-5 accent-[#1F8A70]" checked={callMe} onChange={(e) => { setCallMe(e.target.checked); if (e.target.checked) setSlotId(null); }} />
+            <label className="mt-3 flex items-center gap-2 text-sm font-medium">
+              <input type="checkbox" className="h-5 w-5 accent-[#136F58]" checked={callMe} onChange={(e) => { setCallMe(e.target.checked); if (e.target.checked) setSlotId(null); }} />
               None of these suit me. Call me to agree a time.
             </label>
           </>
@@ -128,10 +128,10 @@ export function BookingForm({ defaultReason }: { defaultReason: string }) {
       </fieldset>
 
       <label className="flex items-start gap-3 rounded-[var(--radius-md)] bg-ground p-4">
-        <input type="checkbox" className="mt-0.5 h-6 w-6 shrink-0 accent-[#1F8A70]" checked={share} onChange={(e) => setShare(e.target.checked)} />
-        <span className="text-sm font-bold">
+        <input type="checkbox" className="mt-0.5 h-6 w-6 shrink-0 accent-[#136F58]" checked={share} onChange={(e) => setShare(e.target.checked)} />
+        <span className="text-sm font-medium">
           Share my results with the doctor.
-          <span className="block text-xs text-muted-soft">{saved ? "Your latest saved results will be attached." : "If you've saved results with us, they'll be attached."}</span>
+          <span className="block text-xs text-subtle">{saved ? "Your latest saved results will be attached." : "If you've saved results with us, they'll be attached."}</span>
         </span>
       </label>
 
@@ -139,7 +139,7 @@ export function BookingForm({ defaultReason }: { defaultReason: string }) {
       <Button type="submit" disabled={!ready || busy || !configured} icon="chat">
         {busy ? "Opening payment…" : `Pay ₦${site.consultPriceNaira.toLocaleString("en-NG")} and book`}
       </Button>
-      <p className="flex items-center justify-center gap-1.5 text-center text-xs font-bold text-muted-soft">
+      <p className="flex items-center justify-center gap-1.5 text-center text-xs font-medium text-subtle">
         <Icon name="shield" size={14} /> Secure payment by Paystack. Card, bank transfer or USSD.
       </p>
     </form>

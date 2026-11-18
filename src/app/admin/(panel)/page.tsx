@@ -2,7 +2,7 @@ export const dynamic = "force-dynamic";
 import Link from "next/link";
 import { supabaseAdmin } from "@/lib/supabase/server";
 import { paystackTestMode } from "@/lib/paystack";
-import { Card, H1 } from "./ui";
+import { Card, H1 } from "../ui";
 
 async function count(table: string, filter?: (q: any) => any) { // eslint-disable-line @typescript-eslint/no-explicit-any
   let q = supabaseAdmin().from(table).select("*", { count: "exact", head: true });
@@ -42,18 +42,18 @@ export default async function AdminHome() {
   return (
     <>
       <H1 sub="Counts only. No health answers are shown here.">Overview</H1>
-      {paystackTestMode() && <p className="mb-4 rounded-lg bg-caution-bg px-4 py-2 text-sm font-bold text-caution-text">Paystack is in TEST mode: no real money is being taken.</p>}
+      {paystackTestMode() && <p className="mb-4 rounded-lg bg-check-bg px-4 py-2 text-sm font-medium text-check-text">Paystack is in TEST mode: no real money is being taken.</p>}
       {placeholders > 0 && (
-        <p className="mb-4 rounded-lg bg-caution-bg px-4 py-2 text-sm font-bold text-caution-text">
+        <p className="mb-4 rounded-lg bg-check-bg px-4 py-2 text-sm font-medium text-check-text">
           {placeholders} emergency contact placeholder(s) still need a real number. <Link href="/admin/contacts" className="underline">Fix it</Link>
         </p>
       )}
       <div className="grid grid-cols-2 gap-3 md:grid-cols-4">
         {stats.map(([label, n, sub]) => (
           <Card key={label}>
-            <p className="text-sm font-bold text-muted">{label}</p>
-            <p className="font-display text-3xl font-extrabold">{n.toLocaleString("en-NG")}</p>
-            {sub && <p className="text-xs font-bold text-muted-soft">{sub}</p>}
+            <p className="text-sm font-medium text-muted">{label}</p>
+            <p className="font-display text-3xl font-semibold">{n.toLocaleString("en-NG")}</p>
+            {sub && <p className="text-xs font-medium text-subtle">{sub}</p>}
           </Card>
         ))}
       </div>

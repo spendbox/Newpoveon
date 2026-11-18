@@ -42,14 +42,14 @@ export default async function AccountPage() {
       <div className="flex items-center justify-between">
         <Logo />
         <form action="/auth/signout" method="post">
-          <button className="min-h-[44px] rounded-full bg-surface px-4 text-sm font-extrabold">Log out</button>
+          <button className="min-h-[44px] rounded-full bg-surface px-4 text-sm font-semibold">Log out</button>
         </form>
       </div>
       <h1 className="mt-6 text-[30px] leading-[1.05]">Hello!</h1>
       <p className="mt-1 text-muted">Logged in as {user.email}</p>
 
       {!latest ? (
-        <section className="mt-6 rounded-[var(--radius-lg)] bg-surface p-5">
+        <section className="mt-6 rounded-[var(--radius-lg)] border border-line bg-surface p-5">
           <h2 className="text-2xl">No results yet</h2>
           <p className="mt-1 text-muted">Do your check and your results will be saved here.</p>
           <ButtonLink href="/check" className="mt-4 w-full" iconRight="arrowRight">Start my check</ButtonLink>
@@ -57,11 +57,11 @@ export default async function AccountPage() {
       ) : (
         <>
           <section className="mt-6 rounded-[var(--radius-lg)] bg-ink p-5 text-white">
-            <p className="text-[13px] font-extrabold tracking-[0.08em] text-[#BFE3D6] uppercase">Latest check · {dateFmt.format(new Date(latest.created_at))}</p>
+            <p className="text-[13px] font-semibold tracking-[0.08em] text-white/65 uppercase">Latest check · {dateFmt.format(new Date(latest.created_at))}</p>
             {latest.results.heart ? (
-              <p className="mt-1 font-display text-4xl font-extrabold">Heart age <span className="text-coral">{latest.heart_age}</span> <span className="text-xl text-[#DDEFE8]">({latest.risk_percent}% risk)</span></p>
+              <p className="mt-1 font-display text-4xl font-semibold">Heart age <span className="text-coral">{latest.heart_age}</span> <span className="text-xl text-white/75">({latest.risk_percent}% risk)</span></p>
             ) : (
-              <p className="mt-1 font-display text-2xl font-extrabold">{latest.results.heartNote ?? "Results saved"}</p>
+              <p className="mt-1 font-display text-2xl font-semibold">{latest.results.heartNote ?? "Results saved"}</p>
             )}
             <div className="mt-4 flex flex-col gap-3 sm:flex-row">
               <ButtonLink href="/account/edit" icon="edit">Update my answers</ButtonLink>
@@ -81,12 +81,12 @@ export default async function AccountPage() {
                 const b = (r: Results) => r.cards.find((c) => c.id === "body")?.value;
                 if (prev && b(prev.results) !== b(h.results) && b(h.results)) changes.push(`${b(prev.results) ?? "BMI ?"} → ${b(h.results)}`);
                 return (
-                  <li key={h.id} className="rounded-[var(--radius-md)] bg-surface p-4">
-                    <p className="text-sm font-extrabold text-muted-soft">{dateFmt.format(new Date(h.created_at))}</p>
-                    <p className="font-display text-xl font-extrabold">{h.heart_age ? `Heart age ${h.heart_age} · ${h.risk_percent}%` : "No heart age"}</p>
+                  <li key={h.id} className="rounded-[var(--radius-md)] border border-line bg-surface p-4">
+                    <p className="text-sm font-semibold text-subtle">{dateFmt.format(new Date(h.created_at))}</p>
+                    <p className="font-display text-xl font-semibold">{h.heart_age ? `Heart age ${h.heart_age} · ${h.risk_percent}%` : "No heart age"}</p>
                     {changes.length > 0 && (
                       <ul className="mt-1 flex flex-wrap gap-1.5">
-                        {changes.map((c) => <li key={c} className="rounded-full bg-ground px-2.5 py-1 text-xs font-extrabold">{c}</li>)}
+                        {changes.map((c) => <li key={c} className="rounded-full bg-ground px-2.5 py-1 text-xs font-semibold">{c}</li>)}
                       </ul>
                     )}
                   </li>
@@ -109,7 +109,7 @@ export default async function AccountPage() {
           <h2 id="bookings" className="text-2xl">Your doctor bookings</h2>
           <ul className="mt-3 flex flex-col gap-2">
             {bookings.map((b) => (
-              <li key={b.id} className="flex items-center gap-3 rounded-[var(--radius-md)] bg-surface p-4 text-sm font-bold">
+              <li key={b.id} className="flex items-center gap-3 rounded-[var(--radius-md)] border border-line bg-surface p-4 text-sm font-medium">
                 <Icon name="clock" size={20} />
                 {b.slot_starts_at ? formatWhen(b.slot_starts_at) : "Time to be agreed"} · {b.status === "pending_payment" ? "Not paid" : b.status}
               </li>
@@ -118,7 +118,7 @@ export default async function AccountPage() {
         </section>
       )}
 
-      <section className="mt-10 rounded-[var(--radius-lg)] bg-surface p-5">
+      <section className="mt-10 rounded-[var(--radius-lg)] border border-line bg-surface p-5">
         <h2 className="text-xl">Your data</h2>
         <p className="mt-1 text-sm text-muted">You can delete your account and every result saved with your email. This can&apos;t be undone. <Link href="/privacy" className="underline">Privacy notice</Link></p>
         <DeleteAccount />

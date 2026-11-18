@@ -2,14 +2,24 @@ import { createServerClient } from "@supabase/ssr";
 import { NextResponse, type NextRequest } from "next/server";
 
 /**
- * Runs before pages: keeps the Supabase login session fresh (magic-link logins),
- * and sends people who aren't logged in away from /admin.
+ * Runs before pages:
+ *  - sends anyone without an admin session cookie from /admin to /admin/login
+ *    (the cookie's signature is fully checked again on the server by requireAdmin),
+ *  - keeps the Supabase login session fresh for people using magic-link accounts.
  */
 export async function proxy(request: NextRequest) {
+  const path = request.nextUrl.pathname;
+  if (path.startsWith("/admin") && !path.startsWith("/admin/login") && !request.cookies.get("hc_admin")) {
+    const to = request.nextUrl.clone();
+    to.pathname = "/admin/login";
+    to.search = "";
+    return NextResponse.redirect(to);
+  }
+
+  let response = NextResponse.next({ request });
   const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
   const key = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY;
-  let response = NextResponse.next({ request });
-  if (!url || !key) return response;
+  if (!url || !key || path.startsWith("/admin")) return response;
 
   const supabase = createServerClient(url, key, {
     cookies: {
@@ -21,14 +31,7 @@ export async function proxy(request: NextRequest) {
       },
     },
   });
-  const { data } = await supabase.auth.getUser();
-
-  if (request.nextUrl.pathname.startsWith("/admin") && !data.user) {
-    const to = request.nextUrl.clone();
-    to.pathname = "/login";
-    to.search = "?next=/admin";
-    return NextResponse.redirect(to);
-  }
+  await supabase.auth.getUser();
   return response;
 }
 

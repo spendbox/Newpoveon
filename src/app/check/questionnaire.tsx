@@ -102,24 +102,24 @@ export function Questionnaire() {
   const answered = value !== undefined && !(Array.isArray(value) && value.length === 0);
 
   return (
-    <div className="mx-auto w-full max-w-[430px] px-6 pt-6 pb-8 md:my-8 md:rounded-[40px] md:bg-ground md:shadow-[0_0_0_2.5px_#0E2A24,0_14px_0_#0E2A24]">
+    <div className="mx-auto w-full max-w-[460px] px-5 pt-5 pb-8 md:my-10 md:rounded-[var(--radius-xl)] md:border md:border-line md:bg-surface md:px-8 md:pt-7 md:shadow-[var(--shadow-lg)]">
       {support && <SupportScreen onClose={() => { setSupport(false); goTo(index + 1); }} />}
       <div className="flex h-11 items-center justify-between">
         {index === 0 ? (
-          <button type="button" onClick={() => router.push("/")} aria-label="Back to start" className="flex h-11 w-11 items-center justify-center rounded-[var(--radius-sm)] bg-surface">
-            <Icon name="close" size={20} />
+          <button type="button" onClick={() => router.push("/")} aria-label="Back to start" className="flex h-11 w-11 items-center justify-center rounded-full border border-line bg-surface hover:bg-surface-2">
+            <Icon name="close" size={18} strokeWidth={2} />
           </button>
         ) : (
-          <button type="button" onClick={() => goTo(index - 1)} aria-label="Previous question" className="flex h-11 w-11 items-center justify-center rounded-[var(--radius-sm)] bg-surface">
-            <Icon name="arrowLeft" size={20} />
+          <button type="button" onClick={() => goTo(index - 1)} aria-label="Previous question" className="flex h-11 w-11 items-center justify-center rounded-full border border-line bg-surface hover:bg-surface-2">
+            <Icon name="arrowLeft" size={18} strokeWidth={2} />
           </button>
         )}
-        <span className="text-[15px] font-extrabold text-muted">
-          Question {index + 1} of {list.length}
-          <span className="block text-center text-xs text-muted-soft">{q.topic}</span>
+        <span className="text-center text-sm font-medium text-muted tabular">
+          <span className="block text-xs font-semibold tracking-[0.06em] text-primary uppercase">{q.topic}</span>
+          {index + 1} of {list.length}
         </span>
-        <Link href="/doctor" aria-label="Talk to a doctor" className="flex h-11 items-center gap-1.5 rounded-[var(--radius-sm)] bg-surface px-3 text-xs font-extrabold">
-          <span className="flex h-6 w-6 items-center justify-center rounded-full bg-coral"><Icon name="chat" size={14} /></span>Doctor
+        <Link href="/doctor" aria-label="Talk to a doctor" className="flex h-11 items-center gap-1.5 rounded-full border border-line bg-surface pr-3.5 pl-1.5 text-[13px] font-medium hover:bg-surface-2">
+          <span className="flex h-8 w-8 items-center justify-center rounded-full bg-primary text-white"><Icon name="stethoscope" size={16} strokeWidth={2} /></span>Doctor
         </Link>
       </div>
 
@@ -129,21 +129,21 @@ export function Questionnaire() {
         <motion.section
           key={q.id}
           custom={dir}
-          initial={reduce ? { opacity: 0 } : { opacity: 0, x: 40 * dir, scale: 0.97 }}
+          initial={reduce ? { opacity: 0 } : { opacity: 0, x: 28 * dir }}
           animate={{ opacity: 1, x: 0, scale: 1 }}
-          exit={reduce ? { opacity: 0 } : { opacity: 0, x: -30 * dir }}
-          transition={{ duration: reduce ? 0.1 : 0.45, ease: [0.2, 0.8, 0.2, 1] }}
+          exit={reduce ? { opacity: 0 } : { opacity: 0, x: -20 * dir }}
+          transition={{ duration: reduce ? 0.1 : 0.32, ease: [0.2, 0.8, 0.2, 1] }}
           aria-labelledby={`q-${q.id}`}
-          className="mt-3"
+          className="mt-5"
         >
-          <IllustrationCard name={q.illustration} happy={q.id === "smoking" && (value === "never" || value === "former")} />
-          {q.help && (q.topic === "Mood" || q.topic === "Worry") && <p className="mt-4 text-[15px] font-bold text-muted">{q.help}</p>}
-          <h1 id={`q-${q.id}`} className="mt-3 text-[27px] leading-[30px]">{q.title}</h1>
+          <IllustrationCard name={q.illustration} compact />
+          {q.help && (q.topic === "Mood" || q.topic === "Worry") && <p className="mt-5 text-sm text-muted">{q.help}</p>}
+          <h1 id={`q-${q.id}`} className="mt-5 text-[26px] leading-[1.15] font-semibold">{q.title}</h1>
           {q.help && q.topic !== "Mood" && q.topic !== "Worry" && <p className="mt-2 text-[15px] leading-snug text-muted">{q.help}</p>}
 
-          <div className="mt-4">
+          <div className="mt-5">
             {q.kind === "choice" && (
-              <div role="radiogroup" aria-labelledby={`q-${q.id}`} className={q.layout === "rows" || q.options.length > 4 ? "flex flex-col gap-2.5" : `grid gap-3 ${q.options.length === 2 || q.options.length === 4 ? "grid-cols-2" : "grid-cols-3"}`}>
+              <div role="radiogroup" aria-labelledby={`q-${q.id}`} className={q.layout === "rows" || q.options.length > 4 ? "flex flex-col gap-2" : `grid gap-2.5 ${q.options.length === 2 || q.options.length === 4 ? "grid-cols-2" : "grid-cols-3"}`}>
                 {q.options.map((o) => (
                   <AnswerTile key={o.value} label={o.label} icon={o.icon} selected={value === o.value} layout={q.layout === "rows" || q.options.length > 4 ? "rows" : "grid"} onClick={() => choose(q, o.value)} />
                 ))}
@@ -181,7 +181,7 @@ export function Questionnaire() {
           )}
         </motion.section>
       </AnimatePresence>
-      <p className="mt-5 text-center text-xs font-bold text-muted-soft">Your answers are saved on this phone as you go.</p>
+      <p className="mt-5 flex items-center justify-center gap-1.5 text-center text-xs text-subtle"><Icon name="shield" size={14} strokeWidth={2} /> Saved privately on this phone as you go</p>
     </div>
   );
 }
@@ -213,7 +213,7 @@ function NumberInput({ q, value, onChange }: { q: Extract<Question, { kind: "num
         <div className="flex gap-2" role="group" aria-label="Units">
           {(["cm", "ft"] as const).map((u) => (
             <button key={u} type="button" aria-pressed={unit === u} onClick={() => { setUnit(u); onChange(undefined); setText(""); setFt(""); setInch(""); }}
-              className={`min-h-[44px] rounded-full border-[2.5px] px-4 text-sm font-extrabold ${unit === u ? "border-ink bg-coral-tint" : "border-border bg-surface"}`}>
+              className={`min-h-[44px] rounded-full border px-4 text-sm font-semibold ${unit === u ? "border-ink bg-coral-soft" : "border-line bg-surface"}`}>
               {u === "cm" ? "Centimetres" : "Feet and inches"}
             </button>
           ))}
@@ -222,20 +222,20 @@ function NumberInput({ q, value, onChange }: { q: Extract<Question, { kind: "num
       {unit === "cm" || !q.feetInches ? (
         <div className="flex items-center gap-3">
           <label htmlFor={`in-${q.id}`} className="sr-only">{q.title} ({q.unit})</label>
-          <input id={`in-${q.id}`} inputMode="decimal" autoComplete="off" className={`${inputCls} font-display text-2xl`} placeholder={q.placeholder} value={unknown ? "" : text} disabled={unknown} onChange={(e) => commit(e.target.value.replace(/[^\d.]/g, ""))} aria-invalid={outOfRange} />
-          <span className="text-lg font-extrabold">{q.unit}</span>
+          <input id={`in-${q.id}`} inputMode="decimal" autoComplete="off" className={`${inputCls} text-xl font-medium tabular`} placeholder={q.placeholder} value={unknown ? "" : text} disabled={unknown} onChange={(e) => commit(e.target.value.replace(/[^\d.]/g, ""))} aria-invalid={outOfRange} />
+          <span className="text-lg font-semibold">{q.unit}</span>
         </div>
       ) : (
         <div className="flex items-center gap-3">
           <label className="sr-only" htmlFor={`ft-${q.id}`}>Feet</label>
-          <input id={`ft-${q.id}`} inputMode="numeric" className={`${inputCls} font-display text-2xl`} placeholder="5" value={ft} onChange={(e) => commitFeet(e.target.value.replace(/\D/g, ""), inch)} />
-          <span className="font-extrabold">ft</span>
+          <input id={`ft-${q.id}`} inputMode="numeric" className={`${inputCls} text-xl font-medium tabular`} placeholder="5" value={ft} onChange={(e) => commitFeet(e.target.value.replace(/\D/g, ""), inch)} />
+          <span className="font-semibold">ft</span>
           <label className="sr-only" htmlFor={`inch-${q.id}`}>Inches</label>
-          <input id={`inch-${q.id}`} inputMode="numeric" className={`${inputCls} font-display text-2xl`} placeholder="8" value={inch} onChange={(e) => commitFeet(ft, e.target.value.replace(/\D/g, ""))} />
-          <span className="font-extrabold">in</span>
+          <input id={`inch-${q.id}`} inputMode="numeric" className={`${inputCls} text-xl font-medium tabular`} placeholder="8" value={inch} onChange={(e) => commitFeet(ft, e.target.value.replace(/\D/g, ""))} />
+          <span className="font-semibold">in</span>
         </div>
       )}
-      {outOfRange && <p className="text-sm font-bold text-caution-text" role="alert">Please enter a number between {q.min} and {q.max}.</p>}
+      {outOfRange && <p className="text-sm font-medium text-check-text" role="alert">Please enter a number between {q.min} and {q.max}.</p>}
       {q.skipLabel && (
         <AnswerTile layout="rows" label={q.skipLabel} icon="question" selected={unknown} multi onClick={() => { setText(""); onChange(unknown ? undefined : "unknown"); }} />
       )}
@@ -257,17 +257,17 @@ function BpInput({ value, onChange }: { value: BpValue | undefined; onChange: (v
     <div>
       <div className="flex items-end gap-3">
         <div className="flex-1">
-          <label htmlFor="sbp" className="mb-1 block text-sm font-extrabold">Top number</label>
-          <input id="sbp" inputMode="numeric" className={`${inputCls} font-display text-2xl`} placeholder="120" value={s} onChange={(e) => commit(e.target.value.replace(/\D/g, ""), d)} />
+          <label htmlFor="sbp" className="mb-1 block text-sm font-semibold">Top number</label>
+          <input id="sbp" inputMode="numeric" className={`${inputCls} text-xl font-medium tabular`} placeholder="120" value={s} onChange={(e) => commit(e.target.value.replace(/\D/g, ""), d)} />
         </div>
-        <span className="pb-3 font-display text-3xl font-extrabold" aria-hidden="true">/</span>
+        <span className="pb-3 font-display text-3xl font-semibold" aria-hidden="true">/</span>
         <div className="flex-1">
-          <label htmlFor="dbp" className="mb-1 block text-sm font-extrabold">Bottom number</label>
-          <input id="dbp" inputMode="numeric" className={`${inputCls} font-display text-2xl`} placeholder="80" value={d} onChange={(e) => commit(s, e.target.value.replace(/\D/g, ""))} />
+          <label htmlFor="dbp" className="mb-1 block text-sm font-semibold">Bottom number</label>
+          <input id="dbp" inputMode="numeric" className={`${inputCls} text-xl font-medium tabular`} placeholder="80" value={d} onChange={(e) => commit(s, e.target.value.replace(/\D/g, ""))} />
         </div>
-        <span className="pb-3 text-sm font-extrabold">mmHg</span>
+        <span className="pb-3 text-sm font-semibold">mmHg</span>
       </div>
-      {bad && <p className="mt-2 text-sm font-bold text-caution-text" role="alert">That reading doesn&apos;t look right. The top number is usually 90–200 and the bottom 50–120.</p>}
+      {bad && <p className="mt-2 text-sm font-medium text-check-text" role="alert">That reading doesn&apos;t look right. The top number is usually 90–200 and the bottom 50–120.</p>}
     </div>
   );
 }

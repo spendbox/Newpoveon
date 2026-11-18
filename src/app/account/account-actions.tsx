@@ -40,12 +40,12 @@ export function DeleteAccount() {
   if (!open) return <Button variant="quiet" icon="trash" className="mt-3" onClick={() => setOpen(true)}>Delete my account and data</Button>;
   return (
     <div className="mt-3 flex flex-col gap-3">
-      <label htmlFor="del" className="text-sm font-extrabold">Type DELETE to confirm</label>
+      <label htmlFor="del" className="text-sm font-semibold">Type DELETE to confirm</label>
       <input id="del" className={inputCls} value={text} onChange={(e) => setText(e.target.value)} autoComplete="off" />
       {error && <Notice tone="warn">That didn&apos;t work. Please try again or contact us.</Notice>}
       <div className="flex gap-2">
         <Button variant="secondary" onClick={() => setOpen(false)}>Cancel</Button>
-        <Button variant="secondary" icon="trash" disabled={text !== "DELETE" || busy} onClick={go} className="border-caution-text text-caution-text">
+        <Button variant="secondary" icon="trash" disabled={text !== "DELETE" || busy} onClick={go} className="border-check-text text-check-text">
           {busy ? "Deleting…" : "Delete everything"}
         </Button>
       </div>

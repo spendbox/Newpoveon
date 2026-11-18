@@ -64,13 +64,23 @@ export async function setRequestStatus(f: FormData) {
 export async function saveTest(f: FormData) {
   await requireAdmin();
   const priceRaw = str(f, "price", 12).replace(/[^\d]/g, "");
+  const cats = ["full", "heart", "diabetes", "women", "men", "fertility", "sexual", "premarital", "pregnancy", "organs", "wellness", "single"];
+  const includes = str(f, "includes", 4000).split(/\n|,(?![^(]*\))/).map((x) => x.trim()).filter(Boolean).slice(0, 60);
   const row = {
     code: str(f, "code", 60).toLowerCase().replace(/[^a-z0-9-]/g, "-"),
     name: str(f, "name", 120),
     description: str(f, "description", 500) || null,
     price_naira: priceRaw ? Number(priceRaw) : null,
-    is_bundle: f.get("is_bundle") === "on",
-    includes: str(f, "includes", 500).split(",").map((s) => s.trim()).filter(Boolean),
+    category: cats.includes(str(f, "category")) ? str(f, "category") : "single",
+    is_bundle: includes.length > 1,
+    includes,
+    sample: str(f, "sample", 80) || null,
+    fasting: f.get("fasting") === "on",
+    turnaround: str(f, "turnaround", 40) || null,
+    notes: str(f, "notes", 600) || null,
+    for_sex: ["female", "male"].includes(str(f, "for_sex")) ? str(f, "for_sex") : null,
+    collection: ["home", "lab", "both"].includes(str(f, "collection")) ? str(f, "collection") : "home",
+    featured: f.get("featured") === "on",
     active: f.get("active") === "on",
     sort: Number(f.get("sort") || 100),
     updated_at: new Date().toISOString(),

@@ -12,7 +12,15 @@ create function auth.uid() returns uuid language sql stable as $$ select nullif(
 grant usage on schema public to anon, authenticated, service_role;
 alter default privileges in schema public grant all on tables to anon, authenticated, service_role;
 `);
-await db.exec(fs.readFileSync(new URL("../migrations/20261117000000_init.sql", import.meta.url), "utf8"));
+for (const f of fs.readdirSync(new URL("../migrations/", import.meta.url)).filter((f) => f.endsWith(".sql")).sort()) {
+  await db.exec(fs.readFileSync(new URL(`../migrations/${f}`, import.meta.url), "utf8"));
+}
+// Running the package migration twice must be safe.
+await db.exec(fs.readFileSync(new URL("../migrations/20261118000000_lab_packages.sql", import.meta.url), "utf8"));
+await db.exec("update home_tests set price_naira = 45000 where code = 'full-health-check'");
+await db.exec(fs.readFileSync(new URL("../migrations/20261118000000_lab_packages.sql", import.meta.url), "utf8"));
+console.log("price kept after re-run:", (await db.query("select price_naira from home_tests where code='full-health-check'")).rows[0].price_naira);
+console.log("packages:", (await db.query("select count(*)::int n from home_tests where is_bundle and active")).rows[0].n, "single tests:", (await db.query("select count(*)::int n from home_tests where not is_bundle and active")).rows[0].n);
 console.log("migration OK");
 const u1 = "11111111-1111-1111-1111-111111111111", u2 = "22222222-2222-2222-2222-222222222222";
 await db.exec(`insert into auth.users values ('${u1}','a@x.com'),('${u2}','b@x.com');`);

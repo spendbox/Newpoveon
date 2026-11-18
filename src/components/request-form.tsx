@@ -8,8 +8,10 @@ import { whatsappLink } from "@/lib/whatsapp";
 
 type Test = { id: string; code: string; name: string; description: string | null; price_naira: number | null; is_bundle: boolean; includes: string[] };
 
-export function RequestForm({ kind, tests, preselect }: { kind: "home_test" | "medication"; tests: Test[]; preselect: string | null }) {
+export function RequestForm({ kind, tests, preselect, hideTestPicker = false }: { kind: "home_test" | "medication"; tests: Test[]; preselect: string | null; hideTestPicker?: boolean }) {
   const [testId, setTestId] = useState<string | null>(tests.find((t) => t.code === preselect)?.id ?? null);
+  // Free-text need when the test list is empty.
+  const [need, setNeed] = useState("");
   const [name, setName] = useState("");
   const [phone, setPhone] = useState("");
   const [email, setEmail] = useState("");
@@ -45,7 +47,7 @@ export function RequestForm({ kind, tests, preselect }: { kind: "home_test" | "m
     const r = await fetch("/api/requests", {
       method: "POST",
       headers: { "content-type": "application/json" },
-      body: JSON.stringify({ kind, testId, name, phone, email: email || null, address, preferredTime: when, medicines, prescription: rx, consultReference: consultRef }),
+      body: JSON.stringify({ kind, testId, name, phone, email: email || null, address, preferredTime: when, need, medicines, prescription: rx, consultReference: consultRef }),
     }).catch(() => null);
     const d = r ? await r.json().catch(() => ({})) : {};
     setBusy(false);
@@ -59,7 +61,7 @@ export function RequestForm({ kind, tests, preselect }: { kind: "home_test" | "m
       <div className="mt-6 flex flex-col gap-3">
         <Notice tone="good">Thank you, {name.split(" ")[0]}! We&apos;ve got your request and will contact you on {phone} soon.</Notice>
         {wa && (
-          <a href={wa} target="_blank" rel="noopener noreferrer" className="inline-flex min-h-[58px] items-center justify-center gap-2 rounded-[var(--radius-md)] border-[2.5px] border-ink bg-[#25D366] text-[19px] font-extrabold btn-press">
+          <a href={wa} target="_blank" rel="noopener noreferrer" className="inline-flex min-h-[58px] items-center justify-center gap-2 rounded-[var(--radius-md)] border border-line-strong bg-[#25D366] text-[19px] font-semibold">
             <Icon name="whatsapp" size={24} /> Chat on WhatsApp
           </a>
         )}
@@ -70,11 +72,14 @@ export function RequestForm({ kind, tests, preselect }: { kind: "home_test" | "m
 
   return (
     <form onSubmit={submit} className="mt-6 flex flex-col gap-4" noValidate>
-      {kind === "home_test" && (
+      {kind === "home_test" && !hideTestPicker && (
         <fieldset>
-          <legend className="text-lg font-extrabold">Choose a test</legend>
+          <legend className="text-lg font-semibold">Choose a test</legend>
           {tests.length === 0 ? (
-            <p className="mt-2 text-sm font-bold text-muted">Our test list is being updated. Tell us what you need below and we&apos;ll call you.</p>
+            <>
+              <label htmlFor="r-need" className="mt-2 block text-sm text-muted">Our test list is being updated. Tell us which test you need and we&apos;ll call you.</label>
+              <textarea id="r-need" rows={2} className={`${inputCls} mt-2 py-3`} value={need} onChange={(e) => setNeed(e.target.value)} maxLength={500} />
+            </>
           ) : (
             <div className="mt-2 flex flex-col gap-2.5" role="radiogroup" aria-label="Test">
               {tests.map((t) => (
@@ -92,7 +97,7 @@ export function RequestForm({ kind, tests, preselect }: { kind: "home_test" | "m
             <textarea id="r-meds" rows={3} className={`${inputCls} py-3`} value={medicines} onChange={(e) => setMedicines(e.target.value)} maxLength={1500} />
           </Field>
           <fieldset>
-            <legend className="text-sm font-extrabold">Are any of these prescription medicines?</legend>
+            <legend className="text-sm font-semibold">Are any of these prescription medicines?</legend>
             <div className="mt-2 grid grid-cols-3 gap-2" role="radiogroup">
               {(["yes", "no", "unsure"] as const).map((v) => (
                 <AnswerTile key={v} label={v === "yes" ? "Yes" : v === "no" ? "No" : "Not sure"} selected={rx === v} onClick={() => setRx(v)} layout="rows" />
@@ -100,8 +105,8 @@ export function RequestForm({ kind, tests, preselect }: { kind: "home_test" | "m
             </div>
           </fieldset>
           {(rx === "yes" || rx === "unsure") && (
-            <div className="flex flex-col gap-3 rounded-[var(--radius-md)] bg-caution-bg p-4">
-              <p className="text-sm font-bold text-caution-text">We can only supply prescription medicines after a consult with one of our doctors.</p>
+            <div className="flex flex-col gap-3 rounded-[var(--radius-md)] bg-check-bg p-4">
+              <p className="text-sm font-medium text-check-text">We can only supply prescription medicines after a consult with one of our doctors.</p>
               <ButtonLink href="/doctor" icon="chat">Book a doctor first</ButtonLink>
               <Field id="r-ref" label="Already had a consult with us? Enter your booking reference">
                 <input id="r-ref" className={inputCls} value={consultRef} onChange={(e) => setConsultRef(e.target.value)} placeholder="HC-…" />

@@ -46,6 +46,15 @@ const P: Record<string, React.ReactNode> = {
   trash: <><path d="M7 11h26M16 11V7h8v4M10 11l2 22h16l2-22" /><path d="M17 17v10M23 17v10" /></>,
   clock: <><circle cx="20" cy="20" r="14" /><path d="M20 12v9l6 3" /></>,
   location: <><path d="M20 35s11-9.5 11-19a11 11 0 0 0-22 0c0 9.5 11 19 11 19z" /><circle cx="20" cy="16" r="4" /></>,
+  scale: <><rect x="7" y="7" width="26" height="26" rx="7" /><path d="M13 16a9 9 0 0 1 14 0" /><path d="M20 16l3-4" /></>,
+  ruler: <><rect x="5" y="14" width="30" height="12" rx="3" /><path d="M11 14v5M17 14v3M23 14v5M29 14v3" /></>,
+  glass: <><path d="M12 6h16l-2 27H14z" /><path d="M13 15h14" /></>,
+  lungs: <><path d="M20 6v14M20 15l-4 4M20 15l4 4" /><path d="M15 13c-5 0-8 7-8 14 0 4 4 6 7 4s3-6 3-12" /><path d="M25 13c5 0 8 7 8 14 0 4-4 6-7 4s-3-6-3-12" /></>,
+  mind: <><path d="M14 33v-5c-4-2-7-6-7-11a13 13 0 0 1 26 0c0 3-1 5-3 6v4h-4v6" /><path d="M16 17a4 4 0 0 1 8 0c0 3-4 3-4 6" /></>,
+  clipboard: <><rect x="9" y="8" width="22" height="27" rx="4" /><path d="M15 8V6h10v2" /><path d="M14 18l3 3 6-6M14 28h12" /></>,
+  stethoscope: <><path d="M10 5v9a7 7 0 0 0 14 0V5" /><path d="M17 21v4a8 8 0 0 0 16 0v-3" /><circle cx="33" cy="19" r="3" /></>,
+  box: <><path d="M6 13l14-7 14 7v15l-14 7-14-7z" /><path d="M6 13l14 7 14-7M20 20v15" /></>,
+  target: <><circle cx="20" cy="20" r="14" /><circle cx="20" cy="20" r="8" /><circle cx="20" cy="20" r="2" /></>,
   sparkle: <path d="M20 5l3.5 11.5L35 20l-11.5 3.5L20 35l-3.5-11.5L5 20l11.5-3.5z" />,
 };
 

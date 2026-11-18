@@ -20,7 +20,7 @@ export default async function DoctorPage({ searchParams }: PageProps<"/doctor">)
           <p className="mt-2 text-[17px] text-muted">
             A {site.consultMinutes}-minute phone or WhatsApp consult with a qualified Nigerian physician. No login needed. Pay securely with Paystack.
           </p>
-          <ul className="mt-4 flex flex-col gap-2 text-[15px] font-bold">
+          <ul className="mt-4 flex flex-col gap-2 text-[15px] font-medium">
             <li className="flex gap-2"><Icon name="check" size={20} /> Pick a time that suits you</li>
             <li className="flex gap-2"><Icon name="check" size={20} /> Share your results so you don&apos;t repeat yourself</li>
             <li className="flex gap-2"><Icon name="check" size={20} /> Prescriptions and home tests arranged if needed</li>
