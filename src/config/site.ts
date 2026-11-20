@@ -4,7 +4,8 @@
  */
 export const site = {
   /** Working name of the screening app. Rename here and it changes everywhere. */
-  appName: process.env.NEXT_PUBLIC_APP_NAME || "HealthCheck",
+  /** The brand name everywhere on the site and in emails. */
+  appName: "Poveon",
   /** The company / platform name. */
   companyName: "Poveon",
   tagline: "Friendly health screening for Nigerians",
@@ -21,8 +22,8 @@ export const site = {
   /** Where team notifications go (env: TEAM_NOTIFICATION_EMAIL). Server only. */
   teamEmail: process.env.TEAM_NOTIFICATION_EMAIL || "",
 
-  /** Sender for all emails, e.g. "HealthCheck <hello@yourdomain.com>" (env: EMAIL_FROM). */
-  emailFrom: process.env.EMAIL_FROM || "HealthCheck <onboarding@resend.dev>",
+  /** Sender for all emails, e.g. "Poveon <hello@yourdomain.com>" (env: EMAIL_FROM). */
+  emailFrom: process.env.EMAIL_FROM || "Poveon <onboarding@resend.dev>",
 
   /** Timezone used to show appointment times. */
   timeZone: "Africa/Lagos",

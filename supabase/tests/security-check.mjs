@@ -52,6 +52,11 @@ await db.exec(fs.readFileSync(new URL("../migrations/20261120000000_voice_notes.
 await db.exec(fs.readFileSync(new URL("../migrations/20261120000000_voice_notes.sql", import.meta.url), "utf8"));
 console.log("voice bucket private:", JSON.stringify((await db.query("select id, public from storage.buckets")).rows));
 console.log("packages:", (await db.query("select count(*)::int n from home_tests where is_bundle and active")).rows[0].n, "single tests:", (await db.query("select count(*)::int n from home_tests where not is_bundle and active")).rows[0].n);
+{
+  const rn = fs.readFileSync(new URL("../migrations/20261123000000_rename_to_poveon.sql", import.meta.url), "utf8");
+  await db.exec(rn); await db.exec(rn);
+  console.log("old name left in consult types:", (await db.query("select count(*)::int n from consult_types where name like '%HealthCheck%' or description like '%HealthCheck%'")).rows[0].n);
+}
 console.log("migration OK");
 const u1 = "11111111-1111-1111-1111-111111111111", u2 = "22222222-2222-2222-2222-222222222222";
 await db.exec(`insert into auth.users values ('${u1}','a@x.com'),('${u2}','b@x.com');`);

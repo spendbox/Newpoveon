@@ -1,6 +1,6 @@
 # Screening tools: sources, licences and how we checked them
 
-Every score in HealthCheck comes from a published, validated tool. Nothing is invented.
+Every score in Poveon comes from a published, validated tool. Nothing is invented.
 The scoring code is in `src/lib/scoring/`, with the source cited at the top of each function,
 and the tests are in `src/lib/scoring/scoring.test.ts` (run `npm test`).
 

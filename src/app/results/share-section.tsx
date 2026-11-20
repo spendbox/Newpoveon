@@ -77,7 +77,7 @@ export function ShareSection({ results, saved }: { results: Results; saved: Save
     setMsg(enabled ? "Your share link is on. Anyone with the link can see your summary." : "Your share link is off. The old link no longer works.");
   }
 
-  const waText = link ? `I just did my free ${site.appName}. Here's my summary: ${link}` : `I just did a free ${site.appName} in 10 minutes. Check your heart age: ${site.siteUrl}`;
+  const waText = link ? `I just did my free ${site.appName} health check. Here's my summary: ${link}` : `I just did a free ${site.appName} health check in 10 minutes. Check your heart age: ${site.siteUrl}`;
 
   return (
     <section className="mt-8 rounded-[var(--radius-xl)] border border-line bg-surface p-5" aria-labelledby="share">

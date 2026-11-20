@@ -1,4 +1,4 @@
-# HealthCheck design guide (v2 · "Calm vitality")
+# Poveon design guide (v2 · "Calm vitality")
 
 Modern, clean and quietly fun. It should feel like a well-made product, not a hospital form and not a cartoon.
 v1 (thick outlines, chunky shadows, cartoon characters) is kept for reference in [`archive-v1/`](archive-v1/).
@@ -80,3 +80,11 @@ Text meets 4.5:1 (3:1 for text 24px and larger). Touch targets are 44px or more.
 ## Voice
 
 Short sentences. Encourage, never scare: "This can come down." Every result says it's an estimate, not a diagnosis, and names its tool.
+
+## Logo (Poveon mark)
+
+- Editable vector: `public/brand/poveon-mark.svg` (viewBox 400 × 400, three paths: `poveon-top`, `poveon-left`, `poveon-big`).
+- In code: `src/components/poveon-mark.tsx`. The browser tab icon is `src/app/icon.svg`.
+- Colours, matched to the site greens: top `#8FD3BF`, left `#3FA88A`, main piece primary `#136F58`.
+- Shape: three pieces with 45° cut ends forming a cross and a forward arrow; 20-unit gaps; soft rounded corners.
+- Motion: on a visitor's first visit to the home page, the pieces glide in (top from above, left from the side, main piece from bottom-right) and the name fades in. Plays once per browser; never for reduced motion.

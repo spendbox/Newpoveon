@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { BodyMap } from "@/components/body-map";
 import { Logo } from "@/components/ui";
 
-export const metadata: Metadata = { title: "Health guides", description: "What each part of your HealthCheck means and how to improve it." };
+export const metadata: Metadata = { title: "Health guides", description: "What each part of your Poveon check means and how to improve it." };
 
 export default function LearnIndex() {
   return (

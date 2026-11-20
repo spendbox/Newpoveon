@@ -1,6 +1,7 @@
 import Link from "next/link";
 import type { ComponentProps, ReactNode } from "react";
 import { Icon, type IconName } from "./icons";
+import { PoveonMark } from "./poveon-mark";
 import { site } from "@/config/site";
 import type { ResultCard as ResultCardData, Status } from "@/lib/scoring/results";
 import { STATUS_LABEL } from "@/lib/scoring/results";
@@ -33,16 +34,12 @@ export function ButtonLink({ variant = "primary", icon, iconRight, children, cla
   );
 }
 
-export function Logo() {
+/** Poveon mark + product name. `animate` (home page nav only) plays the first-visit intro. */
+export function Logo({ animate = false }: { animate?: boolean }) {
   return (
     <Link href="/" className="inline-flex items-center gap-2" aria-label={`${site.appName} home`}>
-      <span className="relative flex h-8 w-8 items-center justify-center rounded-[10px] bg-primary">
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-          <path d="M3 12h4l2-5 4 10 2-5h6" />
-        </svg>
-        <span className="absolute -top-0.5 -right-0.5 h-2.5 w-2.5 rounded-full border-2 border-ground bg-coral" />
-      </span>
-      <span className="font-display text-[19px] font-bold tracking-tight">{site.appName}</span>
+      <PoveonMark size={32} animate={animate} />
+      <span className={`font-display text-[19px] font-bold tracking-tight ${animate ? "pv-word" : ""}`}>{site.appName}</span>
     </Link>
   );
 }
