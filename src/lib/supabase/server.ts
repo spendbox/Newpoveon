@@ -2,7 +2,6 @@ import "server-only";
 import { createServerClient } from "@supabase/ssr";
 import { createClient, type SupabaseClient } from "@supabase/supabase-js";
 import { cookies } from "next/headers";
-import { adminEmails } from "@/config/site";
 
 const url = () => process.env.NEXT_PUBLIC_SUPABASE_URL || "";
 /** Supabase calls this the "anon" or "publishable" key. Safe for the browser. */
@@ -42,15 +41,6 @@ export async function currentUser() {
   const sb = await supabaseUser();
   const { data } = await sb.auth.getUser();
   return data.user ?? null;
-}
-
-/** Admin = email is in ADMIN_EMAILS *and* the database role is 'admin' (kept in sync at login). */
-export async function currentAdmin() {
-  const user = await currentUser();
-  if (!user?.email) return null;
-  if (!adminEmails().includes(user.email.toLowerCase())) return null;
-  const { data } = await supabaseAdmin().from("profiles").select("role").eq("id", user.id).single();
-  return data?.role === "admin" ? user : null;
 }
 
 export class NotConfiguredError extends Error {

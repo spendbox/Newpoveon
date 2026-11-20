@@ -66,7 +66,7 @@ export interface Results {
 }
 
 const retest = (months: number): NextStep => ({ kind: "retest", label: `Check again in ${months} months`, months });
-const doctor = (label = "Talk to a doctor"): NextStep => ({ kind: "doctor", label });
+const doctor = (label = "Get help from a doctor"): NextStep => ({ kind: "doctor", label });
 const test = (testCode: string, label: string): NextStep => ({ kind: "test", testCode, label });
 const pct = (p: number) => Math.round(p * 1000) / 10;
 

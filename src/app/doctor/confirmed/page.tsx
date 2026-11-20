@@ -1,5 +1,4 @@
 import type { Metadata } from "next";
-import { site } from "@/config/site";
 import { Icon } from "@/components/icons";
 import { IllustrationCard } from "@/components/illustrations";
 import { ButtonLink, Logo, Notice } from "@/components/ui";
@@ -15,11 +14,11 @@ export default async function ConfirmedPage({ searchParams }: PageProps<"/doctor
   const sp = await searchParams;
   const reference = typeof sp.reference === "string" && /^HC-[A-Za-z0-9_-]{6,40}$/.test(sp.reference) ? sp.reference : null;
   let paid = false;
-  let booking: { name: string; slot_starts_at: string | null; needs_reschedule: boolean } | null = null;
+  let booking: { name: string; slot_starts_at: string | null; needs_reschedule: boolean; amount_kobo: number; doctor_type: string | null } | null = null;
   if (reference && supabaseConfigured() && paystackConfigured()) {
     try {
       paid = (await confirmBookingPayment(reference, "verify")).paid;
-      const { data } = await supabaseAdmin().from("bookings").select("name, slot_starts_at, needs_reschedule, status").eq("paystack_reference", reference).single();
+      const { data } = await supabaseAdmin().from("bookings").select("name, slot_starts_at, needs_reschedule, status, amount_kobo, doctor_type").eq("paystack_reference", reference).single();
       if (data) {
         booking = data;
         paid = paid || data.status === "paid";
@@ -36,13 +35,13 @@ export default async function ConfirmedPage({ searchParams }: PageProps<"/doctor
       {paid ? (
         <>
           <h1 className="mt-5 text-[30px] leading-[1.05]">You&apos;re booked{booking ? `, ${booking.name.split(" ")[0]}` : ""}!</h1>
-          <p className="mt-2 text-[17px] text-muted">We&apos;ve received your ₦{site.consultPriceNaira.toLocaleString("en-NG")} payment and emailed your confirmation.</p>
+          <p className="mt-2 text-[17px] text-muted">We&apos;ve received your {booking ? `₦${(booking.amount_kobo / 100).toLocaleString("en-NG")} ` : ""}payment and emailed your confirmation.{booking?.doctor_type ? ` You'll speak with a ${booking.doctor_type.toLowerCase()}.` : ""}</p>
           <div className="mt-4 flex items-center gap-3 rounded-[var(--radius-md)] bg-good-bg p-4 text-good-text">
             <Icon name="clock" size={24} />
-            <p className="font-extrabold">{booking?.slot_starts_at ? formatWhen(booking.slot_starts_at) : "We'll call you to agree a time."}</p>
+            <p className="font-semibold">{booking?.slot_starts_at ? formatWhen(booking.slot_starts_at) : "We'll call you to agree a time."}</p>
           </div>
           {booking?.needs_reschedule && <div className="mt-3"><Notice tone="warn">That time was taken while you were paying. Our team will call you to pick a new one.</Notice></div>}
-          <p className="mt-3 text-sm font-bold text-muted-soft">Reference: {reference}</p>
+          <p className="mt-3 text-sm font-medium text-subtle">Reference: {reference}</p>
         </>
       ) : (
         <>
@@ -50,12 +49,12 @@ export default async function ConfirmedPage({ searchParams }: PageProps<"/doctor
           <p className="mt-2 text-[17px] text-muted">
             If you completed payment, your confirmation email will arrive shortly. If something went wrong, no money was taken. You can try again or message us.
           </p>
-          {reference && <p className="mt-3 text-sm font-bold text-muted-soft">Reference: {reference}</p>}
+          {reference && <p className="mt-3 text-sm font-medium text-subtle">Reference: {reference}</p>}
         </>
       )}
       <div className="mt-6 flex flex-col gap-3">
         {wa && (
-          <a href={wa} target="_blank" rel="noopener noreferrer" className="inline-flex min-h-[58px] items-center justify-center gap-2 rounded-[var(--radius-md)] border-[2.5px] border-ink bg-[#25D366] text-[19px] font-extrabold btn-press">
+          <a href={wa} target="_blank" rel="noopener noreferrer" className="inline-flex min-h-[58px] items-center justify-center gap-2 rounded-[var(--radius-md)] border border-line-strong bg-[#25D366] text-[19px] font-semibold">
             <Icon name="whatsapp" size={24} /> Chat on WhatsApp
           </a>
         )}

@@ -1,10 +1,7 @@
 import type { Metadata, Viewport } from "next";
 import Link from "next/link";
-import "@fontsource/baloo-2/700.css";
-import "@fontsource/baloo-2/800.css";
-import "@fontsource/nunito/600.css";
-import "@fontsource/nunito/700.css";
-import "@fontsource/nunito/800.css";
+import "@fontsource-variable/bricolage-grotesque/wght.css";
+import "@fontsource-variable/inter/wght.css";
 import "./globals.css";
 import { site } from "@/config/site";
 import { FloatingDoctor } from "@/components/client";
@@ -15,7 +12,7 @@ export const metadata: Metadata = {
   description: "Answer a few friendly questions and find out your heart age, diabetes risk, sleep, mood and more. Free, private, and a doctor is a tap away.",
 };
 
-export const viewport: Viewport = { themeColor: "#EEF8F4", width: "device-width", initialScale: 1 };
+export const viewport: Viewport = { themeColor: "#F6F8F7", width: "device-width", initialScale: 1 };
 
 export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
@@ -25,14 +22,14 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
           Skip to content
         </a>
         <div id="main" className="flex flex-1 flex-col">{children}</div>
-        <footer className="mt-auto px-6 pt-10 pb-24 text-center text-[13px] font-bold text-muted-soft">
+        <footer className="mt-auto px-6 pt-14 pb-24 text-center text-[13px] text-subtle">
           <p>
             {site.appName} by {site.companyName} gives estimates, not diagnoses. In an emergency call <a href="tel:112" className="underline">112</a>.
           </p>
           <nav className="mt-2 flex flex-wrap justify-center gap-x-4 gap-y-1" aria-label="Footer">
             <Link href="/privacy" className="underline">Privacy</Link>
             <Link href="/terms" className="underline">Terms</Link>
-            <Link href="/home-tests" className="underline">Home tests</Link>
+            <Link href="/home-tests" className="underline">Lab tests</Link>
             <Link href="/medication" className="underline">Medication delivery</Link>
             <Link href="/account" className="underline">My account</Link>
           </nav>

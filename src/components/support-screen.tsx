@@ -35,7 +35,7 @@ export function SupportScreen({ onClose }: { onClose: () => void }) {
         <div className="mt-5 flex flex-col gap-3">
           <ButtonLink href="/doctor?reason=support" icon="chat">Talk to a doctor now</ButtonLink>
           {wa && (
-            <a href={wa} target="_blank" rel="noopener noreferrer" className="inline-flex min-h-[52px] items-center justify-center gap-2 rounded-[18px] border-[2.5px] border-ink bg-surface px-5 text-base font-extrabold">
+            <a href={wa} target="_blank" rel="noopener noreferrer" className="inline-flex min-h-[52px] items-center justify-center gap-2 rounded-[18px] border border-line-strong bg-surface px-5 text-base font-semibold">
               <Icon name="whatsapp" size={22} /> Message us on WhatsApp
             </a>
           )}
@@ -44,18 +44,18 @@ export function SupportScreen({ onClose }: { onClose: () => void }) {
         <ul className="mt-3 flex flex-col gap-2.5">
           {contacts.filter((c) => c.phone).map((c) => (
             <li key={c.label}>
-              <a href={`tel:${c.phone}`} className="flex items-center gap-3 rounded-[var(--radius-md)] bg-surface p-4">
+              <a href={`tel:${c.phone}`} className="flex items-center gap-3 rounded-[var(--radius-md)] border border-line bg-surface p-4">
                 <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-coral"><Icon name="phone" size={20} /></span>
                 <span>
-                  <span className="block font-display text-xl leading-6 font-extrabold">{c.phone}</span>
-                  <span className="block text-sm font-bold">{c.label}</span>
-                  {c.description && <span className="block text-xs font-bold text-muted-soft">{c.description}</span>}
+                  <span className="block font-display text-xl leading-6 font-semibold">{c.phone}</span>
+                  <span className="block text-sm font-medium">{c.label}</span>
+                  {c.description && <span className="block text-xs font-medium text-subtle">{c.description}</span>}
                 </span>
               </a>
             </li>
           ))}
         </ul>
-        <p className="mt-4 text-sm font-bold text-muted-soft">Or go to the nearest hospital emergency department, or ask someone you trust to stay with you.</p>
+        <p className="mt-4 text-sm font-medium text-subtle">Or go to the nearest hospital emergency department, or ask someone you trust to stay with you.</p>
         <Button variant="secondary" className="mt-7" onClick={onClose}>Continue my {site.appName}</Button>
       </div>
     </div>

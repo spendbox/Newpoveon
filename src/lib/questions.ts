@@ -97,8 +97,8 @@ export const QUESTIONS: Question[] = [
   /* ---------------- About you ---------------- */
   { id: "age", topic: "About you", kind: "number", title: "How old are you?", unit: "years", min: 18, max: 100, placeholder: "e.g. 42", illustration: "aboutYou" },
   {
-    id: "sex", topic: "About you", kind: "choice", title: "What sex were you assigned at birth?",
-    help: "The health formulas we use are different for men and women.", illustration: "aboutYou",
+    id: "sex", topic: "About you", kind: "choice", title: "What sex are you?",
+    help: "The heart and diabetes formulas we use are different for men and women.", illustration: "aboutYou",
     options: [{ value: "female", label: "Female", icon: "female" }, { value: "male", label: "Male", icon: "male" }],
   },
 

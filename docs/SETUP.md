@@ -6,9 +6,9 @@ the app works without them, and that feature just shows a friendly "not switched
 | Part | Switches on | Time |
 |---|---|---|
 | 1. Vercel | The website itself, with a link you can open on your phone | 10 min |
-| 2. Supabase | Saving results, accounts (magic link), bookings, requests, admin | 20 min |
+| 2. Supabase | Saving results, accounts, bookings, requests | 20 min |
 | 3. Resend | Results emails, booking confirmations, team notifications | 15 min (plus DNS wait) |
-| 4. Paystack (test mode) | ₦5,000 doctor consult payments | 10 min |
+| 4. Paystack (test mode) | Doctor consult payments | 10 min |
 | 5. Admin set-up | Doctor times, test prices, helpline number | 15 min |
 
 > **Never paste keys into chat, email or WhatsApp.** Keys go only into Vercel → Settings → Environment Variables.
@@ -29,6 +29,7 @@ the app works without them, and that feature just shows a friendly "not switched
 1. Go to **supabase.com → New project**. Pick a strong database password and save it in a password manager.
    Region: Supabase has no African region, so pick **London (eu-west-2)** or **Frankfurt**. Your privacy notice must mention this (see the NDPA note in `/privacy`).
 2. **SQL Editor → New query**. Paste the whole of `supabase/migrations/20261117000000_init.sql` and press **Run**. You should see "Success".
+   Then do the same with `supabase/migrations/20261118000000_lab_packages.sql` (lab packages) `supabase/migrations/20261118100000_password_login.sql` (email + password accounts) `supabase/migrations/20261118200000_care_plans.sql` (care plans and pricing) `supabase/migrations/20261118300000_family_care.sql` (care for your parents) `supabase/migrations/20261119000000_consults_and_schedule.sql` (consult types, fees and weekly availability) and `supabase/migrations/20261120000000_voice_notes.sql` (private voice notes for doctor bookings).
 3. **Project Settings → API**. Copy these into Vercel's Environment Variables:
    - Project URL → `NEXT_PUBLIC_SUPABASE_URL`
    - anon / publishable key → `NEXT_PUBLIC_SUPABASE_ANON_KEY`
@@ -36,11 +37,11 @@ the app works without them, and that feature just shows a friendly "not switched
 4. **Authentication → URL Configuration**:
    - Site URL: your website address (for example `https://healthcheck.yourdomain.com`)
    - Redirect URLs: add `https://YOUR-DOMAIN/auth/callback` and `https://*-YOUR-VERCEL-TEAM.vercel.app/auth/callback` (for preview links)
-5. **Authentication → Providers → Email**: make sure Email is on. Passwords aren't used. People log in with the magic link.
-6. **Important: magic-link emails.** Supabase's built-in email only sends a few emails an hour. After step 3 below, go to
-   **Authentication → Emails → SMTP Settings** and switch on custom SMTP with Resend
-   (host `smtp.resend.com`, port `465`, username `resend`, password = your Resend API key, sender = your verified address).
-7. Add `ADMIN_EMAILS` (your email) and `TEAM_NOTIFICATION_EMAIL` in Vercel, then redeploy.
+5. **Authentication → Providers → Email**: make sure Email is on. Set **Minimum password length** to 10.
+   New people confirm their email with a **one-time code**, choose a password, and from then on log in with email + password.
+   Login codes are emailed by the app through **Resend** (step 3), so Supabase's email limits and templates don't matter.
+6. Supabase only sends emails as a fallback if Resend isn't set up yet. Nothing to change here.
+7. Add `TEAM_NOTIFICATION_EMAIL` in Vercel, then redeploy.
 
 ## 3. Resend (emails)
 
@@ -62,10 +63,14 @@ the app works without them, and that feature just shows a friendly "not switched
 
 ## 5. Admin set-up
 
-1. Go to `https://YOUR-DOMAIN/admin`, enter an email from `ADMIN_EMAILS`, and click the magic link.
-2. **Availability:** add the days and times doctors can take calls (Lagos time). The booking page shows them.
-3. **Home tests:** set a price for each test (blank shows "price confirmed when we call"). Add or hide tests here.
-4. **Emergency contacts:** replace the **mental health helpline placeholder** with a verified number. Until then it stays hidden, and only 112 shows.
+1. In Vercel, set `ADMIN_EMAILS` (your email) and `ADMIN_PASSWORD` (at least 12 characters), and redeploy.
+   Then go to `https://YOUR-DOMAIN/admin` and log in with that email and password.
+   To change the password later, change `ADMIN_PASSWORD` in Vercel and redeploy (everyone is logged out).
+2. **Availability:** set your weekly hours once (they repeat every week), add closed days and extra hours, and set consult length and notice. Booked times disappear automatically.
+   **Consults and fees:** set the fee for each kind of help (a type with no fee is hidden).
+3. **Lab tests:** 16 standard packages and 10 single tests are loaded (full health checks, heart, diabetes, women, men, fertility, sexual health, pre-marital, pregnancy and more). Set a price for each (blank shows "Price on request"), edit what's included, hide what you don't offer, and add your own packages.
+4. **Pricing and Care plans:** in **Pricing**, enter what each building block costs you and your target markup (4× = 75% margin). In **Care plans**, every plan shows its cost, price, markup and margin; type a fixed price on any plan to override the automatic one. Switch a goal on when its plans are ready.
+5. **Emergency contacts:** replace the **mental health helpline placeholder** with a verified number. Until then it stays hidden, and only 112 shows.
 
 ---
 
