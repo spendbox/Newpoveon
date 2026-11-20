@@ -1,5 +1,5 @@
 "use client";
-import Link from "next/link";
+import Link, { useLinkStatus } from "next/link";
 import { usePathname } from "next/navigation";
 import { useState, type ComponentProps } from "react";
 import { motion, useReducedMotion } from "framer-motion";
@@ -62,7 +62,19 @@ export function ProgressWalker({ fraction, cheer }: { fraction: number; cheer: s
   );
 }
 
-/* ---------------- Small floating "Talk to a doctor" button ---------------- */
+/* ---------------- Floating "Get help" button ---------------- */
+/** Inside the link: swaps the icon for a spinner and says "Opening…" while the page loads. */
+function HelpLabel() {
+  const { pending } = useLinkStatus();
+  return (
+    <>
+      <span className="flex h-11 w-11 items-center justify-center rounded-full bg-primary text-white">
+        {pending ? <span className="h-5 w-5 animate-spin rounded-full border-[2.5px] border-white/35 border-t-white" aria-hidden="true" /> : <Icon name="stethoscope" size={22} strokeWidth={2} />}
+      </span>
+      <span aria-live="polite">{pending ? "Opening…" : "Get help"}</span>
+    </>
+  );
+}
 export function FloatingDoctor() {
   const path = usePathname();
   // On question screens the doctor link sits in the top bar instead, so it never covers "Continue".
@@ -70,14 +82,11 @@ export function FloatingDoctor() {
   return (
     <Link
       href="/doctor"
-      className="fixed right-4 bottom-4 z-40 inline-flex min-h-[48px] items-center gap-2 rounded-full border border-line bg-surface/95 py-1.5 pr-4 pl-1.5 text-[14px] font-semibold text-ink shadow-[var(--shadow-lg)] backdrop-blur transition-transform hover:-translate-y-0.5"
+      className="fixed right-4 bottom-4 z-40 inline-flex min-h-[60px] items-center gap-2.5 rounded-full border border-line bg-surface/95 py-2 pr-5 pl-2 text-[16px] font-semibold text-ink shadow-[var(--shadow-lg)] backdrop-blur transition-transform hover:-translate-y-0.5 active:scale-95"
       aria-label="Get help from a doctor"
       style={{ marginBottom: "env(safe-area-inset-bottom, 0px)" }}
     >
-      <span className="flex h-9 w-9 items-center justify-center rounded-full bg-primary text-white">
-        <Icon name="stethoscope" size={18} strokeWidth={2} />
-      </span>
-      <span>Get help</span>
+      <HelpLabel />
     </Link>
   );
 }

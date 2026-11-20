@@ -15,6 +15,11 @@ export default function MedicationPage() {
       icon="box"
       kind="medicine"
       groups={MED_GROUPS}
+      heroExtra={
+        <a href={NAFDAC_CHECK_URL} target="_blank" rel="noopener noreferrer" className="inline-flex min-h-[56px] w-full items-center justify-center gap-2 rounded-[var(--radius-md)] border border-white/30 px-6 text-[17px] font-semibold text-white hover:bg-white/10 md:w-auto">
+          <Icon name="shield" size={22} strokeWidth={2} /> Check if a drug is real
+        </a>
+      }
       steps={["Send us the medicine name or a photo of your prescription", "We find it and confirm the price", "We deliver it to your door"]}
     >
       <div className="mt-6 grid gap-4 md:grid-cols-2">
@@ -22,7 +27,7 @@ export default function MedicationPage() {
           <span className="flex h-10 w-10 items-center justify-center rounded-[var(--radius-md)] bg-primary-soft text-primary"><Icon name="shield" size={20} strokeWidth={2} /></span>
           <h2 className="mt-4 text-lg font-semibold">Is your medicine real?</h2>
           <p className="mt-1 text-[15px] text-muted">Every genuine medicine sold in Nigeria has a NAFDAC number on the pack. Check it on NAFDAC&apos;s own website before you use it, whoever you bought it from.</p>
-          <a href={NAFDAC_CHECK_URL} target="_blank" rel="noopener noreferrer" className="mt-4 inline-flex min-h-[48px] items-center justify-center gap-2 rounded-[var(--radius-md)] border border-line-strong px-5 font-semibold hover:bg-surface-2">
+          <a href={NAFDAC_CHECK_URL} target="_blank" rel="noopener noreferrer" className="mt-4 inline-flex min-h-[52px] items-center justify-center gap-2 rounded-[var(--radius-md)] bg-primary px-5 font-semibold text-white hover:bg-primary-hover">
             Check on the NAFDAC portal <Icon name="arrowRight" size={18} strokeWidth={2} />
           </a>
         </div>

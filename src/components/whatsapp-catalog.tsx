@@ -23,10 +23,10 @@ export function WhatsAppButton({ message, children, size = "lg", className = "" 
 
 /** Lab tests and Medication pages: what we can arrange, then one tap to WhatsApp. No forms, no prices. */
 export function WhatsAppCatalog({
-  eyebrow, title, intro, icon, groups, kind, highlight, children, steps,
+  eyebrow, title, intro, icon, groups, kind, highlight, children, steps, heroExtra,
 }: {
   eyebrow: string; title: string; intro: string; icon: IconName; groups: CatalogGroup[]; kind: "lab test" | "medicine";
-  highlight?: string | null; children?: ReactNode; steps: string[];
+  highlight?: string | null; children?: ReactNode; steps: string[]; heroExtra?: ReactNode;
 }) {
   const general = highlight ? `Hello, I'd like to ask about a ${kind}: ${highlight}.` : `Hello, I'd like to ask about a ${kind}.`;
   return (
@@ -41,7 +41,10 @@ export function WhatsAppCatalog({
         {highlight && (
           <p className="mt-4 inline-flex items-center gap-2 rounded-full bg-white/10 px-3 py-1.5 text-sm font-medium"><Icon name="check" size={16} strokeWidth={2.4} /> {highlight}</p>
         )}
-        <WhatsAppButton message={general} className="mt-6 w-full md:w-auto">Request on WhatsApp</WhatsAppButton>
+        <div className="mt-6 flex flex-col gap-3 md:flex-row">
+          <WhatsAppButton message={general} className="w-full md:w-auto">Request on WhatsApp</WhatsAppButton>
+          {heroExtra}
+        </div>
         <ol className="mt-6 grid gap-3 text-[15px] text-white/80 md:grid-cols-3">
           {steps.map((s, i) => (
             <li key={s} className="flex items-start gap-3">
