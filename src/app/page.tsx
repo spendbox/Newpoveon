@@ -20,7 +20,7 @@ export default function HomePage() {
   return (
     <main className="mx-auto w-full max-w-6xl px-5 md:px-8">
       <header className="flex items-center justify-between gap-3 py-5">
-        <Logo />
+        <Logo animate />
         <nav className="flex items-center gap-1" aria-label="Main">
           <Link href="/doctor" className="hidden rounded-full px-3 py-2 text-[15px] font-medium text-muted hover:text-ink md:inline-block">Get help</Link>
           <Link href="/home-tests" className="hidden rounded-full px-3 py-2 text-[15px] font-medium text-muted hover:text-ink md:inline-block">Lab tests</Link>

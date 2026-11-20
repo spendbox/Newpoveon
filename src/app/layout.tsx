@@ -16,7 +16,15 @@ export const viewport: Viewport = { themeColor: "#F6F8F7", width: "device-width"
 
 export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
-    <html lang="en-NG" className="h-full antialiased">
+    <html lang="en-NG" className="h-full antialiased" suppressHydrationWarning>
+      <head>
+        {/* First visit to the home page: mark it before paint so the logo pieces glide in once (see .pv-anim). */}
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `try{if(location.pathname==="/"&&!localStorage.getItem("hc.logo.seen")){document.documentElement.setAttribute("data-logo-intro","");localStorage.setItem("hc.logo.seen","1")}}catch(e){}`,
+          }}
+        />
+      </head>
       <body className="flex min-h-full flex-col">
         <a href="#main" className="sr-only focus:not-sr-only focus:fixed focus:top-2 focus:left-2 focus:z-50 focus:rounded-lg focus:bg-surface focus:px-4 focus:py-2">
           Skip to content
