@@ -2,6 +2,7 @@
 import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
 import { animate, motion, useReducedMotion } from "framer-motion";
+import { EXTENDED_MIN_AGE } from "@/config/site";
 import { CONSENT_TEXT } from "@/lib/consent";
 import { Icon } from "@/components/icons";
 import { IllustrationCard } from "@/components/illustrations";
@@ -228,7 +229,17 @@ function Reveal({ results, saved }: { results: Results; saved: SavedScreening | 
               {counts.good} looking good
               {counts.check + counts.act > 0 && <span className="block text-[28px] text-sun">{counts.check + counts.act} to look at</span>}
             </p>
-            {results.heartNote && <p className="mt-3 text-center text-[15px] leading-snug font-medium">{results.heartNote}</p>}
+            {results.age < EXTENDED_MIN_AGE && !results.cards.some((c) => c.id === "heart") ? (
+              <div className="mt-4 flex w-full max-w-sm items-start gap-3 rounded-[var(--radius-lg)] bg-white/10 p-4 text-left">
+                <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-coral/90"><Icon name="heart" size={20} strokeWidth={2.2} /></span>
+                <div>
+                  <p className="font-semibold">Heart age: not calculated</p>
+                  <p className="mt-0.5 text-[14px] leading-snug text-white/75">Heart age starts at {EXTENDED_MIN_AGE}. The WHO heart model wasn&apos;t built for people under {EXTENDED_MIN_AGE}, so any number would be a guess. Your other results below still count.</p>
+                </div>
+              </div>
+            ) : (
+              results.heartNote && <p className="mt-3 text-center text-[15px] leading-snug font-medium">{results.heartNote}</p>
+            )}
             {results.cards.find((c) => c.id === "heart")?.next.kind === "test" && (
               <ButtonLink href="/home-tests?test=bp-check" className="mt-4" icon="home">Book a home BP check</ButtonLink>
             )}

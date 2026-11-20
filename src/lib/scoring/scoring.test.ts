@@ -218,7 +218,7 @@ describe("computeResults", () => {
   it("does not calculate heart age under 30", () => {
     const r = computeResults({ ...healthy, age: 29 });
     expect(r.heart).toBeNull();
-    expect(r.heartNote).toMatch(/starts at 30/);
+    expect(r.heartNote).toMatch(/No heart age yet: it starts at 30/);
   });
   it("raises the safety flag when PHQ-9 item 9 is above 'Not at all'", () => {
     const r = computeResults({ ...healthy, phq1: "2", phq2: "2", phq3: "0", phq4: "0", phq5: "0", phq6: "0", phq7: "0", phq8: "0", phq9: "1" });

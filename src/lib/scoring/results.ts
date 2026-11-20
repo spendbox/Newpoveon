@@ -96,7 +96,7 @@ export function computeResults(a: Answers): Results {
     });
   } else if (age < EXTENDED_MIN_AGE || age > WHO_MAX_AGE) {
     heartNote = age < EXTENDED_MIN_AGE
-      ? `Heart age starts at ${EXTENDED_MIN_AGE}. Keeping your blood pressure, weight and smoking in check now pays off later.`
+      ? `No heart age yet: it starts at ${EXTENDED_MIN_AGE}. The WHO heart model wasn't built for people under ${EXTENDED_MIN_AGE}, so any number would be a guess. Your other results below still count.`
       : `The WHO heart risk model covers ages up to ${WHO_MAX_AGE}, so we can't give a heart age. A doctor can review your heart health.`;
   } else if (!bp || !bmi) {
     heartNote = "We need a real blood pressure reading to work out your heart age.";
