@@ -146,7 +146,7 @@ export function BookingForm({ types, preselect, defaultReason }: { types: Type[]
       <button type="button" disabled={!has} aria-pressed={on} onClick={() => { pickDay(k); setShowCal(false); }}
         className={`flex min-h-[64px] flex-1 flex-col items-center justify-center rounded-[var(--radius-lg)] border px-3 transition-colors disabled:opacity-45 ${on ? "border-primary bg-primary text-white" : "border-line bg-surface hover:border-line-strong"}`}>
         <span className="font-semibold">{label}</span>
-        <span className={`text-xs ${on ? "text-white/80" : "text-muted"}`}>{has ? `${byDay.get(k)!.length} times · ${shortDay.format(keyDate(k))}` : "No times left"}</span>
+        <span className={`text-xs ${on ? "text-white/80" : "text-muted"}`}>{has ? shortDay.format(keyDate(k)) : "Fully booked"}</span>
       </button>
     );
   };

@@ -51,8 +51,8 @@ export default function HomePage() {
       <nav className="flex flex-col divide-y divide-line overflow-hidden rounded-[var(--radius-xl)] border border-line bg-surface md:hidden" aria-label="What would you like to do?">
         {[
           { href: "/doctor", icon: "stethoscope" as const, title: "Get help with a health concern", text: "We match you with the right doctor", tint: "bg-primary-soft text-primary" },
-          { href: "/home-tests", icon: "flask" as const, title: "Lab tests and packages", text: "Samples collected at home", tint: "bg-lavender-soft text-lavender" },
-          { href: "/medication", icon: "box" as const, title: "Medication delivery", text: "Your regular medicines, delivered", tint: "bg-sun-soft text-check-text" },
+          { href: "/home-tests", icon: "flask" as const, title: "Lab tests", text: "Samples collected at home", tint: "bg-lavender-soft text-lavender" },
+          { href: "/medication", icon: "box" as const, title: "Medication delivery", text: "Any medicine, even hard-to-find ones", tint: "bg-sun-soft text-check-text" },
           ...(features.familyCare ? [{ href: "/family", icon: "family" as const, title: "Care for parents in Nigeria", text: "For family living abroad", tint: "bg-coral-soft text-act-text" }] : []),
         ].map((x) => (
           <Link key={x.href} href={x.href} className="flex items-center gap-3.5 px-4 py-3.5 active:bg-surface-2">
@@ -126,15 +126,15 @@ export default function HomePage() {
           </Link>
           <Link href="/home-tests" className="group flex flex-col rounded-[var(--radius-xl)] border border-line bg-surface p-6 transition-[transform,box-shadow] hover:-translate-y-0.5 hover:shadow-[var(--shadow-md)]">
             <span className="flex h-11 w-11 items-center justify-center rounded-[var(--radius-md)] bg-lavender-soft text-lavender"><Icon name="flask" size={22} strokeWidth={2} /></span>
-            <h3 className="mt-5 text-2xl font-semibold">Lab tests and packages</h3>
-            <p className="mt-1 text-[15px] text-muted">Full health checks, heart, diabetes, fertility, sexual health and more. Samples collected at home.</p>
-            <span className="mt-auto inline-flex items-center gap-1 pt-6 text-sm font-semibold text-primary">See packages <Icon name="arrowRight" size={16} strokeWidth={2} /></span>
+            <h3 className="mt-5 text-2xl font-semibold">Lab tests</h3>
+            <p className="mt-1 text-[15px] text-muted">Full health checks, heart, diabetes, fertility, sexual health and more. Request on WhatsApp; samples collected at home.</p>
+            <span className="mt-auto inline-flex items-center gap-1 pt-6 text-sm font-semibold text-primary">See tests <Icon name="arrowRight" size={16} strokeWidth={2} /></span>
           </Link>
           <Link href="/medication" className="group flex flex-col rounded-[var(--radius-xl)] border border-line bg-surface p-6 transition-[transform,box-shadow] hover:-translate-y-0.5 hover:shadow-[var(--shadow-md)]">
             <span className="flex h-11 w-11 items-center justify-center rounded-[var(--radius-md)] bg-sun-soft text-check-text"><Icon name="box" size={22} strokeWidth={2} /></span>
             <h3 className="mt-5 text-2xl font-semibold">Medication delivery</h3>
-            <p className="mt-1 text-[15px] text-muted">Your regular medicines, delivered. Prescription medicines only after a doctor consult.</p>
-            <span className="mt-auto inline-flex items-center gap-1 pt-6 text-sm font-semibold text-primary">Request a delivery <Icon name="arrowRight" size={16} strokeWidth={2} /></span>
+            <p className="mt-1 text-[15px] text-muted">Any medicine, even rare or imported ones, sourced by our partners. Order on WhatsApp.</p>
+            <span className="mt-auto inline-flex items-center gap-1 pt-6 text-sm font-semibold text-primary">See medicines <Icon name="arrowRight" size={16} strokeWidth={2} /></span>
           </Link>
         </div>
       </section>

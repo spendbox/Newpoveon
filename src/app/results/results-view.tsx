@@ -296,7 +296,7 @@ function Reveal({ results, saved }: { results: Results; saved: SavedScreening | 
                 <p className="text-sm leading-5 text-muted">{r.detail}</p>
                 <p className="text-xs font-medium text-subtle">Source: {r.source}</p>
                 {!r.done && r.testCode && (
-                  <Link href={`/home-tests?test=${r.testCode}`} className="mt-1 inline-flex items-center gap-1 text-sm font-semibold text-primary hover:underline">Book it at home <Icon name="arrowRight" size={14} /></Link>
+                  <Link href={`/home-tests?test=${r.testCode}`} className="mt-1 inline-flex items-center gap-1 text-sm font-semibold text-primary hover:underline">Arrange it at home <Icon name="arrowRight" size={14} /></Link>
                 )}
               </div>
             </li>

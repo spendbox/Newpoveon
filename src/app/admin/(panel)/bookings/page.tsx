@@ -5,6 +5,7 @@ import { STATUS_LABEL } from "@/lib/scoring/results";
 import { supabaseAdmin } from "@/lib/supabase/server";
 import { saveBookingNotes, setBookingStatus } from "../../actions";
 import { aBtn, aBtnQuiet, aInput, Badge, Card, H1, Tabs } from "../../ui";
+import { AudioPlayer } from "@/components/audio-player";
 
 const VIEWS = { upcoming: "Paid · upcoming", done: "Done", unpaid: "Unpaid", all: "All" } as const;
 
@@ -48,7 +49,7 @@ export default async function BookingsPage({ searchParams }: PageProps<"/admin/b
               <p className="mt-2 text-sm"><span className="font-semibold">Needs help with:</span> {b.consult_type_name ?? "General consult"}{b.doctor_type ? ` · ${b.doctor_type}` : ""} · ₦{(b.amount_kobo / 100).toLocaleString("en-NG")}</p>
               <p className="text-sm"><span className="font-semibold">In their words:</span> {b.reason}</p>
               {b.voice_note_path && signed.get(b.voice_note_path) && (
-                <div className="mt-2"><p className="text-xs font-semibold text-muted">Voice note</p><audio controls preload="none" src={signed.get(b.voice_note_path)} className="mt-1 w-full max-w-md" /></div>
+                <div className="mt-2"><p className="text-xs font-semibold text-muted">Voice note</p>{signed.get(b.voice_note_path) ? <div className="mt-1 max-w-md"><AudioPlayer src={signed.get(b.voice_note_path)!} /></div> : <p className="text-sm text-muted">Couldn&apos;t load the recording. Refresh the page.</p>}</div>
               )}
               <p className="text-xs text-muted">Ref {b.paystack_reference}{b.paid_at ? ` · paid ${formatWhen(b.paid_at)}` : ""}</p>
               {shared && (

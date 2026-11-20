@@ -15,7 +15,7 @@ const NAV = [
   ["/admin/requests", "Requests"],
   ["/admin/plans", "Care plans"],
   ["/admin/pricing", "Pricing"],
-  ["/admin/tests", "Lab tests"],
+  // Lab packages are paused: tests and medicines are requested on WhatsApp for now (src/config/catalog.ts).
   ["/admin/contacts", "Emergency contacts"],
 ] as const;
 

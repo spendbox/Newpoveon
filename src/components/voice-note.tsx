@@ -1,5 +1,6 @@
 "use client";
 import { useEffect, useRef, useState } from "react";
+import { AudioPlayer } from "./audio-player";
 import { Icon } from "./icons";
 
 export const VOICE_MAX_SECONDS = 120;
@@ -93,10 +94,10 @@ export function VoiceNote({ value, onChange }: { value: Blob | null; onChange: (
       ) : url ? (
         <div className="flex flex-col gap-3">
           <p className="flex items-center gap-2 text-sm font-semibold text-good-text"><Icon name="check" size={16} strokeWidth={2.6} /> Voice note ready. Play it back to check.</p>
-          <audio src={url} controls className="w-full" preload="metadata" />
-          <div className="flex gap-4 text-sm">
-            <button type="button" onClick={start} className="font-medium text-primary hover:underline">Record again</button>
-            <button type="button" onClick={() => onChange(null)} className="font-medium text-act-text hover:underline">Delete</button>
+          <AudioPlayer src={url} durationHint={seconds || undefined} analyseOnLoad tone="soft" />
+          <div className="flex gap-2">
+            <button type="button" onClick={start} className="inline-flex min-h-[40px] items-center gap-1.5 rounded-full border border-line px-4 text-sm font-medium hover:bg-surface-2"><Icon name="mic" size={16} strokeWidth={2} /> Record again</button>
+            <button type="button" onClick={() => onChange(null)} className="inline-flex min-h-[40px] items-center gap-1.5 rounded-full border border-line px-4 text-sm font-medium text-act-text hover:bg-act-bg"><Icon name="trash" size={16} strokeWidth={2} /> Delete</button>
           </div>
         </div>
       ) : (
