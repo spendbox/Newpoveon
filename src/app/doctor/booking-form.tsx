@@ -1,9 +1,11 @@
 "use client";
 import { useEffect, useMemo, useState } from "react";
+import { useRouter } from "next/navigation";
 import { Icon } from "@/components/icons";
 import { AnswerTile } from "@/components/client";
 import { Field, inputCls, Notice } from "@/components/ui";
 import { Steps, type Step } from "@/components/steps";
+import { VoiceNote } from "@/components/voice-note";
 import { loadSaved } from "@/lib/storage";
 import { whatsappLink } from "@/lib/whatsapp";
 
@@ -12,13 +14,16 @@ type Slot = { startsAt: string };
 
 const TZ = "Africa/Lagos";
 const dayKey = new Intl.DateTimeFormat("en-CA", { timeZone: TZ, year: "numeric", month: "2-digit", day: "2-digit" });
-const wk = new Intl.DateTimeFormat("en-NG", { weekday: "short", timeZone: TZ });
-const dnum = new Intl.DateTimeFormat("en-NG", { day: "numeric", timeZone: TZ });
-const mon = new Intl.DateTimeFormat("en-NG", { month: "short", timeZone: TZ });
 const time = new Intl.DateTimeFormat("en-NG", { hour: "numeric", minute: "2-digit", timeZone: TZ });
+const clock = new Intl.DateTimeFormat("en-NG", { hour: "numeric", minute: "2-digit", second: "2-digit", timeZone: TZ });
 const hour = new Intl.DateTimeFormat("en-GB", { hour: "numeric", hour12: false, timeZone: TZ });
 const longDay = new Intl.DateTimeFormat("en-NG", { weekday: "long", day: "numeric", month: "long", timeZone: TZ });
+const shortDay = new Intl.DateTimeFormat("en-NG", { weekday: "short", day: "numeric", month: "short", timeZone: "UTC" });
+const monthTitle = new Intl.DateTimeFormat("en-NG", { month: "long", year: "numeric", timeZone: "UTC" });
 const ngn = (n: number) => `₦${n.toLocaleString("en-NG")}`;
+/** "YYYY-MM-DD" → a Date at noon UTC on that calendar day (for labels only). */
+const keyDate = (k: string) => new Date(`${k}T12:00:00Z`);
+const addDays = (k: string, n: number) => new Date(keyDate(k).getTime() + n * 86400000).toISOString().slice(0, 10);
 
 const DANGER = [
   "Chest pain or pressure",
@@ -31,12 +36,28 @@ const DANGER = [
   "Thoughts of harming yourself",
 ];
 
+/** Live clock, updated every second. */
+function useNow() {
+  const [now, setNow] = useState<Date | null>(null);
+  useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- start the clock after mount
+    setNow(new Date());
+    const t = setInterval(() => setNow(new Date()), 1000);
+    return () => clearInterval(t);
+  }, []);
+  return now;
+}
+
 export function BookingForm({ types, preselect, defaultReason }: { types: Type[]; preselect: string | null; defaultReason: string }) {
+  const router = useRouter();
   const [typeId, setTypeId] = useState<string | null>(types.find((t) => t.code === preselect)?.id ?? null);
   const [danger, setDanger] = useState<"yes" | "no" | null>(null);
   const [reason, setReason] = useState(defaultReason);
+  const [voice, setVoice] = useState<Blob | null>(null);
   const [slots, setSlots] = useState<Slot[] | null>(null);
   const [day, setDay] = useState<string | null>(null);
+  const [showCal, setShowCal] = useState(false);
+  const [calMonth, setCalMonth] = useState<string | null>(null);
   const [startsAt, setStartsAt] = useState<string | null>(null);
   const [callMe, setCallMe] = useState(false);
   const [name, setName] = useState("");
@@ -47,6 +68,7 @@ export function BookingForm({ types, preselect, defaultReason }: { types: Type[]
   const [error, setError] = useState<string | null>(null);
   const [saved, setSaved] = useState<ReturnType<typeof loadSaved>>(null);
   const [myTz, setMyTz] = useState<string | null>(null);
+  const now = useNow();
 
   useEffect(() => {
     const s = loadSaved();
@@ -72,8 +94,10 @@ export function BookingForm({ types, preselect, defaultReason }: { types: Type[]
     }
     return m;
   }, [slots]);
-  const days = [...byDay.keys()];
-  const activeDay = day ?? days[0] ?? null;
+  const days = [...byDay.keys()].sort();
+  const today = now ? dayKey.format(now) : days[0] ?? null;
+  const tomorrow = today ? addDays(today, 1) : null;
+  const activeDay = day ?? (today && byDay.has(today) ? today : days[0] ?? null);
   const mine = myTz ? new Intl.DateTimeFormat("en-GB", { hour: "numeric", minute: "2-digit", timeZone: myTz }) : null;
   const wa = whatsappLink("Hello, I'd like to talk to a doctor.");
 
@@ -81,11 +105,11 @@ export function BookingForm({ types, preselect, defaultReason }: { types: Type[]
     if (!type) return;
     setBusy(true);
     setError(null);
-    const res = await fetch("/api/bookings", {
-      method: "POST",
-      headers: { "content-type": "application/json" },
-      body: JSON.stringify({ consultTypeId: type.id, startsAt: callMe ? null : startsAt, name, phone, email, reason, shareResults: share, screeningId: saved?.screeningId, ownerToken: saved?.ownerToken }),
-    }).catch(() => null);
+    const data = { consultTypeId: type.id, startsAt: callMe ? null : startsAt, name, phone, email, reason, shareResults: share, screeningId: saved?.screeningId, ownerToken: saved?.ownerToken };
+    const form = new FormData();
+    form.set("data", JSON.stringify(data));
+    if (voice) form.set("voice", voice, `voice.${voice.type.includes("mp4") ? "m4a" : voice.type.includes("ogg") ? "ogg" : "webm"}`);
+    const res = await fetch("/api/bookings", { method: "POST", body: form }).catch(() => null);
     const d = res ? await res.json().catch(() => ({})) : {};
     if (res?.ok && d.authorizationUrl) {
       window.location.assign(d.authorizationUrl); // Paystack's secure payment page
@@ -113,11 +137,42 @@ export function BookingForm({ types, preselect, defaultReason }: { types: Type[]
     { label: "Evening", items: list.filter((s) => Number(hour.format(new Date(s.startsAt))) >= 17) },
   ].filter((p) => p.items.length);
 
+  const pickDay = (k: string) => { setDay(k); setStartsAt(null); setCallMe(false); };
+  const quick = (k: string | null, label: string) => {
+    if (!k) return null;
+    const has = byDay.has(k);
+    const on = activeDay === k && !showCal;
+    return (
+      <button type="button" disabled={!has} aria-pressed={on} onClick={() => { pickDay(k); setShowCal(false); }}
+        className={`flex min-h-[64px] flex-1 flex-col items-center justify-center rounded-[var(--radius-lg)] border px-3 transition-colors disabled:opacity-45 ${on ? "border-primary bg-primary text-white" : "border-line bg-surface hover:border-line-strong"}`}>
+        <span className="font-semibold">{label}</span>
+        <span className={`text-xs ${on ? "text-white/80" : "text-muted"}`}>{has ? `${byDay.get(k)!.length} times · ${shortDay.format(keyDate(k))}` : "No times left"}</span>
+      </button>
+    );
+  };
+
+  // Month calendar for "Choose a date"
+  const month = calMonth ?? (activeDay ?? today ?? "").slice(0, 7);
+  const cal = (() => {
+    if (!month) return [];
+    const first = `${month}-01`;
+    const lead = (keyDate(first).getUTCDay() + 6) % 7; // Monday first
+    const len = new Date(Date.UTC(Number(month.slice(0, 4)), Number(month.slice(5, 7)), 0)).getUTCDate();
+    return [...Array(lead).fill(null), ...Array.from({ length: len }, (_, i) => addDays(first, i))];
+  })();
+  const monthShift = (n: number) => {
+    const [y, m] = month.split("-").map(Number);
+    const d = new Date(Date.UTC(y, m - 1 + n, 1));
+    setCalMonth(d.toISOString().slice(0, 7));
+  };
+  const firstMonth = (days[0] ?? today ?? "").slice(0, 7);
+  const lastMonth = (days.at(-1) ?? today ?? "").slice(0, 7);
+
   const steps: Step[] = [
     {
-      key: "what", title: "What do you need help with?", valid: !!type,
+      key: "what", title: "What can we help you with?", hint: "We'll match you with the right doctor for your concern and show you the fee before you pay.", valid: !!type,
       content: (
-        <div className="flex flex-col gap-4">
+        <div className="flex flex-col gap-5">
           {groups.map((g) => (
             <div key={g}>
               <p className="mb-2 text-xs font-semibold tracking-[0.06em] text-subtle uppercase">{g}</p>
@@ -138,7 +193,7 @@ export function BookingForm({ types, preselect, defaultReason }: { types: Type[]
       key: "safety", title: "First, a quick safety check", hint: "Do you have any of these right now?", valid: danger === "no",
       content: (
         <>
-          <ul className="grid gap-1.5 rounded-[var(--radius-lg)] bg-surface-2 p-4 text-[15px]">
+          <ul className="grid gap-2 rounded-[var(--radius-lg)] bg-surface-2 p-4 text-[15px]">
             {DANGER.map((d) => <li key={d} className="flex gap-2"><Icon name="alert" size={16} strokeWidth={2} className="mt-0.5 shrink-0 text-act-text" />{d}</li>)}
           </ul>
           <div className="grid grid-cols-2 gap-2" role="radiogroup" aria-label="Any of these now?">
@@ -158,67 +213,111 @@ export function BookingForm({ types, preselect, defaultReason }: { types: Type[]
 
   steps.push(
     {
-      key: "more", title: "Tell us a little more", hint: "A sentence or two. Only your doctor sees this.", valid: reason.trim().length > 2,
-      content: <Field id="b-reason" label="What's going on?"><textarea id="b-reason" rows={4} autoFocus className={`${inputCls} py-3`} value={reason} onChange={(e) => setReason(e.target.value)} maxLength={1000} placeholder="e.g. Fever and headache for 3 days, worse at night" /></Field>,
+      key: "more", title: "Tell us a little more", hint: "Record a voice note or type, whichever is easier. Only your doctor hears or reads it.", valid: reason.trim().length > 2 || !!voice,
+      content: (
+        <>
+          <VoiceNote value={voice} onChange={setVoice} />
+          <div className="flex items-center gap-3 text-xs font-semibold tracking-[0.06em] text-subtle uppercase"><span className="h-px flex-1 bg-line" />or type<span className="h-px flex-1 bg-line" /></div>
+          <Field id="b-reason" label="What's going on?"><textarea id="b-reason" rows={4} className={`${inputCls} py-3`} value={reason} onChange={(e) => setReason(e.target.value)} maxLength={1000} placeholder="e.g. Fever and headache for 3 days, worse at night" /></Field>
+        </>
+      ),
     },
     {
       key: "match", title: "Here's who you'll see", valid: true,
       content: type && (
-        <div className="rounded-[var(--radius-lg)] border border-line p-4">
+        <div className="rounded-[var(--radius-xl)] border border-line bg-surface p-5">
           <div className="flex items-start gap-3">
-            <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-primary-soft text-primary"><Icon name="stethoscope" size={22} strokeWidth={2} /></span>
+            <span className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-primary-soft text-primary"><Icon name="stethoscope" size={24} strokeWidth={2} /></span>
             <div className="flex-1">
-              <p className="text-lg font-semibold">A {type.doctor_type.toLowerCase()}</p>
+              <p className="text-xl font-semibold">A {type.doctor_type.toLowerCase()}</p>
               <p className="text-sm text-muted">For: &ldquo;{type.name}&rdquo;</p>
             </div>
           </div>
-          <dl className="mt-4 grid grid-cols-2 gap-3 text-sm">
-            <div className="rounded-[var(--radius-md)] bg-surface-2 p-3"><dt className="text-muted">Consult</dt><dd className="font-semibold">About {type.duration_min} minutes</dd></div>
-            <div className="rounded-[var(--radius-md)] bg-surface-2 p-3"><dt className="text-muted">Your fee</dt><dd className="font-semibold tabular">{type.price_naira != null ? ngn(type.price_naira) : "—"}</dd></div>
+          <dl className="mt-5 grid grid-cols-2 gap-3 text-sm">
+            <div className="rounded-[var(--radius-md)] bg-surface-2 p-3"><dt className="text-muted">Consult</dt><dd className="text-base font-semibold">About {type.duration_min} min</dd></div>
+            <div className="rounded-[var(--radius-md)] bg-surface-2 p-3"><dt className="text-muted">Your fee</dt><dd className="text-base font-semibold tabular">{type.price_naira != null ? ngn(type.price_naira) : "—"}</dd></div>
           </dl>
-          <p className="mt-3 text-xs text-subtle">By phone or video. If you need tests or medicines, your doctor will arrange them{type.credit_to_plan ? ", and this fee is credited if you join a care plan within 30 days" : ""}.</p>
+          <p className="mt-4 text-sm text-muted">By phone or video. If you need tests or medicines, your doctor will arrange them.</p>
         </div>
       ),
     },
     {
-      key: "time", title: "Pick a time", hint: myTz ? "Times are Nigeria time (WAT). Your local time is shown underneath." : "Times are Nigeria time (WAT).", valid: Boolean(startsAt || callMe || (slots && slots.length === 0)),
+      key: "time", title: "When suits you?", valid: Boolean(startsAt || callMe || (slots && slots.length === 0)),
       content: slots === null ? (
-        <p className="text-sm text-muted">Finding times…</p>
+        <p className="text-muted">Finding times…</p>
       ) : slots.length === 0 ? (
         <Notice>No times are open online right now. Carry on and we&apos;ll call you to agree a time.</Notice>
       ) : (
         <>
-          <div className="-mx-1 flex gap-2 overflow-x-auto px-1 pb-1" role="tablist" aria-label="Day">
-            {days.map((d) => {
-              const first = new Date(byDay.get(d)![0].startsAt);
-              const on = d === activeDay;
-              return (
-                <button key={d} type="button" role="tab" aria-selected={on} onClick={() => { setDay(d); setStartsAt(null); }}
-                  className={`flex min-w-[64px] shrink-0 flex-col items-center rounded-[var(--radius-md)] border px-3 py-2 transition-colors ${on ? "border-primary bg-primary text-white" : "border-line bg-surface hover:border-line-strong"}`}>
-                  <span className={`text-xs ${on ? "text-white/80" : "text-muted"}`}>{wk.format(first)}</span>
-                  <span className="font-display text-xl font-semibold tabular">{dnum.format(first)}</span>
-                  <span className={`text-[11px] ${on ? "text-white/80" : "text-muted"}`}>{mon.format(first)}</span>
-                </button>
-              );
-            })}
+          <div className="flex items-center justify-between gap-3 rounded-[var(--radius-lg)] bg-surface-2 px-4 py-3">
+            <div>
+              <p className="text-xs text-muted">Time now in Nigeria</p>
+              <p className="font-display text-2xl font-semibold tabular" aria-live="off">{now ? clock.format(now) : "…"}</p>
+            </div>
+            {mine && now && (
+              <div className="text-right">
+                <p className="text-xs text-muted">Your time</p>
+                <p className="font-display text-lg font-semibold tabular">{mine.format(now)}</p>
+              </div>
+            )}
           </div>
-          {activeDay && parts(byDay.get(activeDay) ?? []).map((p) => (
-            <div key={p.label}>
-              <p className="mb-2 text-xs font-semibold tracking-[0.06em] text-subtle uppercase">{p.label}</p>
-              <div className="grid grid-cols-3 gap-2" role="radiogroup" aria-label={`${p.label} times`}>
-                {p.items.map((s) => {
-                  const on = startsAt === s.startsAt;
-                  return (
-                    <button key={s.startsAt} type="button" role="radio" aria-checked={on} onClick={() => { setStartsAt(s.startsAt); setCallMe(false); }}
-                      className={`flex min-h-[46px] flex-col items-center justify-center rounded-[var(--radius-md)] border text-[15px] font-medium tabular ${on ? "border-primary bg-primary-soft shadow-[0_0_0_1px_var(--color-primary)]" : "border-line bg-surface hover:border-line-strong"}`}>
-                      {time.format(new Date(s.startsAt))}
-                      {mine && <span className="text-[11px] font-normal text-muted">{mine.format(new Date(s.startsAt))} yours</span>}
-                    </button>
-                  );
-                })}
+
+          <div className="flex gap-2">
+            {quick(today, "Today")}
+            {quick(tomorrow, "Tomorrow")}
+            <button type="button" aria-expanded={showCal} onClick={() => setShowCal(!showCal)}
+              className={`flex min-h-[64px] flex-1 flex-col items-center justify-center rounded-[var(--radius-lg)] border px-3 transition-colors ${showCal || (activeDay && activeDay !== today && activeDay !== tomorrow) ? "border-primary bg-primary-soft" : "border-line bg-surface hover:border-line-strong"}`}>
+              <span className="flex items-center gap-1 font-semibold"><Icon name="calendar" size={16} strokeWidth={2} /> Other day</span>
+              <span className="text-xs text-muted">{activeDay && activeDay !== today && activeDay !== tomorrow ? shortDay.format(keyDate(activeDay)) : "Pick a date"}</span>
+            </button>
+          </div>
+
+          {showCal && (
+            <div className="rounded-[var(--radius-lg)] border border-line bg-surface p-4">
+              <div className="mb-3 flex items-center justify-between">
+                <button type="button" onClick={() => monthShift(-1)} disabled={month <= firstMonth} aria-label="Previous month" className="flex h-9 w-9 items-center justify-center rounded-full hover:bg-surface-2 disabled:opacity-30"><Icon name="arrowLeft" size={18} strokeWidth={2} /></button>
+                <p className="font-semibold">{monthTitle.format(keyDate(`${month}-01`))}</p>
+                <button type="button" onClick={() => monthShift(1)} disabled={month >= lastMonth} aria-label="Next month" className="flex h-9 w-9 items-center justify-center rounded-full hover:bg-surface-2 disabled:opacity-30"><Icon name="arrowRight" size={18} strokeWidth={2} /></button>
+              </div>
+              <div className="grid grid-cols-7 gap-1 text-center text-xs text-muted">{["M", "T", "W", "T", "F", "S", "S"].map((d, i) => <span key={i}>{d}</span>)}</div>
+              <div className="mt-1 grid grid-cols-7 gap-1">
+                {cal.map((k, i) => k === null ? <span key={`b${i}`} /> : (
+                  <button key={k} type="button" disabled={!byDay.has(k)} onClick={() => { pickDay(k); setShowCal(false); }}
+                    aria-label={`${shortDay.format(keyDate(k))}${byDay.has(k) ? "" : ", no times"}`} aria-pressed={activeDay === k}
+                    className={`flex aspect-square items-center justify-center rounded-full text-sm tabular transition-colors disabled:text-subtle/40 ${activeDay === k ? "bg-primary font-semibold text-white" : byDay.has(k) ? "font-semibold hover:bg-primary-soft" : ""} ${k === today && activeDay !== k ? "ring-1 ring-primary" : ""}`}>
+                    {Number(k.slice(8))}
+                  </button>
+                ))}
               </div>
             </div>
-          ))}
+          )}
+
+          {activeDay && !showCal && (
+            <>
+              <p className="font-semibold">{longDay.format(new Date(byDay.get(activeDay)?.[0]?.startsAt ?? keyDate(activeDay)))}</p>
+              {parts(byDay.get(activeDay) ?? []).map((p) => (
+                <div key={p.label}>
+                  <p className="mb-2 text-xs font-semibold tracking-[0.06em] text-subtle uppercase">{p.label}</p>
+                  <div className="grid grid-cols-3 gap-2 sm:grid-cols-4" role="radiogroup" aria-label={`${p.label} times`}>
+                    {p.items.map((s) => {
+                      const on = startsAt === s.startsAt;
+                      return (
+                        <button key={s.startsAt} type="button" role="radio" aria-checked={on} onClick={() => { setStartsAt(s.startsAt); setCallMe(false); }}
+                          className={`flex min-h-[52px] flex-col items-center justify-center rounded-[var(--radius-md)] border text-[15px] font-medium tabular ${on ? "border-primary bg-primary text-white" : "border-line bg-surface hover:border-line-strong"}`}>
+                          {time.format(new Date(s.startsAt))}
+                          {mine && <span className={`text-[11px] font-normal ${on ? "text-white/80" : "text-muted"}`}>{mine.format(new Date(s.startsAt))} yours</span>}
+                        </button>
+                      );
+                    })}
+                  </div>
+                </div>
+              ))}
+            </>
+          )}
+
+          {startsAt && (
+            <p className="flex items-center gap-2 rounded-[var(--radius-md)] bg-primary-soft px-4 py-3 text-sm font-medium text-primary"><Icon name="check" size={16} strokeWidth={2.6} /> {longDay.format(new Date(startsAt))} at {time.format(new Date(startsAt))}</p>
+          )}
           <label className="flex items-center gap-2 text-sm">
             <input type="checkbox" className="h-5 w-5 accent-[#136F58]" checked={callMe} onChange={(e) => { setCallMe(e.target.checked); if (e.target.checked) setStartsAt(null); }} />
             None of these suit me. Call me to agree a time.
@@ -240,11 +339,12 @@ export function BookingForm({ types, preselect, defaultReason }: { types: Type[]
       key: "pay", title: "Check and pay", valid: !!type,
       content: type && (
         <>
-          <dl className="grid gap-2 rounded-[var(--radius-lg)] bg-surface-2 p-4 text-sm">
+          <dl className="grid gap-2.5 rounded-[var(--radius-lg)] bg-surface-2 p-4 text-sm">
             <div className="flex justify-between gap-4"><dt className="text-muted">Help with</dt><dd className="text-right font-medium">{type.name}</dd></div>
             <div className="flex justify-between gap-4"><dt className="text-muted">You&apos;ll see</dt><dd className="text-right font-medium">A {type.doctor_type.toLowerCase()}</dd></div>
             <div className="flex justify-between gap-4"><dt className="text-muted">When</dt><dd className="text-right font-medium">{startsAt ? `${longDay.format(new Date(startsAt))}, ${time.format(new Date(startsAt))}` : "We'll call to agree a time"}</dd></div>
-            <div className="flex justify-between gap-4"><dt className="text-muted">Fee</dt><dd className="text-right font-semibold tabular">{type.price_naira != null ? ngn(type.price_naira) : "—"}</dd></div>
+            <div className="flex justify-between gap-4"><dt className="text-muted">Your message</dt><dd className="text-right font-medium">{voice ? "Voice note" : ""}{voice && reason.trim() ? " + text" : reason.trim() ? "Text" : ""}</dd></div>
+            <div className="flex justify-between gap-4 border-t border-line pt-2.5"><dt className="text-muted">Fee</dt><dd className="text-right text-base font-semibold tabular">{type.price_naira != null ? ngn(type.price_naira) : "—"}</dd></div>
           </dl>
           <label className="flex items-start gap-3">
             <input type="checkbox" className="mt-0.5 h-5 w-5 shrink-0 accent-[#136F58]" checked={share} onChange={(e) => setShare(e.target.checked)} />
@@ -256,5 +356,5 @@ export function BookingForm({ types, preselect, defaultReason }: { types: Type[]
     },
   );
 
-  return <Steps className="mt-6" steps={steps} onSubmit={submit} submitLabel={type?.price_naira != null ? `Pay ${ngn(type.price_naira)} and book` : "Book"} busy={busy} error={error} />;
+  return <Steps variant="full" steps={steps} onSubmit={submit} onExit={() => router.push("/")} submitLabel={type?.price_naira != null ? `Pay ${ngn(type.price_naira)} and book` : "Book"} busy={busy} error={error} />;
 }

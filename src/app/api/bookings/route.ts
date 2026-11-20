@@ -10,17 +10,39 @@ import { randomToken } from "@/lib/tokens";
  * Book a goal-based consult: the price comes from the consult type the person chose
  * (set in Admin → Consults), never from the browser. Holds the time, then starts Paystack.
  */
+const VOICE_TYPES = ["audio/webm", "audio/ogg", "audio/mp4", "audio/mpeg", "audio/aac", "audio/wav"];
+
 export async function POST(req: Request) {
   try {
     if (!supabaseConfigured() || !paystackConfigured()) return json({ error: "Online booking isn't switched on yet. Please message us on WhatsApp." }, 503);
-    const b = await readJson(req, 5000);
+    // The form sends JSON, or multipart (JSON in "data" + an optional "voice" recording).
+    let b: Record<string, unknown>;
+    let voice: File | null = null;
+    if ((req.headers.get("content-type") ?? "").includes("multipart/form-data")) {
+      if (Number(req.headers.get("content-length") ?? 0) > 3_500_000) return json({ error: "That voice note is too long. Please keep it under 2 minutes." }, 413);
+      const form = await req.formData();
+      try {
+        b = JSON.parse(String(form.get("data") ?? "{}"));
+      } catch {
+        return json({ error: "Something went wrong. Please try again." }, 400);
+      }
+      const v = form.get("voice");
+      if (v instanceof File && v.size > 0) {
+        const kind = v.type.split(";")[0];
+        if (v.size > 3_145_728) return json({ error: "That voice note is too long. Please keep it under 2 minutes." }, 413);
+        if (!VOICE_TYPES.includes(kind)) return json({ error: "We couldn't read that recording. Please type instead." }, 400);
+        voice = v;
+      }
+    } else {
+      b = await readJson(req, 5000);
+    }
     const name = cleanText(b.name, 120);
     const phone = cleanText(b.phone, 30);
-    const reason = cleanText(b.reason, 1000);
+    const reason = cleanText(b.reason, 1000) || (voice ? "(Voice note)" : "");
     if (name.length < 2) return json({ error: "Please tell us your name." }, 400);
     if (!isPhone(phone)) return json({ error: "Please enter a phone number we can call." }, 400);
     if (!isEmail(b.email)) return json({ error: "Please enter a valid email address." }, 400);
-    if (reason.length < 3) return json({ error: "Please tell us briefly what's going on." }, 400);
+    if (reason.length < 3 && !voice) return json({ error: "Please tell us briefly what's going on, by voice note or text." }, 400);
     const email = (b.email as string).trim().toLowerCase();
     const sb = supabaseAdmin();
 
@@ -67,11 +89,25 @@ export async function POST(req: Request) {
       .single();
     if (error) throw error;
 
+    if (voice) {
+      const kind = voice.type.split(";")[0];
+      const ext = kind.includes("mp4") || kind.includes("aac") ? "m4a" : kind.includes("ogg") ? "ogg" : kind.includes("mpeg") ? "mp3" : kind.includes("wav") ? "wav" : "webm";
+      const path = `${new Date().toISOString().slice(0, 7)}/${booking.id}.${ext}`;
+      const { error: upErr } = await sb.storage.from("voice-notes").upload(path, voice, { contentType: kind, upsert: false });
+      if (upErr) {
+        console.error("[bookings] voice upload", upErr.message);
+        await sb.from("bookings").delete().eq("id", booking.id);
+        return json({ error: "We couldn't save your voice note. Please try again, or type instead." }, 502);
+      }
+      await sb.from("bookings").update({ voice_note_path: path }).eq("id", booking.id);
+    }
+
     if (startsAt) {
       const { data: ok, error: e2 } = await sb.rpc("book_time", { p_booking: booking.id, p_starts: startsAt, p_capacity: capacity, p_hold_minutes: hold });
       if (e2) throw e2;
       if (!ok) {
-        await sb.from("bookings").delete().eq("id", booking.id);
+        const { data: gone } = await sb.from("bookings").delete().eq("id", booking.id).select("voice_note_path").maybeSingle();
+        if (gone?.voice_note_path) await sb.storage.from("voice-notes").remove([gone.voice_note_path]);
         return json({ error: "Sorry, someone just booked that time. Please pick another." }, 409);
       }
     }

@@ -3,6 +3,7 @@ import { features } from "@/config/site";
 import { Icon, type IconName } from "@/components/icons";
 import { Logo, Overline } from "@/components/ui";
 import { StartButton } from "./start-button";
+import { HeroAnimation } from "@/components/hero-animation";
 
 const FINDINGS: { icon: IconName; title: string; text: string; tint: string }[] = [
   { icon: "heart", title: "Heart age", text: "And your 10-year risk of heart attack or stroke.", tint: "bg-coral-soft text-act-text" },
@@ -12,45 +13,6 @@ const FINDINGS: { icon: IconName; title: string; text: string; tint: string }[] 
   { icon: "scale", title: "Body and blood pressure", text: "BMI, waist and blood pressure, in plain words.", tint: "bg-primary-soft text-primary" },
   { icon: "shield", title: "Check-ups you're due", text: "Screenings to book, based on your age and sex.", tint: "bg-primary-soft text-primary" },
 ];
-
-/** A preview of real results: modern, product-first, and a little playful. */
-function HeroPreview() {
-  return (
-    <div className="relative mx-auto h-[360px] w-full max-w-[420px] md:h-[440px]" aria-hidden="true">
-      <div className="absolute inset-x-6 top-6 bottom-6 rounded-[40px] bg-primary-soft" />
-      <div className="absolute -top-2 right-2 h-24 w-24 rounded-full bg-sun/50" />
-      <div className="absolute bottom-0 left-0 h-20 w-20 rounded-[28px] rotate-12 bg-coral/25" />
-
-      <div className="float absolute top-10 left-1/2 w-[250px] -translate-x-1/2 rounded-[24px] bg-ink p-5 text-white shadow-[var(--shadow-lg)] md:top-14 md:w-[280px]">
-        <p className="text-[11px] font-semibold tracking-[0.08em] text-white/60 uppercase">Your heart age</p>
-        <div className="mt-2 flex items-end gap-3">
-          <span className="font-display text-6xl leading-none font-bold">38</span>
-          <span className="mb-1.5 rounded-full bg-good-bg px-2 py-0.5 text-xs font-semibold text-good-text">4 years younger</span>
-        </div>
-        <svg className="mt-4 w-full" height="34" viewBox="0 0 240 34" fill="none" aria-hidden="true">
-          <path d="M0 20h52l8-12 10 22 9-26 9 30 7-14h48l7-9 8 18 7-9h75" stroke="#FF6B4A" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" />
-        </svg>
-        <p className="mt-3 text-xs text-white/60">10-year risk 2.1% · WHO risk charts</p>
-      </div>
-
-      <div className="float-slow absolute bottom-16 left-0 w-[180px] rounded-[18px] border border-line bg-surface p-3.5 shadow-[var(--shadow-md)] md:bottom-20">
-        <p className="text-xs font-medium text-muted">Diabetes risk</p>
-        <p className="mt-0.5 font-display text-lg font-semibold">Low</p>
-        <span className="mt-1.5 inline-flex items-center gap-1 rounded-full bg-good-bg px-2 py-0.5 text-[11px] font-semibold text-good-text">
-          <Icon name="check" size={11} strokeWidth={3} /> Looking good
-        </span>
-      </div>
-
-      <div className="float absolute right-0 bottom-6 w-[170px] rounded-[18px] border border-line bg-surface p-3.5 shadow-[var(--shadow-md)] md:bottom-10">
-        <p className="text-xs font-medium text-muted">Sleep</p>
-        <p className="mt-0.5 font-display text-lg font-semibold">6 h a night</p>
-        <span className="mt-1.5 inline-flex items-center gap-1 rounded-full bg-check-bg px-2 py-0.5 text-[11px] font-semibold text-check-text">
-          <Icon name="warning" size={11} strokeWidth={2.6} /> Worth checking
-        </span>
-      </div>
-    </div>
-  );
-}
 
 export default function HomePage() {
   return (
@@ -67,6 +29,7 @@ export default function HomePage() {
       {/* ---------------- Hero ---------------- */}
       <section className="grid items-center gap-4 pt-6 pb-8 md:grid-cols-[1.05fr_1fr] md:gap-10 md:pt-10 md:pb-20">
         <div>
+          <div className="mb-2 md:hidden"><HeroAnimation compact /></div>
           <h1 className="text-[40px] leading-[1.02] font-bold md:text-[64px]">
             Let&apos;s check in <span className="text-primary">on you</span>
           </h1>
@@ -81,7 +44,7 @@ export default function HomePage() {
             <Icon name="shield" size={16} strokeWidth={2} /> Built on WHO and other validated screening tools. Not a diagnosis.
           </p>
         </div>
-        <div className="hidden md:block"><HeroPreview /></div>
+        <div className="hidden md:block"><HeroAnimation /></div>
       </section>
 
       {/* ---------------- Phone: four simple choices ---------------- */}

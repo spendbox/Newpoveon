@@ -96,3 +96,20 @@ h1, h2, h3, .font-display {
     scroll-behavior: auto !important;
   }
 }
+
+/* ---------- Hero animation (HeroAnimation). The resting state is the finished picture,
+   so with reduced motion everything simply shows, fully drawn and still. ---------- */
+@keyframes hc-ring-draw { from { stroke-dashoffset: 100 } }
+@keyframes hc-ecg { from { stroke-dashoffset: 520 } to { stroke-dashoffset: 0 } }
+@keyframes hc-orbit { to { transform: rotate(360deg) } }
+@keyframes hc-breathe { 0%,100% { transform: scale(1) } 50% { transform: scale(1.035) } }
+@keyframes hc-chip-in { from { opacity: 0; transform: translateY(10px) scale(.96) } }
+@keyframes hc-pop-in { from { opacity: 0; transform: scale(.6) } }
+
+.hc-ring { stroke-dasharray: 100; stroke-dashoffset: var(--off); animation: hc-ring-draw 1.6s cubic-bezier(.2,.8,.2,1) both; animation-delay: var(--d, 0s) }
+.hc-ecg { stroke-dasharray: 90 430; animation: hc-ecg 2.4s linear infinite }
+.hc-orbit { transform-box: view-box; transform-origin: 210px 210px; animation: hc-orbit 24s linear infinite }
+.hc-orbit-rev { transform-box: view-box; transform-origin: 210px 210px; animation: hc-orbit 36s linear infinite reverse }
+.hc-breathe { transform-box: view-box; transform-origin: 210px 210px; animation: hc-breathe 6s ease-in-out infinite }
+.hc-heart { transform-box: fill-box; transform-origin: center; animation: hc-pop-in .7s cubic-bezier(.2,.8,.2,1) .9s both, hc-beat 1.5s ease-in-out 1.6s infinite }
+.hc-chip { animation: hc-chip-in .7s cubic-bezier(.2,.8,.2,1) both, hc-float 6s ease-in-out infinite; animation-delay: var(--d, 0s), calc(var(--d, 0s) + .7s) }

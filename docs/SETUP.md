@@ -8,7 +8,7 @@ the app works without them, and that feature just shows a friendly "not switched
 | 1. Vercel | The website itself, with a link you can open on your phone | 10 min |
 | 2. Supabase | Saving results, accounts, bookings, requests | 20 min |
 | 3. Resend | Results emails, booking confirmations, team notifications | 15 min (plus DNS wait) |
-| 4. Paystack (test mode) | ₦5,000 doctor consult payments | 10 min |
+| 4. Paystack (test mode) | Doctor consult payments | 10 min |
 | 5. Admin set-up | Doctor times, test prices, helpline number | 15 min |
 
 > **Never paste keys into chat, email or WhatsApp.** Keys go only into Vercel → Settings → Environment Variables.
@@ -29,7 +29,7 @@ the app works without them, and that feature just shows a friendly "not switched
 1. Go to **supabase.com → New project**. Pick a strong database password and save it in a password manager.
    Region: Supabase has no African region, so pick **London (eu-west-2)** or **Frankfurt**. Your privacy notice must mention this (see the NDPA note in `/privacy`).
 2. **SQL Editor → New query**. Paste the whole of `supabase/migrations/20261117000000_init.sql` and press **Run**. You should see "Success".
-   Then do the same with `supabase/migrations/20261118000000_lab_packages.sql` (lab packages) `supabase/migrations/20261118100000_password_login.sql` (email + password accounts) `supabase/migrations/20261118200000_care_plans.sql` (care plans and pricing) `supabase/migrations/20261118300000_family_care.sql` (care for your parents) and `supabase/migrations/20261119000000_consults_and_schedule.sql` (consult types, fees and weekly availability).
+   Then do the same with `supabase/migrations/20261118000000_lab_packages.sql` (lab packages) `supabase/migrations/20261118100000_password_login.sql` (email + password accounts) `supabase/migrations/20261118200000_care_plans.sql` (care plans and pricing) `supabase/migrations/20261118300000_family_care.sql` (care for your parents) `supabase/migrations/20261119000000_consults_and_schedule.sql` (consult types, fees and weekly availability) and `supabase/migrations/20261120000000_voice_notes.sql` (private voice notes for doctor bookings).
 3. **Project Settings → API**. Copy these into Vercel's Environment Variables:
    - Project URL → `NEXT_PUBLIC_SUPABASE_URL`
    - anon / publishable key → `NEXT_PUBLIC_SUPABASE_ANON_KEY`

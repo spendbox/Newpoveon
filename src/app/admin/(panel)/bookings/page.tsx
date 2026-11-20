@@ -17,6 +17,13 @@ export default async function BookingsPage({ searchParams }: PageProps<"/admin/b
   else if (view === "unpaid") q = q.eq("status", "pending_payment").order("created_at", { ascending: false });
   else q = q.order("created_at", { ascending: false });
   const { data: rows } = await q;
+  // Short-lived links so the team can listen to voice notes (the bucket is private).
+  const paths = (rows ?? []).map((r) => r.voice_note_path).filter(Boolean) as string[];
+  const signed = new Map<string, string>();
+  if (paths.length) {
+    const { data: urls } = await supabaseAdmin().storage.from("voice-notes").createSignedUrls(paths, 3600);
+    (urls ?? []).forEach((u) => u.signedUrl && u.path && signed.set(u.path, u.signedUrl));
+  }
   return (
     <>
       <H1 sub={`Consult fees are set per type in Consults. Payments are confirmed by Paystack on the server.`}>Doctor bookings</H1>
@@ -40,6 +47,9 @@ export default async function BookingsPage({ searchParams }: PageProps<"/admin/b
               </div>
               <p className="mt-2 text-sm"><span className="font-semibold">Needs help with:</span> {b.consult_type_name ?? "General consult"}{b.doctor_type ? ` · ${b.doctor_type}` : ""} · ₦{(b.amount_kobo / 100).toLocaleString("en-NG")}</p>
               <p className="text-sm"><span className="font-semibold">In their words:</span> {b.reason}</p>
+              {b.voice_note_path && signed.get(b.voice_note_path) && (
+                <div className="mt-2"><p className="text-xs font-semibold text-muted">Voice note</p><audio controls preload="none" src={signed.get(b.voice_note_path)} className="mt-1 w-full max-w-md" /></div>
+              )}
               <p className="text-xs text-muted">Ref {b.paystack_reference}{b.paid_at ? ` · paid ${formatWhen(b.paid_at)}` : ""}</p>
               {shared && (
                 <details className="mt-2 rounded-lg bg-ground p-3 text-sm">

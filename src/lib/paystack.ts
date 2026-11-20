@@ -97,7 +97,7 @@ export async function confirmBookingPayment(reference: string, source: "webhook"
         When: booking.slot_starts_at ? formatWhen(booking.slot_starts_at) : "No slot chosen: call to agree a time",
         "Needs a new time": booking.needs_reschedule ? "YES" : "no",
         "Shared results": booking.share_results && booking.screening_id ? "Yes (see admin)" : "No",
-        Reason: booking.reason, Reference: reference,
+        Reason: booking.reason, "Voice note": booking.voice_note_path ? "Yes: listen in Admin → Doctor bookings" : undefined, Reference: reference,
       });
       await sendEmail(site.teamEmail, t.subject, t.html, t.text);
     }

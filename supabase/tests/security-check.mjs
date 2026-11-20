@@ -7,6 +7,8 @@ const db = new PGlite();
 await db.exec(`
 create role anon; create role authenticated; create role service_role bypassrls;
 create schema auth;
+create schema storage;
+create table storage.buckets (id text primary key, name text, public boolean, file_size_limit bigint, allowed_mime_types text[]);
 create table auth.users (id uuid primary key, email text);
 create function auth.uid() returns uuid language sql stable as $$ select nullif(current_setting('request.jwt.sub', true), '')::uuid $$;
 grant usage on schema public to anon, authenticated, service_role;
@@ -40,6 +42,9 @@ console.log("consult types:", (await db.query("select count(*)::int n from consu
   console.log("book_time capacity 1:", r1, r2, "capacity 2:", r3);
   console.log("new-style paid, no reschedule flag:", JSON.stringify((await db.query(`select status, needs_reschedule from mark_booking_paid('HC-cap1', 500000)`)).rows));
 }
+await db.exec(fs.readFileSync(new URL("../migrations/20261120000000_voice_notes.sql", import.meta.url), "utf8"));
+await db.exec(fs.readFileSync(new URL("../migrations/20261120000000_voice_notes.sql", import.meta.url), "utf8"));
+console.log("voice bucket private:", JSON.stringify((await db.query("select id, public from storage.buckets")).rows));
 console.log("packages:", (await db.query("select count(*)::int n from home_tests where is_bundle and active")).rows[0].n, "single tests:", (await db.query("select count(*)::int n from home_tests where not is_bundle and active")).rows[0].n);
 console.log("migration OK");
 const u1 = "11111111-1111-1111-1111-111111111111", u2 = "22222222-2222-2222-2222-222222222222";
