@@ -56,7 +56,7 @@ export function SupportScreen({ onClose }: { onClose: () => void }) {
           ))}
         </ul>
         <p className="mt-4 text-sm font-medium text-subtle">Or go to the nearest hospital emergency department, or ask someone you trust to stay with you.</p>
-        <Button variant="secondary" className="mt-7" onClick={onClose}>Continue my {site.appName}</Button>
+        <Button variant="secondary" className="mt-7" onClick={onClose}>Continue my check</Button>
       </div>
     </div>
   );

@@ -32,7 +32,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
         <div id="main" className="flex flex-1 flex-col">{children}</div>
         <footer className="mt-auto px-6 pt-14 pb-24 text-center text-[13px] text-subtle">
           <p>
-            {site.appName} by {site.companyName} gives estimates, not diagnoses. In an emergency call <a href="tel:112" className="underline">112</a>.
+            {site.appName} gives estimates, not diagnoses. In an emergency call <a href="tel:112" className="underline">112</a>.
           </p>
           <nav className="mt-2 flex flex-wrap justify-center gap-x-4 gap-y-1" aria-label="Footer">
             <Link href="/privacy" className="underline">Privacy</Link>

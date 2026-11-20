@@ -1,4 +1,4 @@
-# Setting up and launching HealthCheck
+# Setting up and launching Poveon
 
 Plain-English steps. Do them in order. Each part switches on a feature:
 the app works without them, and that feature just shows a friendly "not switched on yet" message.
@@ -29,7 +29,7 @@ the app works without them, and that feature just shows a friendly "not switched
 1. Go to **supabase.com → New project**. Pick a strong database password and save it in a password manager.
    Region: Supabase has no African region, so pick **London (eu-west-2)** or **Frankfurt**. Your privacy notice must mention this (see the NDPA note in `/privacy`).
 2. **SQL Editor → New query**. Paste the whole of `supabase/migrations/20261117000000_init.sql` and press **Run**. You should see "Success".
-   Then do the same with `supabase/migrations/20261118000000_lab_packages.sql` (lab packages) `supabase/migrations/20261118100000_password_login.sql` (email + password accounts) `supabase/migrations/20261118200000_care_plans.sql` (care plans and pricing) `supabase/migrations/20261118300000_family_care.sql` (care for your parents) `supabase/migrations/20261119000000_consults_and_schedule.sql` (consult types, fees and weekly availability) `supabase/migrations/20261120000000_voice_notes.sql` (private voice notes for doctor bookings) `supabase/migrations/20261121000000_wellbeing_score.sql` (wellbeing score column) and `supabase/migrations/20261122000000_more_consult_types.sql` (stop smoking, alcohol, sleep, lower my risk and medicine check consults).
+   Then do the same with `supabase/migrations/20261118000000_lab_packages.sql` (lab packages) `supabase/migrations/20261118100000_password_login.sql` (email + password accounts) `supabase/migrations/20261118200000_care_plans.sql` (care plans and pricing) `supabase/migrations/20261118300000_family_care.sql` (care for your parents) `supabase/migrations/20261119000000_consults_and_schedule.sql` (consult types, fees and weekly availability) `supabase/migrations/20261120000000_voice_notes.sql` (private voice notes for doctor bookings) `supabase/migrations/20261121000000_wellbeing_score.sql` (wellbeing score column) `supabase/migrations/20261122000000_more_consult_types.sql` (stop smoking, alcohol, sleep, lower my risk and medicine check consults) and `supabase/migrations/20261123000000_rename_to_poveon.sql` (brand name in consult text).
 3. **Project Settings → API**. Copy these into Vercel's Environment Variables:
    - Project URL → `NEXT_PUBLIC_SUPABASE_URL`
    - anon / publishable key → `NEXT_PUBLIC_SUPABASE_ANON_KEY`
@@ -49,7 +49,7 @@ the app works without them, and that feature just shows a friendly "not switched
 2. Resend shows a few DNS records (TXT and MX). Add them where you bought your domain (for example Whogohost, Qservers, GoDaddy or Namecheap).
    It can take from a few minutes to a day to show as **Verified**.
 3. **API Keys → Create API key** ("Sending access"). Put it in Vercel as `RESEND_API_KEY`.
-4. Set `EMAIL_FROM`, for example `HealthCheck <hello@yourdomain.com>`, and redeploy.
+4. Set `EMAIL_FROM`, for example `Poveon <hello@yourdomain.com>`, and redeploy.
 
 ## 4. Paystack (test mode first)
 

@@ -166,7 +166,7 @@ export default async function FamilyPage() {
           <h2 id="enquire-title" className="mt-2 text-3xl font-bold md:text-[40px]">Tell us about your parent</h2>
           <p className="mt-2 text-[15px] text-muted">We&apos;ll reply within one working day by WhatsApp or email. Nothing is charged until you and your parent agree a plan.</p>
           <FamilyForm plans={plans.map((p) => p.name)} />
-          <p className="mt-6 text-center text-sm text-muted">Living in Nigeria yourself? <Link href="/" className="font-medium text-primary hover:underline">Do the free {site.appName}</Link></p>
+          <p className="mt-6 text-center text-sm text-muted">Living in Nigeria yourself? <Link href="/" className="font-medium text-primary hover:underline">Do the free {site.appName} check</Link></p>
         </div>
       </section>
     </main>

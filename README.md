@@ -1,8 +1,8 @@
-# Poveon · HealthCheck
+# Poveon
 
-HealthCheck is Poveon's homepage: a free, mobile-first self-screening app. People answer friendly
+Poveon is a free, mobile-first self-screening app. People answer friendly
 questions (about 10 minutes) and get their heart age, diabetes risk, sleep, mood and more. If
-something looks worrying they can book a ₦5,000 doctor consult, order a home test or request
+something looks worrying they can book a doctor consult, order a home test or request
 medication delivery.
 
 - **Setting it up and launching:** [docs/SETUP.md](docs/SETUP.md)
@@ -10,7 +10,7 @@ medication delivery.
 - **Every setting and key:** [.env.example](.env.example)
 - **Look and feel:** [design-reference/DESIGN.md](design-reference/DESIGN.md)
 
-The name "HealthCheck", the WhatsApp number, the consult price and other settings are in
+The name "Poveon", the WhatsApp number, the consult price and other settings are in
 [`src/config/site.ts`](src/config/site.ts).
 
 ## What's where

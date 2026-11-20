@@ -348,7 +348,7 @@ export function BookingForm({ types, preselect, defaultReason }: { types: Type[]
           </dl>
           <label className="flex items-start gap-3">
             <input type="checkbox" className="mt-0.5 h-5 w-5 shrink-0 accent-[#136F58]" checked={share} onChange={(e) => setShare(e.target.checked)} />
-            <span className="text-sm">Share my HealthCheck results with the doctor.<span className="block text-xs text-subtle">{saved ? "Your latest saved results will be attached." : "If you've saved results with us, they'll be attached."}</span></span>
+            <span className="text-sm">Share my Poveon results with the doctor.<span className="block text-xs text-subtle">{saved ? "Your latest saved results will be attached." : "If you've saved results with us, they'll be attached."}</span></span>
           </label>
           <p className="flex items-center gap-1.5 text-xs text-subtle"><Icon name="shield" size={14} /> Secure payment by Paystack. Card, bank transfer or USSD.</p>
         </>

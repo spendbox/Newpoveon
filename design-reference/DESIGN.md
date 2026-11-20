@@ -1,4 +1,4 @@
-# HealthCheck design guide (v2 · "Calm vitality")
+# Poveon design guide (v2 · "Calm vitality")
 
 Modern, clean and quietly fun. It should feel like a well-made product, not a hospital form and not a cartoon.
 v1 (thick outlines, chunky shadows, cartoon characters) is kept for reference in [`archive-v1/`](archive-v1/).
