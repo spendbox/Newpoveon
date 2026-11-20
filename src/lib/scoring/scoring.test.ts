@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 import fixtures from "./__fixtures__.json";
 import { heartAge, isExtrapolated, whoCvdRisk, whoCvdRiskRaw, whoRiskBand, type Sex } from "./who-cvd";
-import { auditC, bmi, bmiClass, bpClass, findrisc, findriscBand, gad2Positive, gad7, phq2Positive, phq9, stopBang, waistToHeight, whtrClass } from "./tools";
+import { auditC, bmi, bmiClass, bpClass, findrisc, findriscBand, gad2Positive, gad7, phq2Positive, phq9, stopBang, waistToHeight, whtrClass, who5 } from "./tools";
 import { computeResults, shareSummary } from "./results";
 import { HEART_AGE_REFERENCE } from "@/config/site";
 import { sanitizeAnswers, visibleQuestions, type Answers } from "@/lib/questions";
@@ -218,7 +218,7 @@ describe("computeResults", () => {
   it("does not calculate heart age under 30", () => {
     const r = computeResults({ ...healthy, age: 29 });
     expect(r.heart).toBeNull();
-    expect(r.heartNote).toMatch(/starts at 30/);
+    expect(r.heartNote).toMatch(/No heart age yet: it starts at 30/);
   });
   it("raises the safety flag when PHQ-9 item 9 is above 'Not at all'", () => {
     const r = computeResults({ ...healthy, phq1: "2", phq2: "2", phq3: "0", phq4: "0", phq5: "0", phq6: "0", phq7: "0", phq8: "0", phq9: "1" });
@@ -229,15 +229,39 @@ describe("computeResults", () => {
     const s = shareSummary(computeResults(healthy));
     expect(JSON.stringify(s)).not.toMatch(/Mood|Worry|Alcohol|PHQ|GAD|AUDIT/);
   });
-  it("opens gated sections only when needed (25–35 questions for most people)", () => {
-    expect(visibleQuestions(healthy).length).toBe(25);
+  it("opens gated sections only when needed (30–40 questions for most people, incl. 5 WHO-5)", () => {
+    expect(visibleQuestions(healthy).length).toBe(30);
     const busy = { ...healthy, snore: "yes", drinks: "yes", phq1: "2", phq2: "2", gad1: "2", gad2: "2", sex: "female" };
-    expect(visibleQuestions(busy).length).toBe(26 + 3 + 3 + 7 + 5);
+    expect(visibleQuestions(busy).length).toBe(31 + 3 + 3 + 7 + 5);
   });
   it("server sanitiser drops invalid and hidden answers", () => {
     const s = sanitizeAnswers({ ...healthy, age: 500, tired: "yes", evil: "<script>" });
     expect(s.age).toBeUndefined();
     expect(s.tired).toBeUndefined(); // hidden because snore = no
     expect((s as Record<string, unknown>).evil).toBeUndefined();
+  });
+});
+
+describe("WHO-5 Well-Being Index (Topp 2015)", () => {
+  it("multiplies the raw score by 4", () => {
+    expect(who5([5, 5, 5, 5, 5])).toEqual({ raw: 25, score: 100, band: "good" });
+    expect(who5([0, 0, 0, 0, 0])).toEqual({ raw: 0, score: 0, band: "very low" });
+  });
+  it("uses ≤50 for low and ≤28 for very low", () => {
+    expect(who5([3, 3, 3, 2, 2]).score).toBe(52);
+    expect(who5([3, 3, 3, 2, 2]).band).toBe("good");
+    expect(who5([3, 3, 2, 2, 2]).band).toBe("low"); // 48
+    expect(who5([2, 2, 2, 2, 2]).band).toBe("low"); // 40
+    expect(who5([2, 2, 1, 1, 1]).band).toBe("very low"); // 28
+    expect(who5([2, 2, 2, 1, 1]).band).toBe("low"); // 32
+  });
+  it("rejects bad input", () => {
+    expect(() => who5([1, 2, 3])).toThrow();
+    expect(() => who5([6, 0, 0, 0, 0])).toThrow();
+  });
+  it("adds a wellbeing card first when all five are answered", () => {
+    const r = computeResults({ age: 25, sex: "female", who1: "4", who2: "3", who3: "3", who4: "2", who5: "4" } as never);
+    expect(r.wellbeing).toEqual({ score: 64, band: "good" });
+    expect(r.cards[0].id).toBe("wellbeing");
   });
 });

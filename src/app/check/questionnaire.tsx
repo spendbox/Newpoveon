@@ -4,7 +4,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 import { AnswerTile, ProgressWalker } from "@/components/client";
-import { IllustrationCard } from "@/components/illustrations";
+import { QuestionArt } from "@/components/question-art";
 import { Icon } from "@/components/icons";
 import { Button, inputCls } from "@/components/ui";
 import { SupportScreen } from "@/components/support-screen";
@@ -136,10 +136,10 @@ export function Questionnaire() {
           aria-labelledby={`q-${q.id}`}
           className="mt-5"
         >
-          <IllustrationCard name={q.illustration} compact />
-          {q.help && (q.topic === "Mood" || q.topic === "Worry") && <p className="mt-5 text-sm text-muted">{q.help}</p>}
+          <QuestionArt id={q.id} fallback={q.illustration} />
+          {q.help && (q.topic === "Mood" || q.topic === "Worry" || q.topic === "Wellbeing") && <p className="mt-5 text-sm text-muted">{q.help}</p>}
           <h1 id={`q-${q.id}`} className="mt-5 text-[26px] leading-[1.15] font-semibold">{q.title}</h1>
-          {q.help && q.topic !== "Mood" && q.topic !== "Worry" && <p className="mt-2 text-[15px] leading-snug text-muted">{q.help}</p>}
+          {q.help && q.topic !== "Mood" && q.topic !== "Worry" && q.topic !== "Wellbeing" && <p className="mt-2 text-[15px] leading-snug text-muted">{q.help}</p>}
 
           <div className="mt-5">
             {q.kind === "choice" && (

@@ -89,15 +89,20 @@ export function ResultCard({ card }: { card: ResultCardData }) {
       <p className="font-display text-xl leading-6 font-semibold">{card.value}</p>
       <p className="text-[15px] leading-6 text-ink/90">{card.summary}</p>
       <p className="text-xs leading-5 text-subtle">{card.basis} An estimate, not a diagnosis.</p>
-      {href ? (
-        <Link href={href} className="mt-1 inline-flex items-center gap-1 self-start text-sm font-semibold text-primary hover:underline">
-          {card.next.label} <Icon name="arrowRight" size={16} strokeWidth={2} />
+      <div className="mt-1 flex flex-wrap items-center gap-x-4 gap-y-2">
+        {href ? (
+          <Link href={href} className="inline-flex items-center gap-1 text-sm font-semibold text-primary hover:underline">
+            {card.next.label} <Icon name="arrowRight" size={16} strokeWidth={2} />
+          </Link>
+        ) : (
+          <p className="inline-flex items-center gap-1.5 text-sm font-medium text-muted">
+            <Icon name="clock" size={16} strokeWidth={2} /> {card.next.label}
+          </p>
+        )}
+        <Link href={`/learn/${card.id}`} className="inline-flex items-center gap-1 text-sm font-semibold text-ink/70 hover:text-ink hover:underline">
+          How to improve it <Icon name="arrowRight" size={14} strokeWidth={2} />
         </Link>
-      ) : (
-        <p className="mt-1 inline-flex items-center gap-1.5 text-sm font-medium text-muted">
-          <Icon name="clock" size={16} strokeWidth={2} /> {card.next.label}
-        </p>
-      )}
+      </div>
     </article>
   );
 }

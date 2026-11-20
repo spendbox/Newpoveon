@@ -12,6 +12,7 @@ export type Answers = Record<string, AnswerValue>;
 
 export type Topic =
   | "About you"
+  | "Wellbeing"
   | "Your body"
   | "Your heart"
   | "Blood sugar"
@@ -90,6 +91,17 @@ const gad2Score = (a: Answers) => Number(a.gad1 ?? 0) + Number(a.gad2 ?? 0);
 const snores = (a: Answers) => a.snore === "yes" || a.snore === "unsure";
 const drinks = (a: Answers) => a.drinks === "yes";
 
+/** WHO-5 response scale (published wording), scored 5 → 0. */
+export const WHO5_OPTIONS: Option[] = [
+  { value: "5", label: "All of the time" },
+  { value: "4", label: "Most of the time" },
+  { value: "3", label: "More than half of the time" },
+  { value: "2", label: "Less than half of the time" },
+  { value: "1", label: "Some of the time" },
+  { value: "0", label: "At no time" },
+];
+const WHO5_STEM = "Over the last two weeks:";
+
 const PHQ_STEM = "Over the last 2 weeks, how often have you been bothered by:";
 const GAD_STEM = "Over the last 2 weeks, how often have you been bothered by:";
 
@@ -101,6 +113,17 @@ export const QUESTIONS: Question[] = [
     help: "The heart and diabetes formulas we use are different for men and women.", illustration: "aboutYou",
     options: [{ value: "female", label: "Female", icon: "female" }, { value: "male", label: "Male", icon: "male" }],
   },
+
+  /* ---------------- Wellbeing (WHO-5) ---------------- */
+  ...(
+    [
+      ["who1", "I have felt cheerful and in good spirits"],
+      ["who2", "I have felt calm and relaxed"],
+      ["who3", "I have felt active and vigorous"],
+      ["who4", "I woke up feeling fresh and rested"],
+      ["who5", "My daily life has been filled with things that interest me"],
+    ] as const
+  ).map(([id, title]): Question => ({ id, topic: "Wellbeing", kind: "choice", title, help: WHO5_STEM, illustration: "mood", options: WHO5_OPTIONS, layout: "rows" })),
 
   /* ---------------- Your body ---------------- */
   { id: "height", topic: "Your body", kind: "number", title: "How tall are you?", unit: "cm", min: 120, max: 220, placeholder: "e.g. 170", feetInches: true, illustration: "scale" },

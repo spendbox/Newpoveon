@@ -4,6 +4,7 @@ import { cleanText, handleError, isEmail, isPhone, json, readJson } from "@/lib/
 import { isComplete, sanitizeAnswers } from "@/lib/questions";
 import { computeResults, RESULTS_VERSION } from "@/lib/scoring/results";
 import { currentUser, supabaseAdmin, supabaseConfigured } from "@/lib/supabase/server";
+import { insertScreening } from "@/lib/screening-insert";
 import { randomToken, sha256 } from "@/lib/tokens";
 
 /**
@@ -26,9 +27,7 @@ export async function POST(req: Request) {
     const user = await currentUser();
     const ownerToken = randomToken();
     const sb = supabaseAdmin();
-    const { data, error } = await sb
-      .from("screenings")
-      .insert({
+    const { data, error } = await insertScreening(sb, {
         // Attach to the account only if the logged-in email matches.
         user_id: user && user.email?.toLowerCase() === email ? user.id : null,
         email,
@@ -38,12 +37,11 @@ export async function POST(req: Request) {
         results_version: RESULTS_VERSION,
         heart_age: results.heart?.heartAge.value ?? null,
         risk_percent: results.heart?.riskPercent ?? null,
+        wellbeing_score: results.wellbeing?.score ?? null,
         consent_at: new Date().toISOString(),
         consent_text: CONSENT_TEXT,
         owner_token_hash: sha256(ownerToken),
-      })
-      .select("id")
-      .single();
+      });
     if (error) throw error;
     if (user && user.email?.toLowerCase() === email) {
       await sb.from("profiles").update({ latest_answers: answers, phone: phone ?? undefined, updated_at: new Date().toISOString() }).eq("id", user.id);

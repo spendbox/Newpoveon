@@ -7,7 +7,7 @@ import { type Answers, type BpValue, num, str } from "@/lib/questions";
 import { heartAge, isExtrapolated, whoCvdRisk, whoRiskBand, WHO_MAX_AGE, type HeartAge, type Sex } from "./who-cvd";
 import {
   auditC, bmi as calcBmi, bmiClass, bpClass, FINDRISC_BAND_RISK, findrisc, gad2Positive, gad7, meetsSleepGuideline,
-  meetsWhoActivity, phq2Positive, phq9, stopBang, waistToHeight, whtrClass,
+  meetsWhoActivity, phq2Positive, phq9, stopBang, waistToHeight, whtrClass, who5, type Who5Band,
 } from "./tools";
 
 export const RESULTS_VERSION = 1;
@@ -21,7 +21,7 @@ export type NextStep =
   | { kind: "retest"; label: string; months: number };
 
 export interface ResultCard {
-  id: "heart" | "bp" | "diabetes" | "body" | "sleep" | "mood" | "anxiety" | "alcohol" | "smoking" | "activity";
+  id: "wellbeing" | "heart" | "bp" | "diabetes" | "body" | "sleep" | "mood" | "anxiety" | "alcohol" | "smoking" | "activity";
   topic: string;
   status: Status;
   /** Short headline value, e.g. "Low" or "BMI 27.1". */
@@ -52,8 +52,16 @@ export interface HeartResult {
   earlyEstimate: boolean;
 }
 
+export interface WellbeingResult {
+  /** 0–100 (WHO-5 raw score × 4). */
+  score: number;
+  band: Who5Band;
+}
+
 export interface Results {
   version: number;
+  /** WHO-5. Missing on results saved before wellbeing was added. */
+  wellbeing?: WellbeingResult | null;
   age: number;
   sex: Sex;
   heart: HeartResult | null;
@@ -84,6 +92,27 @@ export function computeResults(a: Answers): Results {
 
   const cards: ResultCard[] = [];
 
+  /* ---------- Wellbeing (WHO-5) ---------- */
+  let wellbeing: WellbeingResult | null = null;
+  {
+    const items = [1, 2, 3, 4, 5].map((i) => a[`who${i}`]);
+    if (items.every((v) => v !== undefined)) {
+      const w = who5(items.map(Number));
+      wellbeing = { score: w.score, band: w.band };
+      const status: Status = w.band === "good" ? "good" : w.band === "low" ? "check" : "act";
+      cards.push({
+        id: "wellbeing", topic: "Wellbeing", status, sensitive: true,
+        value: `${w.score} / 100`,
+        summary:
+          w.band === "good" ? "You've been feeling well most of the time over the last two weeks. Keep doing what works for you."
+          : w.band === "low" ? "Your wellbeing has been lower than usual. Small changes help, and talking to someone can too."
+          : "You've been feeling low for much of the last two weeks. Please talk to a doctor. Feeling better is very possible.",
+        basis: "Based on the WHO-5 Well-Being Index.",
+        next: w.band === "good" ? retest(3) : doctor(w.band === "low" ? "Talk it through with a doctor" : "Get help from a doctor"),
+      });
+    }
+  }
+
   /* ---------- Heart (WHO 2019 non-lab) ---------- */
   let heart: HeartResult | null = null;
   let heartNote: string | null = null;
@@ -96,7 +125,7 @@ export function computeResults(a: Answers): Results {
     });
   } else if (age < EXTENDED_MIN_AGE || age > WHO_MAX_AGE) {
     heartNote = age < EXTENDED_MIN_AGE
-      ? `Heart age starts at ${EXTENDED_MIN_AGE}. Keeping your blood pressure, weight and smoking in check now pays off later.`
+      ? `No heart age yet: it starts at ${EXTENDED_MIN_AGE}. The WHO heart model wasn't built for people under ${EXTENDED_MIN_AGE}, so any number would be a guess. Your other results below still count.`
       : `The WHO heart risk model covers ages up to ${WHO_MAX_AGE}, so we can't give a heart age. A doctor can review your heart health.`;
   } else if (!bp || !bmi) {
     heartNote = "We need a real blood pressure reading to work out your heart age.";
@@ -302,7 +331,7 @@ export function computeResults(a: Answers): Results {
     });
   }
 
-  return { version: RESULTS_VERSION, age, sex, heart, heartNote, cards, reminders: prevention(a, age, sex, bmi), selfHarmFlag };
+  return { version: RESULTS_VERSION, wellbeing, age, sex, heart, heartNote, cards, reminders: prevention(a, age, sex, bmi), selfHarmFlag };
 }
 
 /* ---------------------------------------------------------------- Prevention checklist */
