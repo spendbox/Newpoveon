@@ -4,7 +4,8 @@ import { useState } from "react";
 import { LEARN, LEARN_ORDER, type BodyArea, type LearnSlug } from "@/content/learn";
 import { STATUS_LABEL, type Status } from "@/lib/scoring/results";
 import { Icon } from "./icons";
-import { AREA_POINTS, Mannequin } from "./mannequin";
+import { AREA_POINTS } from "@/content/body-points";
+import { Mannequin } from "./mannequin";
 
 const DOT: Record<Status, string> = { good: "bg-primary", check: "bg-sun", act: "bg-coral" };
 const RANK: Record<Status, number> = { good: 0, check: 1, act: 2 };

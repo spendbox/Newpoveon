@@ -1,95 +1,128 @@
+"use client";
+import { useId } from "react";
 import type { BodyArea } from "@/content/learn";
 
-/** Where each body area sits on the figure (viewBox 0 0 300 560). Front view: the person's left is on the right. */
-export const AREA_POINTS: Record<BodyArea, { x: number; y: number; label: string }> = {
-  mind: { x: 150, y: 50, label: "Mind" },
-  sleep: { x: 150, y: 116, label: "Sleep and breathing" },
-  lungs: { x: 126, y: 172, label: "Lungs" },
-  heart: { x: 168, y: 182, label: "Heart" },
-  bp: { x: 87, y: 210, label: "Blood pressure" },
-  liver: { x: 130, y: 236, label: "Liver" },
-  sugar: { x: 168, y: 256, label: "Blood sugar" },
-  waist: { x: 150, y: 298, label: "Weight and waist" },
-  legs: { x: 178, y: 440, label: "Movement" },
-};
+type P = [number, number];
+type Seg = [P, P, P]; // cubic: control 1, control 2, end
 
-const SKIN = "#F3F7F5";
-const SHADE = "#DCE8E2";
-const EDGE = "var(--color-line-strong)";
+/* The right half of the body outline, from the top of the head to the crotch. The left half is its mirror. */
+const START: P = [150, 14];
+const RIGHT: Seg[] = [
+  [[167, 14], [179, 29], [179, 48]], // crown → temple
+  [[179, 66], [172, 80], [163, 87]], // cheek → jaw
+  [[161, 93], [162, 101], [165, 106]], // neck
+  [[171, 112], [183, 115], [194, 119]], // trapezius
+  [[207, 124], [214, 134], [215, 150]], // shoulder
+  [[217, 172], [219, 198], [221, 222]], // upper arm, outer
+  [[223, 250], [227, 280], [230, 302]], // forearm, outer
+  [[232, 314], [238, 326], [238, 340]], // wrist → palm
+  [[238, 352], [231, 358], [225, 355]], // fingertips
+  [[219, 352], [217, 340], [216, 328]], // palm, inner
+  [[214, 312], [210, 290], [206, 266]], // forearm, inner
+  [[203, 246], [200, 222], [199, 200]], // elbow → upper arm, inner
+  [[198, 184], [196, 170], [192, 160]], // armpit
+  [[193, 186], [186, 210], [184, 232]], // ribs → waist
+  [[183, 252], [193, 276], [196, 300]], // hip
+  [[199, 334], [193, 380], [188, 410]], // thigh, outer
+  [[185, 428], [184, 444], [185, 458]], // knee
+  [[187, 484], [184, 508], [178, 528]], // calf
+  [[177, 536], [186, 544], [189, 550]], // ankle → foot
+  [[191, 557], [176, 559], [164, 556]], // toes
+  [[160, 552], [161, 542], [161, 532]], // inner ankle
+  [[159, 506], [157, 476], [159, 452]], // inner calf
+  [[160, 432], [160, 404], [158, 380]], // inner knee → thigh
+  [[156, 356], [154, 340], [150, 332]], // inner thigh → crotch
+];
+
+const f = (p: P) => `${p[0]} ${p[1]}`;
+const m = (p: P): P => [300 - p[0], p[1]];
+const BODY = (() => {
+  let d = `M${f(START)}`;
+  for (const [c1, c2, e] of RIGHT) d += ` C${f(c1)} ${f(c2)} ${f(e)}`;
+  // Walk back up the left side: reverse each segment and mirror it.
+  const pts: P[] = [START, ...RIGHT.map((s) => s[2])];
+  for (let i = RIGHT.length - 1; i >= 0; i--) {
+    const [c1, c2] = RIGHT[i];
+    d += ` C${f(m(c2))} ${f(m(c1))} ${f(m(pts[i]))}`;
+  }
+  return d + "Z";
+})();
 
 /**
- * A calm, gender-neutral mannequin with soft organ hints. `highlight` brings one area forward.
+ * A soft, gender-neutral body figure with gently glowing organs. `highlight` brings one area forward.
  * `crop="upper"` shows head to hips (for small hero spaces).
  */
 export function Mannequin({ highlight, crop = "full", className = "" }: { highlight?: BodyArea | null; crop?: "full" | "upper"; className?: string }) {
-  const dim = (a: BodyArea) => (highlight && highlight !== a ? 0.28 : 1);
-  const limb = (d: string, w: number) => (
-    <>
-      <path d={d} stroke={EDGE} strokeWidth={w + 3} strokeLinecap="round" strokeLinejoin="round" fill="none" />
-      <path d={d} stroke={SKIN} strokeWidth={w} strokeLinecap="round" strokeLinejoin="round" fill="none" />
-    </>
-  );
+  const op = (a: BodyArea, on = 1) => (highlight && highlight !== a ? on * 0.3 : on);
+  // Unique ids per figure: a page can show several, and a hidden one must not own the gradients.
+  const u = useId().replace(/[^a-zA-Z0-9_-]/g, "");
+  const id = (n: string) => `${n}-${u}`;
   return (
     <svg viewBox={crop === "upper" ? "40 0 220 350" : "0 0 300 560"} className={className} role="img" aria-label="A body figure showing the parts of your health we check">
       <defs>
-        <linearGradient id="mq-body" x1="0" x2="1" y1="0" y2="0">
-          <stop offset="0" stopColor={SHADE} />
-          <stop offset=".45" stopColor="#FFFFFF" />
-          <stop offset="1" stopColor={SHADE} />
+        <linearGradient id={id("mq-skin")} x1="0" x2="1" y1="0" y2="0">
+          <stop offset="0" stopColor="#CFE6DD" />
+          <stop offset=".22" stopColor="#E7F3EE" />
+          <stop offset=".5" stopColor="#F8FCFA" />
+          <stop offset=".78" stopColor="#E7F3EE" />
+          <stop offset="1" stopColor="#CFE6DD" />
         </linearGradient>
-        <linearGradient id="mq-limb" x1="0" x2="1" y1="0" y2="0">
-          <stop offset="0" stopColor={SHADE} />
-          <stop offset=".5" stopColor={SKIN} />
-          <stop offset="1" stopColor={SHADE} />
+        <linearGradient id={id("mq-shade")} x1="0" x2="0" y1="0" y2="1">
+          <stop offset="0" stopColor="#FFFFFF" stopOpacity=".55" />
+          <stop offset=".4" stopColor="#FFFFFF" stopOpacity="0" />
+          <stop offset="1" stopColor="var(--color-primary)" stopOpacity=".08" />
         </linearGradient>
-        <radialGradient id="mq-glow" cx=".5" cy=".5" r=".5">
-          <stop offset="0" stopColor="var(--color-primary)" stopOpacity=".18" />
+        <radialGradient id={id("mq-aura")} cx=".5" cy=".42" r=".55">
+          <stop offset="0" stopColor="var(--color-primary)" stopOpacity=".14" />
           <stop offset="1" stopColor="var(--color-primary)" stopOpacity="0" />
         </radialGradient>
+        <radialGradient id={id("mq-heart")} cx=".5" cy=".5" r=".5">
+          <stop offset="0" stopColor="var(--color-coral)" stopOpacity=".5" />
+          <stop offset="1" stopColor="var(--color-coral)" stopOpacity="0" />
+        </radialGradient>
+        <radialGradient id={id("mq-mind")} cx=".5" cy=".5" r=".5">
+          <stop offset="0" stopColor="var(--color-lavender)" stopOpacity=".45" />
+          <stop offset="1" stopColor="var(--color-lavender)" stopOpacity="0" />
+        </radialGradient>
+        <clipPath id={id("mq-clip")}><path d={BODY} /></clipPath>
       </defs>
 
-      {crop === "full" && <ellipse cx="150" cy="300" rx="150" ry="260" fill="url(#mq-glow)" />}
-      <ellipse cx="150" cy="552" rx="70" ry="7" fill="var(--color-ink)" opacity=".08" />
+      {crop === "full" && <ellipse cx="150" cy="250" rx="150" ry="250" fill={`url(#${id("mq-aura")})`} />}
+      <ellipse cx="150" cy="556" rx="62" ry="6" fill="var(--color-ink)" opacity=".07" />
 
-      {/* Legs */}
-      {limb("M130 330 L124 440 L121 528", 34)}
-      {limb("M170 330 L176 440 L179 528", 34)}
-      <ellipse cx="116" cy="540" rx="20" ry="10" fill={SHADE} stroke={EDGE} strokeWidth="1.5" />
-      <ellipse cx="184" cy="540" rx="20" ry="10" fill={SHADE} stroke={EDGE} strokeWidth="1.5" />
+      {/* Body */}
+      <path d={BODY} fill={`url(#${id("mq-skin")})`} />
+      <path d={BODY} fill={`url(#${id("mq-shade")})`} />
 
-      {/* Arms */}
-      {limb("M104 146 L84 236 L78 318", 26)}
-      {limb("M196 146 L216 236 L222 318", 26)}
-      <ellipse cx="77" cy="334" rx="12" ry="16" fill={SKIN} stroke={EDGE} strokeWidth="1.5" />
-      <ellipse cx="223" cy="334" rx="12" ry="16" fill={SKIN} stroke={EDGE} strokeWidth="1.5" />
-
-      {/* Torso and hips */}
-      <path d="M102 130C122 118 178 118 198 130C214 140 214 166 210 194C206 226 196 252 194 282C193 300 198 316 198 332C198 350 176 356 150 356C124 356 102 350 102 332C102 316 107 300 106 282C104 252 94 226 90 194C86 166 86 140 102 130Z" fill="url(#mq-body)" stroke={EDGE} strokeWidth="1.5" />
-
-      {/* Neck and head */}
-      <rect x="136" y="96" width="28" height="34" rx="12" fill={SKIN} stroke={EDGE} strokeWidth="1.5" />
-      <ellipse cx="150" cy="58" rx="36" ry="44" fill="url(#mq-body)" stroke={EDGE} strokeWidth="1.5" />
-
-      {/* Joints: the mannequin look */}
-      {[[104, 146], [196, 146], [84, 236], [216, 236], [124, 440], [176, 440]].map(([x, y]) => (
-        <circle key={`${x}-${y}`} cx={x} cy={y} r="7" fill="none" stroke={EDGE} strokeWidth="1.5" opacity=".7" />
-      ))}
-
-      {/* Organ hints */}
-      <g opacity={dim("mind")}><circle className="mq-pulse-soft" cx="150" cy="50" r="20" fill="var(--color-lavender)" opacity=".18" /><path d="M138 50c0-8 6-12 12-12s12 4 12 12M144 44c2 2 2 6 0 8M156 44c-2 2-2 6 0 8" stroke="var(--color-lavender)" strokeWidth="2" fill="none" strokeLinecap="round" opacity=".7" /></g>
-      <g opacity={dim("sleep")}><path d="M144 104v24M156 104v24" stroke="var(--color-lavender)" strokeWidth="3" strokeLinecap="round" opacity=".4" /></g>
-      <g opacity={dim("lungs")}>
-        <path d="M144 150c-10-6-30 2-32 30-2 22 6 34 16 32 10-2 16-12 16-28z" fill="var(--color-lavender)" opacity=".22" />
-        <path d="M156 150c10-6 30 2 32 30 2 22-6 34-16 32-10-2-16-12-16-28z" fill="var(--color-lavender)" opacity=".22" />
+      {/* Organs, clipped to the body so nothing spills over the outline */}
+      <g clipPath={`url(#${id("mq-clip")})`}>
+        <g opacity={op("mind")}>
+          <circle className="mq-pulse-soft" cx="150" cy="44" r="26" fill={`url(#${id("mq-mind")})`} />
+          <path d="M138 46c-3-9 4-17 12-17s15 8 12 17c-1 5-6 8-12 8s-11-3-12-8z" fill="var(--color-lavender)" opacity=".28" />
+          <path d="M150 30v23M143 38c3 1 4 4 3 7M157 38c-3 1-4 4-3 7" stroke="var(--color-lavender)" strokeWidth="1.4" fill="none" strokeLinecap="round" opacity=".55" />
+        </g>
+        <g opacity={op("sleep")}><path d="M150 92v40" stroke="var(--color-lavender)" strokeWidth="6" strokeLinecap="round" opacity=".22" /></g>
+        <g opacity={op("lungs")}>
+          <path d="M145 140c-9-4-26 4-29 26-3 20 3 34 13 34 9 0 16-8 16-24z" fill="var(--color-lavender)" opacity=".2" />
+          <path d="M155 140c9-4 26 4 29 26 3 20-3 34-13 34-9 0-16-8-16-24z" fill="var(--color-lavender)" opacity=".2" />
+          <path d="M150 128v14M150 142l-8 10M150 142l8 10" stroke="var(--color-lavender)" strokeWidth="1.6" strokeLinecap="round" opacity=".45" />
+        </g>
+        <g opacity={op("liver")}><path d="M118 214c8-8 34-10 44-4 1 10-8 20-26 22-12 1-20-8-18-18z" fill="var(--color-coral)" opacity=".18" /></g>
+        <g opacity={op("sugar")}><ellipse cx="163" cy="236" rx="17" ry="6" transform="rotate(-14 163 236)" fill="var(--color-sun)" opacity=".5" /></g>
+        <g opacity={op("waist")}><path d="M116 266c22 7 46 7 68 0" stroke="var(--color-sun)" strokeWidth="3.5" strokeDasharray="1.5 5" strokeLinecap="round" fill="none" /></g>
+        <g opacity={op("legs")}><ellipse cx="172" cy="436" rx="11" ry="15" fill="var(--color-primary)" opacity={highlight === "legs" ? 0.16 : 0} /></g>
+        <g opacity={op("bp")}><path d="M80 186c8-2 17-2 25 1l-1 18c-8-2-16-2-24 0z" fill="var(--color-lavender)" opacity=".55" /></g>
       </g>
-      <g opacity={dim("liver")}><path d="M108 226c10-8 36-10 50-4 2 10-8 22-28 24-14 2-24-8-22-20z" fill="var(--color-coral)" opacity=".2" /></g>
-      <g opacity={dim("sugar")}><ellipse cx="168" cy="254" rx="20" ry="8" transform="rotate(-12 168 254)" fill="var(--color-sun)" opacity=".45" /></g>
-      <g opacity={dim("waist")}><path d="M104 298c30 10 62 10 92 0" stroke="var(--color-sun)" strokeWidth="5" strokeDasharray="2 6" strokeLinecap="round" fill="none" /></g>
-      <g opacity={dim("bp")}><path d="M74 196l26 6-4 24-26-6z" fill="var(--color-lavender)" opacity=".7" /><path d="M88 222c-4 12 0 22 10 26" stroke="var(--color-ink)" strokeWidth="1.5" fill="none" opacity=".5" /></g>
-      <g opacity={dim("heart")}>
-        <path className="mq-beat" d="M168 192s-16-9-16-20a8 8 0 0 1 16-3 8 8 0 0 1 16 3c0 11-16 20-16 20z" fill="var(--color-coral)" />
+
+      {/* Heart sits on top with a soft glow */}
+      <g opacity={op("heart")}>
+        <circle cx="163" cy="176" r="20" fill={`url(#${id("mq-heart")})`} />
+        <path className="mq-beat" d="M163 186s-13-7.5-13-16.5a6.5 6.5 0 0 1 13-2.5 6.5 6.5 0 0 1 13 2.5c0 9-13 16.5-13 16.5z" fill="var(--color-coral)" />
       </g>
-      <g opacity={dim("legs")}><path d="M176 400v80" stroke="var(--color-primary)" strokeWidth="4" strokeLinecap="round" opacity=".25" /></g>
+
+      {/* A whisper of outline and form */}
+      <path d={BODY} fill="none" stroke="var(--color-primary)" strokeOpacity=".22" strokeWidth="1.2" />
+      <path d="M126 128c8 4 16 5 24 5s16-1 24-5M150 250v4" stroke="var(--color-primary)" strokeOpacity=".14" strokeWidth="1.2" fill="none" strokeLinecap="round" />
     </svg>
   );
 }

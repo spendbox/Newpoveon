@@ -1,5 +1,6 @@
 import type { BodyArea } from "@/content/learn";
-import { AREA_POINTS, Mannequin } from "./mannequin";
+import { AREA_POINTS } from "@/content/body-points";
+import { Mannequin } from "./mannequin";
 
 type Chip = { area: BodyArea; side: "left" | "right"; label: string; value: string; note?: string; d: number };
 
