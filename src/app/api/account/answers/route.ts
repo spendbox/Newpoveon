@@ -16,7 +16,7 @@ export async function POST(req: Request) {
     const sb = supabaseAdmin();
     const { data, error } = await sb.from("screenings").insert({
       user_id: user.id, email: user.email.toLowerCase(), answers, results, results_version: RESULTS_VERSION,
-      heart_age: results.heart?.heartAge.value ?? null, risk_percent: results.heart?.riskPercent ?? null,
+      heart_age: results.heart?.heartAge.value ?? null, risk_percent: results.heart?.riskPercent ?? null, wellbeing_score: results.wellbeing?.score ?? null,
       consent_at: new Date().toISOString(), consent_text: `${CONSENT_TEXT} (updated from account)`,
       owner_token_hash: sha256(randomToken()),
     }).select("id").single();

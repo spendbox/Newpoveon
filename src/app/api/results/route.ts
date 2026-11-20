@@ -38,6 +38,7 @@ export async function POST(req: Request) {
         results_version: RESULTS_VERSION,
         heart_age: results.heart?.heartAge.value ?? null,
         risk_percent: results.heart?.riskPercent ?? null,
+        wellbeing_score: results.wellbeing?.score ?? null,
         consent_at: new Date().toISOString(),
         consent_text: CONSENT_TEXT,
         owner_token_hash: sha256(ownerToken),

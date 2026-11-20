@@ -53,6 +53,14 @@ console.log("profiles auto-created:", (await db.query("select count(*)::int n fr
 await db.exec(`update profiles set role='admin' where id='${u2}';`);
 const ins = (uid, email) => `insert into screenings (user_id,email,answers,results,results_version,consent_at,consent_text,owner_token_hash) values (${uid ? `'${uid}'` : "null"},'${email}','{}','{}',1,now(),'x','h');`;
 await db.exec(ins(u1, "a@x.com") + ins(null, "guest@x.com") + ins(u2, "b@x.com"));
+{
+  // Wellbeing column: backfills from saved results, ignores rows without a score, safe to re-run.
+  await db.exec(`insert into screenings (email,answers,results,results_version,consent_at,consent_text,owner_token_hash) values ('w@x.com','{}','{"wellbeing":{"score":64,"band":"good"}}',1,now(),'x','h');`);
+  const wb = fs.readFileSync(new URL("../migrations/20261121000000_wellbeing_score.sql", import.meta.url), "utf8");
+  await db.exec(wb); await db.exec(wb);
+  console.log("wellbeing backfill:", JSON.stringify((await db.query("select email, wellbeing_score from screenings where email in ('w@x.com','guest@x.com') order by email")).rows));
+  await db.exec("delete from screenings where email = 'w@x.com'");
+}
 const slot = (await db.query("insert into availability_slots (starts_at) values (now() + interval '2 days') returning id")).rows[0].id;
 await db.exec(`insert into bookings (name,phone,email,reason,slot_id,amount_kobo,paystack_reference) values ('A','0803','a@x.com','r','${slot}',500000,'HC-ref1');`);
 const bid = (await db.query("select id from bookings")).rows[0].id;
