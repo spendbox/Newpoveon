@@ -137,9 +137,9 @@ export function Questionnaire() {
           className="mt-5"
         >
           <QuestionArt id={q.id} fallback={q.illustration} />
-          {q.help && (q.topic === "Mood" || q.topic === "Worry") && <p className="mt-5 text-sm text-muted">{q.help}</p>}
+          {q.help && (q.topic === "Mood" || q.topic === "Worry" || q.topic === "Wellbeing") && <p className="mt-5 text-sm text-muted">{q.help}</p>}
           <h1 id={`q-${q.id}`} className="mt-5 text-[26px] leading-[1.15] font-semibold">{q.title}</h1>
-          {q.help && q.topic !== "Mood" && q.topic !== "Worry" && <p className="mt-2 text-[15px] leading-snug text-muted">{q.help}</p>}
+          {q.help && q.topic !== "Mood" && q.topic !== "Worry" && q.topic !== "Wellbeing" && <p className="mt-2 text-[15px] leading-snug text-muted">{q.help}</p>}
 
           <div className="mt-5">
             {q.kind === "choice" && (

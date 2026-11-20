@@ -260,6 +260,46 @@ const SCENES: Record<string, { bg: string; art: ReactNode }> = {
       <text className="qs-pop" style={d(0.8)} x="121" y="24" textAnchor="middle" fontSize="12" fontWeight="800" fill={W}>6+</text>
     </>
   ) },
+  who1: { bg: "bg-sun-soft", art: (
+    <>
+      <g className="qs-spin-slow" style={at(120, 52)}>{Array.from({ length: 12 }, (_, i) => <path key={i} d="M120 8v9" transform={`rotate(${i * 30} 120 52)`} stroke={S} strokeWidth="4" strokeLinecap="round" />)}</g>
+      <circle className="qs-beat" style={at(120, 52)} cx="120" cy="52" r="28" fill={S} />
+      <circle cx="110" cy="47" r="3" fill={I} /><circle cx="130" cy="47" r="3" fill={I} />
+      <path d="M108 58q12 11 24 0" stroke={I} strokeWidth="3" fill="none" strokeLinecap="round" />
+      <circle cx="102" cy="57" r="4" fill={C} opacity=".5" /><circle cx="138" cy="57" r="4" fill={C} opacity=".5" />
+    </>
+  ) },
+  who2: { bg: "bg-primary-soft", art: (
+    <>
+      {[0, 1, 2].map((i) => <ellipse key={i} className="qs-breathe-big" style={{ ...at(120, 70), ...d(i * 0.6) }} cx="120" cy="70" rx={30 + i * 22} ry={7 + i * 5} fill="none" stroke={P} strokeWidth="2" opacity={0.5 - i * 0.12} />)}
+      <g className="qs-float"><path d="M120 66c-20-6-26-26-18-44 18 6 26 24 18 44z" fill={P} /><path d="M120 66c-3-14-8-26-16-38" stroke={W} strokeWidth="2" fill="none" strokeLinecap="round" /></g>
+    </>
+  ) },
+  who3: { bg: "bg-coral-soft", art: (
+    <>
+      <path className="qs-beat" style={at(120, 52)} d="M128 10L96 58h22l-8 36 34-50h-22z" fill={S} stroke={I} strokeWidth="2.5" strokeLinejoin="round" />
+      {[0, 1, 2].map((i) => <path key={i} className="qs-wave" style={d(i * 0.3)} d={`M${62 + i * 4} ${34 + i * 18}h${22 - i * 4}`} stroke={C} strokeWidth="4" strokeLinecap="round" />)}
+      {[0, 1, 2].map((i) => <path key={i} className="qs-wave" style={d(0.15 + i * 0.3)} d={`M${156 - i * 4} ${34 + i * 18}h${22 - i * 4}`} stroke={C} strokeWidth="4" strokeLinecap="round" />)}
+    </>
+  ) },
+  who4: { bg: "bg-lavender-soft", art: (
+    <>
+      <g className="qs-rise-sun"><circle cx="120" cy="72" r="26" fill={S} />{[-60, -30, 0, 30, 60].map((r) => <path key={r} d="M120 36v-8" transform={`rotate(${r} 120 72)`} stroke={S} strokeWidth="4" strokeLinecap="round" />)}</g>
+      <rect x="40" y="70" width="160" height="34" fill="var(--color-lavender-soft)" />
+      <rect x="56" y="70" width="128" height="18" rx="8" fill={L} />
+      <rect x="64" y="60" width="38" height="14" rx="7" fill={W} />
+      <path d="M40 70h160" stroke={L} strokeWidth="2" opacity=".5" />
+    </>
+  ) },
+  who5: { bg: "bg-primary-soft", art: (
+    <>
+      <path className="qs-twinkle" d="M120 18l7 20 20 7-20 7-7 20-7-20-20-7 20-7z" fill={S} />
+      {[[74, 30, L, 0.3], [170, 34, C, 0.6], [86, 78, P, 0.9], [160, 80, S, 1.2]].map(([x, y, f, t], i) => (
+        <g key={i} className="qs-pop" style={d(t as number)}><circle cx={x as number} cy={y as number} r="10" fill={f as string} /><circle cx={x as number} cy={y as number} r="4" fill={W} /></g>
+      ))}
+      <path className="qs-draw" pathLength={100} d="M84 78Q120 96 160 80M74 30Q100 18 113 38M170 34Q150 20 128 38" fill="none" stroke={I} strokeWidth="2" strokeDasharray="3 5" opacity=".35" />
+    </>
+  ) },
   mood: { bg: "bg-sun-soft", art: (
     <>
       <g className="qs-spin-slow" style={at(110, 50)}>{Array.from({ length: 8 }, (_, i) => <path key={i} d="M110 14v8" transform={`rotate(${i * 45} 110 50)`} stroke={S} strokeWidth="4" strokeLinecap="round" />)}</g>

@@ -72,6 +72,12 @@ export function resultsEmail(r: Results) {
     : r.heartNote
       ? `<p style="background:#FFF4DC;color:#7A4A00;border-radius:16px;padding:12px 14px;font-weight:700">${esc(r.heartNote)}</p>`
       : "";
+  const wb = r.wellbeing
+    ? `<div style="background:#E3F2EC;border-radius:20px;padding:18px;text-align:center;margin-bottom:14px">
+<div style="font-size:12px;font-weight:800;letter-spacing:1px;color:#136F58;text-transform:uppercase">Your wellbeing score</div>
+<div style="font-size:48px;font-weight:800;color:#10221D;line-height:56px">${r.wellbeing.score}<span style="font-size:20px;color:#5E706A"> / 100</span></div>
+<div style="font-size:12px;color:#5E706A;margin-top:4px">WHO-5 Well-Being Index, over the last two weeks. Not a diagnosis.</div></div>`
+    : "";
   const cards = r.cards
     .map(
       (c) => `<tr><td style="padding:6px 0"><div style="background:${c.status === "good" ? "#E6F4EE" : "#FFF4DC"};border-radius:16px;padding:12px 14px">
@@ -80,13 +86,13 @@ export function resultsEmail(r: Results) {
 <div style="font-size:18px;font-weight:800">${esc(c.value)}</div>
 <div style="font-size:14px;margin-top:4px">${esc(c.summary)}</div>
 <div style="font-size:12px;color:#5E706A;margin-top:4px">${esc(c.basis)} An estimate, not a diagnosis.</div>
-<div style="font-size:14px;font-weight:800;margin-top:6px">Next step: ${esc(c.next.label)}</div></div></td></tr>`,
+<div style="font-size:14px;font-weight:800;margin-top:6px">Next step: ${esc(c.next.label)} · <a href="${site.siteUrl}/learn/${c.id}" style="color:#136F58">Learn more</a></div></div></td></tr>`,
     )
     .join("");
   const due = r.reminders.filter((x) => !x.done).map((x) => `<li style="margin:4px 0"><b>${esc(x.title)}</b>: ${esc(x.detail)}</li>`).join("");
   const html = layout(
     "Here are your results",
-    `${heart}<table role="presentation" width="100%">${cards}</table>
+    `${wb}${heart}<table role="presentation" width="100%">${cards}</table>
 ${due ? `<h2 style="font-size:18px;margin:18px 0 6px">Check-ups you're due for</h2><ul style="padding-left:18px;margin:0;font-size:14px">${due}</ul>` : ""}
 <p style="margin:20px 0 8px;font-size:15px">Something worrying? A doctor can talk it through with you.</p>
 ${button(`${site.siteUrl}/doctor`, "Get help from a doctor")}
@@ -94,6 +100,7 @@ ${button(`${site.siteUrl}/doctor`, "Get help from a doctor")}
   );
   const text = [
     `Your ${site.appName} results`,
+    r.wellbeing ? `Wellbeing score: ${r.wellbeing.score}/100 (WHO-5).` : "",
     r.heart ? `Heart age: ${r.heart.heartAge.value} (you're ${r.age}). 10-year risk: ${r.heart.riskPercent}%.` : r.heartNote ?? "",
     ...r.cards.map((c) => `- ${c.topic}: ${STATUS_LABEL[c.status]} — ${c.value}. ${c.summary} (${c.basis}) Next: ${c.next.label}`),
     "Every result is an estimate, not a diagnosis.",

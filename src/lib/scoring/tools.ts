@@ -194,3 +194,20 @@ export const meetsWhoActivity = (days: "0-1" | "2-4" | "5+") => days === "5+";
  * Watson NF, et al. (AASM/SRS consensus). Sleep 2015;38(6):843–844.
  */
 export const meetsSleepGuideline = (h: "lt6" | "6-7" | "7-9" | "gt9") => h === "7-9" || h === "gt9";
+
+/* ------------------------------------------------------------------ WHO-5 Well-Being Index */
+
+/**
+ * WHO-5 Well-Being Index (WHO Regional Office for Europe, 1998; Psychiatric Research Unit, Mental Health Centre
+ * North Zealand). Five items, each 0–5 ("At no time" … "All of the time"); raw 0–25, multiplied by 4 to give 0–100.
+ * Cut-offs from the systematic review by Topp CW, Østergaard SD, Søndergaard S, Bech P. Psychother Psychosom
+ * 2015;84:167–176: ≤50 suggests poor wellbeing (screen for depression); ≤28 suggests likely depression.
+ */
+export type Who5Band = "good" | "low" | "very low";
+export function who5(items: number[]) {
+  if (items.length !== 5 || items.some((v) => !Number.isInteger(v) || v < 0 || v > 5)) throw new Error("WHO-5 needs 5 items scored 0–5");
+  const raw = items.reduce((s, v) => s + v, 0);
+  const score = raw * 4;
+  const band: Who5Band = score <= 28 ? "very low" : score <= 50 ? "low" : "good";
+  return { raw, score, band } as const;
+}

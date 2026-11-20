@@ -3,13 +3,15 @@ import { features } from "@/config/site";
 import { Icon, type IconName } from "@/components/icons";
 import { Logo, Overline } from "@/components/ui";
 import { StartButton } from "./start-button";
-import { HeroAnimation } from "@/components/hero-animation";
+import { MannequinHero } from "@/components/mannequin-hero";
+import { BodyMap } from "@/components/body-map";
 
 const FINDINGS: { icon: IconName; title: string; text: string; tint: string }[] = [
+  { icon: "sun", title: "Wellbeing score", text: "How you've really been feeling, out of 100.", tint: "bg-sun-soft text-check-text" },
   { icon: "heart", title: "Heart age", text: "And your 10-year risk of heart attack or stroke.", tint: "bg-coral-soft text-act-text" },
   { icon: "drop", title: "Diabetes risk", text: "Whether a sugar test is a good idea.", tint: "bg-lavender-soft text-lavender" },
   { icon: "moon", title: "Sleep", text: "Hours, snoring and signs of sleep apnoea.", tint: "bg-lavender-soft text-night" },
-  { icon: "sun", title: "Mood and stress", text: "A gentle check on low mood and worry.", tint: "bg-sun-soft text-check-text" },
+  { icon: "mind", title: "Mood and stress", text: "A gentle check on low mood and worry.", tint: "bg-lavender-soft text-lavender" },
   { icon: "scale", title: "Body and blood pressure", text: "BMI, waist and blood pressure, in plain words.", tint: "bg-primary-soft text-primary" },
   { icon: "shield", title: "Check-ups you're due", text: "Screenings to book, based on your age and sex.", tint: "bg-primary-soft text-primary" },
 ];
@@ -29,13 +31,13 @@ export default function HomePage() {
       {/* ---------------- Hero ---------------- */}
       <section className="grid items-center gap-4 pt-6 pb-8 md:grid-cols-[1.05fr_1fr] md:gap-10 md:pt-10 md:pb-20">
         <div>
-          <div className="mb-2 md:hidden"><HeroAnimation compact /></div>
+          <div className="mb-4 md:hidden"><MannequinHero compact /></div>
           <h1 className="text-[40px] leading-[1.02] font-bold md:text-[64px]">
             Let&apos;s check in <span className="text-primary">on you</span>
           </h1>
           <p className="mt-4 max-w-md text-[17px] leading-relaxed text-muted md:text-lg">
-            <span className="md:hidden">Find out your heart age and more in 10 minutes. Free.</span>
-            <span className="hidden md:inline">Answer a few quick questions and find out your heart age, diabetes risk, sleep and more. No sign-up needed.</span>
+            <span className="md:hidden">Your wellbeing score, heart age and more in 10 minutes. Free.</span>
+            <span className="hidden md:inline">Answer a few quick questions and find out your wellbeing score, heart age, diabetes risk and more. No sign-up needed.</span>
           </p>
           <div className="mt-7 max-w-sm">
             <StartButton />
@@ -44,7 +46,7 @@ export default function HomePage() {
             <Icon name="shield" size={16} strokeWidth={2} /> Built on WHO and other validated screening tools. Not a diagnosis.
           </p>
         </div>
-        <div className="hidden md:block"><HeroAnimation /></div>
+        <div className="hidden md:block"><MannequinHero /></div>
       </section>
 
       {/* ---------------- Phone: four simple choices ---------------- */}
@@ -69,12 +71,20 @@ export default function HomePage() {
         <Icon name="shield" size={14} strokeWidth={2} /> Built on WHO screening tools. Private. Not a diagnosis.
       </p>
 
+      {/* ---------------- Explore the body ---------------- */}
+      <section className="py-12 md:py-16" aria-labelledby="explore">
+        <Overline>What we check</Overline>
+        <h2 id="explore" className="mt-2 max-w-xl text-3xl font-bold md:text-[40px] md:leading-tight">Tap the body to see what we look at</h2>
+        <p className="mt-2 max-w-xl text-[16px] text-muted">Each part opens a full guide: what it means, how to improve it, and when to see a doctor.</p>
+        <div className="mt-8"><BodyMap mode="explore" /></div>
+      </section>
+
       <div className="hidden md:block">
 
       {/* ---------------- What you'll find out ---------------- */}
       <section className="py-12" aria-labelledby="find-out">
         <Overline>What you&apos;ll find out</Overline>
-        <h2 id="find-out" className="mt-2 max-w-xl text-3xl font-bold md:text-[40px] md:leading-tight">Six things worth knowing about your health</h2>
+        <h2 id="find-out" className="mt-2 max-w-xl text-3xl font-bold md:text-[40px] md:leading-tight">Seven things worth knowing about your health</h2>
         <div className="mt-8 grid gap-x-8 gap-y-6 sm:grid-cols-2 lg:grid-cols-3">
           {FINDINGS.map((f) => (
             <div key={f.title} className="flex gap-4">

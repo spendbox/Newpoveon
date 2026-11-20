@@ -8,6 +8,8 @@ import { Icon } from "@/components/icons";
 import { IllustrationCard } from "@/components/illustrations";
 import { Button, ButtonLink, Field, inputCls, Notice, ResultCard, StatusLabel } from "@/components/ui";
 import { SupportScreen } from "@/components/support-screen";
+import { BodyMap } from "@/components/body-map";
+import { WellbeingHero } from "@/components/score-widgets";
 import { ShareSection } from "./share-section";
 import { Steps } from "@/components/steps";
 import { isComplete } from "@/lib/questions";
@@ -169,6 +171,9 @@ function Reveal({ results, saved }: { results: Results; saved: SavedScreening | 
         <span className="w-[68px]" />
       </div>
 
+      {/* Headline: wellbeing (WHO-5), valid at every age */}
+      {results.wellbeing && <div className="mt-4"><WellbeingHero w={results.wellbeing} /></div>}
+
       {/* Hero: heart age */}
       <motion.section
         initial={reduce ? false : { opacity: 0, scale: 0.6 }}
@@ -264,6 +269,16 @@ function Reveal({ results, saved }: { results: Results; saved: SavedScreening | 
               <span className="font-display text-[18px] leading-[22px] font-semibold">{c.value}</span>
             </motion.a>
           ))}
+        </div>
+      </section>
+
+      {/* Body map */}
+      <section className="mt-8 rounded-[var(--radius-xl)] border border-line bg-surface p-5 md:p-8" aria-labelledby="bodymap">
+        <h2 id="bodymap" className="text-2xl font-semibold">Your body map</h2>
+        <p className="mt-1 text-[15px] text-muted">Tap a point to see your result there and how to improve it.</p>
+        <div className="mt-6">
+          <BodyMap mode="results"
+            results={Object.fromEntries(results.cards.map((c) => [c.id, { status: c.status, value: c.value }]))} />
         </div>
       </section>
 
