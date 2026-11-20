@@ -16,8 +16,8 @@ export default function MedicationPage() {
       kind="medicine"
       groups={MED_GROUPS}
       heroExtra={
-        <a href={NAFDAC_CHECK_URL} target="_blank" rel="noopener noreferrer" className="inline-flex min-h-[56px] w-full items-center justify-center gap-2 rounded-[var(--radius-md)] border border-white/30 px-6 text-[17px] font-semibold text-white hover:bg-white/10 md:w-auto">
-          <Icon name="shield" size={22} strokeWidth={2} /> Check if a drug is real
+        <a href={NAFDAC_CHECK_URL} target="_blank" rel="noopener noreferrer" className="inline-flex min-h-[44px] items-center justify-center gap-1.5 self-center rounded-full border border-white/30 px-4 text-[15px] font-semibold text-white hover:bg-white/10 md:self-auto">
+          <Icon name="shield" size={18} strokeWidth={2} /> Verify a drug
         </a>
       }
       steps={["Send us the medicine name or a photo of your prescription", "We find it and confirm the price", "We deliver it to your door"]}
