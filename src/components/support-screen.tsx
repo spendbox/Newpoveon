@@ -1,6 +1,6 @@
 "use client";
 import { useEffect, useState } from "react";
-import { FALLBACK_EMERGENCY_CONTACTS, site } from "@/config/site";
+import { FALLBACK_EMERGENCY_CONTACTS } from "@/config/site";
 import { IllustrationCard } from "./illustrations";
 import { Button, ButtonLink } from "./ui";
 import { Icon } from "./icons";
