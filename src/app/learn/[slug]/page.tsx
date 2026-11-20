@@ -64,13 +64,13 @@ export default async function LearnPage({ params }: PageProps<"/learn/[slug]">) 
             <h2 id="bands" className="text-2xl font-semibold">What your result means</h2>
             <ul className="mt-4 grid gap-2.5">
               {t.bands.map((b) => (
-                <li key={b.label} className="grid gap-1 rounded-[var(--radius-md)] border border-line p-4 sm:grid-cols-[150px_1fr] sm:gap-4">
-                  <div>
+                <li key={b.label} className="rounded-[var(--radius-md)] border border-line p-4">
+                  <div className="flex flex-wrap items-center gap-2">
                     <span className={`inline-block rounded-full px-2.5 py-0.5 text-[12px] font-semibold ${BAND[b.status]}`}>{STATUS_LABEL[b.status]}</span>
-                    <p className="mt-1 font-semibold">{b.label}</p>
-                    <p className="text-[13px] text-muted">{b.range}</p>
+                    <span className="text-[13px] font-medium text-muted">{b.range}</span>
                   </div>
-                  <p className="text-[15px] text-ink/85 sm:self-center">{b.meaning}</p>
+                  <p className="mt-1.5 text-[17px] font-semibold">{b.label}</p>
+                  <p className="mt-0.5 text-[15px] leading-snug text-ink/80">{b.meaning}</p>
                 </li>
               ))}
             </ul>

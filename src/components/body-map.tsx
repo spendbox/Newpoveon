@@ -1,6 +1,6 @@
 "use client";
 import Link from "next/link";
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { LEARN, LEARN_ORDER, type BodyArea, type LearnSlug } from "@/content/learn";
 import { STATUS_LABEL, type Status } from "@/lib/scoring/results";
 import { Icon } from "./icons";
@@ -11,7 +11,7 @@ const DOT: Record<Status, string> = { good: "bg-primary", check: "bg-sun", act: 
 const RANK: Record<Status, number> = { good: 0, check: 1, act: 2 };
 const TEXT: Record<Status, string> = { good: "text-good-text", check: "text-check-text", act: "text-act-text" };
 
-export type AreaResults = Partial<Record<LearnSlug, { status: Status; value: string }>>;
+export type AreaResults = Partial<Record<LearnSlug, { status: Status; value: string; summary?: string }>>;
 
 const topicsFor = (area: BodyArea) => LEARN_ORDER.filter((s) => LEARN[s].area === area);
 const AREAS = Object.keys(AREA_POINTS) as BodyArea[];
@@ -29,6 +29,14 @@ export function BodyMap({ mode, results, initial }: { mode: "explore" | "results
   // Results: open on the area that most needs attention.
   const start = initial ?? (mode === "results" ? [...shown].sort((x, y) => RANK[worst(y) ?? "good"] - RANK[worst(x) ?? "good"])[0] : "heart");
   const [sel, setSel] = useState<BodyArea>(start && shown.includes(start) ? start : shown[0] ?? "heart");
+  const panel = useRef<HTMLDivElement>(null);
+  /** Tapping the body on a phone brings the explanation into view. */
+  const pick = (a: BodyArea, fromBody: boolean) => {
+    setSel(a);
+    if (fromBody && typeof window !== "undefined" && window.matchMedia("(max-width: 767px)").matches) {
+      requestAnimationFrame(() => panel.current?.scrollIntoView({ behavior: "smooth", block: "start" }));
+    }
+  };
 
   return (
     <div className="grid items-center gap-6 md:grid-cols-[minmax(0,340px)_1fr] md:gap-10">
@@ -40,7 +48,7 @@ export function BodyMap({ mode, results, initial }: { mode: "explore" | "results
           const active = a === sel;
           return (
             <button
-              key={a} type="button" onClick={() => setSel(a)} aria-pressed={active}
+              key={a} type="button" onClick={() => pick(a, true)} aria-pressed={active}
               aria-label={`${p.label}${st ? `: ${STATUS_LABEL[st]}` : ""}`}
               className="absolute flex h-11 w-11 -translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-full"
               style={{ left: `${(p.x / 300) * 100}%`, top: `${(p.y / 560) * 100}%` }}
@@ -52,7 +60,7 @@ export function BodyMap({ mode, results, initial }: { mode: "explore" | "results
         })}
       </div>
 
-      <div aria-live="polite">
+      <div ref={panel} aria-live="polite" className="scroll-mt-4">
         <p className="text-[13px] font-semibold tracking-[0.06em] text-primary uppercase">{AREA_POINTS[sel].label}</p>
         <ul className="mt-3 flex flex-col gap-3">
           {topicsFor(sel).map((s) => {
@@ -64,11 +72,18 @@ export function BodyMap({ mode, results, initial }: { mode: "explore" | "results
                 <Link href={`/learn/${s}`} className="group flex items-start gap-4 rounded-[var(--radius-lg)] border border-line bg-surface p-4 transition-shadow hover:shadow-[var(--shadow-md)]">
                   <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-[var(--radius-md)] bg-primary-soft text-primary"><Icon name={t.icon} size={22} strokeWidth={2} /></span>
                   <span className="min-w-0 flex-1">
-                    <span className="flex flex-wrap items-baseline justify-between gap-x-3">
-                      <span className="text-lg font-semibold">{t.title}</span>
-                      {r && <span className={`text-sm font-semibold ${TEXT[r.status]}`}>{STATUS_LABEL[r.status]} · {r.value}</span>}
-                    </span>
-                    <span className="mt-0.5 block text-[15px] text-muted">{t.tagline}</span>
+                    <span className="block text-lg font-semibold">{t.title}</span>
+                    {r ? (
+                      <>
+                        <span className="mt-1 flex flex-wrap items-baseline gap-x-2">
+                          <span className="font-display text-2xl font-bold">{r.value}</span>
+                          <span className={`text-sm font-semibold ${TEXT[r.status]}`}>{STATUS_LABEL[r.status]}</span>
+                        </span>
+                        {r.summary && <span className="mt-1 block text-[15px] leading-snug text-ink/80">{r.summary}</span>}
+                      </>
+                    ) : (
+                      <span className="mt-0.5 block text-[15px] text-muted">{t.tagline}</span>
+                    )}
                     <span className="mt-2 inline-flex items-center gap-1 text-sm font-semibold text-primary">How to improve it <Icon name="arrowRight" size={14} strokeWidth={2} className="transition-transform group-hover:translate-x-0.5" /></span>
                   </span>
                 </Link>
@@ -78,7 +93,7 @@ export function BodyMap({ mode, results, initial }: { mode: "explore" | "results
         </ul>
         <div className="mt-4 flex flex-wrap gap-2" role="group" aria-label="Body areas">
           {shown.map((a) => (
-            <button key={a} type="button" onClick={() => setSel(a)} aria-pressed={a === sel}
+            <button key={a} type="button" onClick={() => pick(a, false)} aria-pressed={a === sel}
               className={`min-h-[36px] rounded-full border px-3 text-[13px] font-medium transition-colors ${a === sel ? "border-ink bg-ink text-white" : "border-line bg-surface text-muted hover:text-ink"}`}>
               {AREA_POINTS[a].label}
             </button>

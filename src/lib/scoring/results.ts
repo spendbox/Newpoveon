@@ -74,7 +74,7 @@ export interface Results {
 }
 
 const retest = (months: number): NextStep => ({ kind: "retest", label: `Check again in ${months} months`, months });
-const doctor = (label = "Get help from a doctor"): NextStep => ({ kind: "doctor", label });
+const doctor = (label = "Talk to a doctor"): NextStep => ({ kind: "doctor", label });
 const test = (testCode: string, label: string): NextStep => ({ kind: "test", testCode, label });
 const pct = (p: number) => Math.round(p * 1000) / 10;
 
@@ -108,7 +108,7 @@ export function computeResults(a: Answers): Results {
           : w.band === "low" ? "Your wellbeing has been lower than usual. Small changes help, and talking to someone can too."
           : "You've been feeling low for much of the last two weeks. Please talk to a doctor. Feeling better is very possible.",
         basis: "Based on the WHO-5 Well-Being Index.",
-        next: w.band === "good" ? retest(3) : doctor(w.band === "low" ? "Talk it through with a doctor" : "Get help from a doctor"),
+        next: w.band === "good" ? retest(3) : doctor("Talk to a doctor"),
       });
     }
   }
@@ -121,7 +121,7 @@ export function computeResults(a: Answers): Results {
     cards.push({
       id: "heart", topic: "Heart health", status: "act", value: "Keep up reviews", sensitive: false,
       summary: "After a heart attack or stroke, the best protection is regular check-ups and taking your medicines.",
-      basis: "WHO risk charts are not used for people who already have heart disease.", next: doctor("Book a review with a doctor"),
+      basis: "WHO risk charts are not used for people who already have heart disease.", next: doctor("Book a review"),
     });
   } else if (age < EXTENDED_MIN_AGE || age > WHO_MAX_AGE) {
     heartNote = age < EXTENDED_MIN_AGE
@@ -132,7 +132,7 @@ export function computeResults(a: Answers): Results {
     cards.push({
       id: "heart", topic: "Heart age", status: "check", value: "Needs a BP reading", sensitive: false,
       summary: "We need a real blood pressure reading for your heart age. Book a home check and we'll work it out.",
-      basis: "Estimate based on WHO 2019 risk charts (needs blood pressure).", next: test("bp-check", "Book a home blood pressure check"),
+      basis: "Estimate based on WHO 2019 risk charts (needs blood pressure).", next: test("bp-check", "Book a BP check"),
     });
   } else {
     const inputs = { age, sex, sbp: bp.sbp, bmi, smoker };
@@ -144,7 +144,7 @@ export function computeResults(a: Answers): Results {
     const haText = ha.kind === "below" ? `under ${ha.value}` : ha.kind === "above" ? `over ${ha.value}` : String(ha.value);
     cards.push({
       id: "heart", topic: "Heart age", status, value: `${haText} · ${pct(risk)}% risk`, sensitive: false,
-      summary: `Your chance of a heart attack or stroke in the next 10 years is about ${pct(risk)}% (WHO band ${heart.band}).`,
+      summary: `Your chance of a heart attack or stroke in the next 10 years is about ${pct(risk)}%: roughly ${Math.max(1, Math.round(risk * 100))} in 100 people with your numbers. ${status === "good" ? "That's a low risk." : status === "check" ? "That's a raised risk, and it can come down." : "That's a high risk. Treatment lowers it."}`,
       basis: early
         ? "Early estimate: uses the WHO 2019 risk charts (non-lab, West Africa) below age 40, younger than the ages they were tested on."
         : "Estimate based on WHO 2019 risk charts (non-lab, West Africa).",
@@ -160,8 +160,8 @@ export function computeResults(a: Answers): Results {
       status: c === "normal" ? "good" : "act",
       value: `${bp.sbp}/${bp.dbp}`,
       summary:
-        c === "normal" ? "Your reading is below 140/90." :
-        c === "hypertension" ? "Your reading is 140/90 or higher. One reading isn't a diagnosis, but it needs checking." :
+        c === "normal" ? "Your reading is below 140/90, so blood pressure isn't adding to your risk of stroke or heart attack." :
+        c === "hypertension" ? "Your reading is 140/90 or higher. High blood pressure raises your risk of stroke, heart attack and kidney disease. One reading isn't a diagnosis, so get it rechecked." :
         "Your reading is very high (180/110 or more). Please see a doctor soon. If you have chest pain, a bad headache or weakness, call 112 now.",
       basis: "Based on WHO 2021 blood pressure thresholds.",
       next: c === "normal" ? retest(12) : doctor(),
@@ -170,7 +170,7 @@ export function computeResults(a: Answers): Results {
     cards.push({
       id: "bp", topic: "Blood pressure", status: "check", value: "Unknown", sensitive: false,
       summary: "High blood pressure usually has no symptoms. A quick check tells you where you stand.",
-      basis: "Based on WHO 2021 blood pressure thresholds.", next: test("bp-check", "Book a home blood pressure check"),
+      basis: "Based on WHO 2021 blood pressure thresholds.", next: test("bp-check", "Book a BP check"),
     });
   }
 
@@ -179,7 +179,7 @@ export function computeResults(a: Answers): Results {
     cards.push({
       id: "diabetes", topic: "Diabetes", status: "check", value: "Diagnosed", sensitive: false,
       summary: "You already know you have diabetes. Regular sugar checks and reviews keep you on track.",
-      basis: "FINDRISC is for people without diabetes, so we didn't score it.", next: test("blood-sugar", "Order a sugar check"),
+      basis: "FINDRISC is for people without diabetes, so we didn't score it.", next: test("blood-sugar", "Order a sugar test"),
     });
   } else if (bmi) {
     const f = findrisc({
@@ -197,7 +197,7 @@ export function computeResults(a: Answers): Results {
         (f.waistMissing ? " Add your waist size for a full score." : "") +
         (status === "act" ? " A high score means you should get a sugar test. It doesn't mean you have diabetes." : ""),
       basis: "Estimate based on FINDRISC.",
-      next: status === "good" ? retest(12) : test("blood-sugar", "Order a blood sugar test"),
+      next: status === "good" ? retest(12) : test("blood-sugar", "Order a sugar test"),
     });
   }
 
@@ -218,9 +218,10 @@ export function computeResults(a: Answers): Results {
         `Your BMI is ${bmiWords}.` +
         (whtr !== null
           ? ` Your waist is ${Math.round(whtr * 100)}% of your height${whtr >= 0.5 ? " (0.5 or more is a warning sign: keep your waist under half your height)." : ", nicely under half."}`
-          : " Measure your waist to check belly fat too."),
+          : " Measure your waist to check belly fat too.") +
+        (status !== "good" && bc !== "underweight" ? " Extra weight raises your risk of type 2 diabetes, high blood pressure and heart disease." : ""),
       basis: "Based on WHO BMI ranges and waist-to-height ratio.",
-      next: status === "good" ? retest(12) : doctor("Get advice from a doctor"),
+      next: status === "good" ? retest(12) : doctor("Talk to a doctor"),
     });
   }
 
@@ -307,7 +308,7 @@ export function computeResults(a: Answers): Results {
       summary: r.positive
         ? `Your AUDIT-C score is ${r.score} out of 12. Cutting down protects your liver, heart and blood pressure.`
         : a.drinks === "yes" ? `Your AUDIT-C score is ${r.score} out of 12.` : "Not drinking is great for your heart and liver.",
-      basis: "Estimate based on AUDIT-C.", next: r.positive ? doctor("Get support from a doctor") : retest(12),
+      basis: "Estimate based on AUDIT-C.", next: r.positive ? doctor("Get support") : retest(12),
     });
   }
 
@@ -326,7 +327,7 @@ export function computeResults(a: Answers): Results {
     cards.push({
       id: "activity", topic: "Moving", status: ok ? "good" : "check", sensitive: false,
       value: ok ? "Active" : "Room to move more",
-      summary: ok ? "You're meeting the WHO goal of 150 minutes of activity a week." : "WHO suggests at least 150 minutes of brisk activity a week, such as 30 minutes on 5 days.",
+      summary: ok ? "You're meeting the WHO goal of 150 minutes of activity a week." : "Being inactive raises your risk of heart disease and type 2 diabetes. WHO suggests at least 150 minutes of brisk activity a week, such as 30 minutes on 5 days.",
       basis: "Based on WHO 2020 physical activity guidelines.", next: ok ? retest(12) : retest(3),
     });
   }

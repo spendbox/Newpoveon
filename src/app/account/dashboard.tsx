@@ -121,7 +121,7 @@ export function Dashboard({ email, history, bookings }: { email: string; history
           <section className="mt-10 rounded-[var(--radius-xl)] border border-line bg-surface p-5 md:p-8" aria-labelledby="map">
             <h2 id="map" className="text-2xl font-semibold">Your body map</h2>
             <p className="mt-1 text-[15px] text-muted">Tap a point to see your result and how to improve it.</p>
-            <div className="mt-6"><BodyMap mode="results" results={Object.fromEntries(latest.results.cards.map((c) => [c.id, { status: c.status, value: c.value }]))} /></div>
+            <div className="mt-6"><BodyMap mode="results" results={Object.fromEntries(latest.results.cards.map((c) => [c.id, { status: c.status, value: c.value, summary: c.summary }]))} /></div>
           </section>
 
           {/* 5. Trends */}

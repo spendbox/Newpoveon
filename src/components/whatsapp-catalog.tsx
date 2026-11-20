@@ -14,7 +14,7 @@ export function WhatsAppButton({ message, children, size = "lg", className = "" 
     : "min-h-[44px] rounded-full px-4 text-[14px]";
   if (!href) return <p className={`text-sm opacity-70 ${className}`}>WhatsApp is being set up. Please check back soon.</p>;
   return (
-    <a href={href} target="_blank" rel="noopener noreferrer" className={`inline-flex items-center justify-center gap-2 font-semibold transition-colors ${WA_GREEN} ${cls} ${className}`}>
+    <a href={href} target="_blank" rel="noopener noreferrer" className={`inline-flex items-center justify-center gap-2 whitespace-nowrap font-semibold transition-colors ${WA_GREEN} ${cls} ${className}`}>
       <Icon name="whatsapp" size={size === "lg" ? 22 : 18} strokeWidth={2} />
       {children}
     </a>
