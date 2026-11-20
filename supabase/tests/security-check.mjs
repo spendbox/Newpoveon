@@ -57,6 +57,11 @@ console.log("packages:", (await db.query("select count(*)::int n from home_tests
   await db.exec(rn); await db.exec(rn);
   console.log("old name left in consult types:", (await db.query("select count(*)::int n from consult_types where name like '%HealthCheck%' or description like '%HealthCheck%'")).rows[0].n);
 }
+{
+  const se = fs.readFileSync(new URL("../migrations/20261124000000_something_else_consult.sql", import.meta.url), "utf8");
+  await db.exec(se); await db.exec(se);
+  console.log("something else:", JSON.stringify((await db.query("select code, grp, urgent_check, price_naira from consult_types where code = 'something-else'")).rows));
+}
 console.log("migration OK");
 const u1 = "11111111-1111-1111-1111-111111111111", u2 = "22222222-2222-2222-2222-222222222222";
 await db.exec(`insert into auth.users values ('${u1}','a@x.com'),('${u2}','b@x.com');`);

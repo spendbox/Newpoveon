@@ -48,8 +48,12 @@ export async function POST(req: Request) {
 
     const typeId = typeof b.consultTypeId === "string" && /^[0-9a-f-]{36}$/i.test(b.consultTypeId) ? b.consultTypeId : null;
     if (!typeId) return json({ error: "Please choose what you need help with." }, 400);
-    const { data: type } = await sb.from("consult_types").select("id, name, doctor_type, price_naira, active").eq("id", typeId).maybeSingle();
+    const { data: type } = await sb.from("consult_types").select("id, code, name, doctor_type, price_naira, active").eq("id", typeId).maybeSingle();
     if (!type || !type.active || type.price_naira == null) return json({ error: "That option isn't available right now. Please choose another." }, 400);
+    // "Something else": the person names their concern in a few words.
+    const otherTopic = type.code === "something-else" ? cleanText(b.otherTopic, 80) : "";
+    if (type.code === "something-else" && otherTopic.length < 3) return json({ error: "Please tell us in a few words what you need help with." }, 400);
+    const typeName = otherTopic ? `Something else: ${otherTopic}` : type.name;
     const amount = type.price_naira * 100;
 
     // The time must be one we actually offer and still have room for.
@@ -83,7 +87,7 @@ export async function POST(req: Request) {
       .from("bookings")
       .insert({
         user_id: user?.id ?? null, name, phone, email, reason, share_results: shareResults, screening_id: screeningId,
-        amount_kobo: amount, paystack_reference: reference, consult_type_id: type.id, consult_type_name: type.name, doctor_type: type.doctor_type,
+        amount_kobo: amount, paystack_reference: reference, consult_type_id: type.id, consult_type_name: typeName, doctor_type: type.doctor_type,
       })
       .select("id")
       .single();

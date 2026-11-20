@@ -53,6 +53,7 @@ export function BookingForm({ types, preselect, defaultReason }: { types: Type[]
   const [typeId, setTypeId] = useState<string | null>(types.find((t) => t.code === preselect)?.id ?? null);
   const [danger, setDanger] = useState<"yes" | "no" | null>(null);
   const [reason, setReason] = useState(defaultReason);
+  const [other, setOther] = useState("");
   const [voice, setVoice] = useState<Blob | null>(null);
   const [slots, setSlots] = useState<Slot[] | null>(null);
   const [day, setDay] = useState<string | null>(null);
@@ -85,6 +86,8 @@ export function BookingForm({ types, preselect, defaultReason }: { types: Type[]
   }, []);
 
   const type = types.find((t) => t.id === typeId) ?? null;
+  const isOther = type?.code === "something-else";
+  const typeLabel = isOther && other.trim() ? other.trim() : type?.name ?? "";
   const groups = useMemo(() => [...new Set(types.map((t) => t.grp))], [types]);
   const byDay = useMemo(() => {
     const m = new Map<string, Slot[]>();
@@ -105,7 +108,7 @@ export function BookingForm({ types, preselect, defaultReason }: { types: Type[]
     if (!type) return;
     setBusy(true);
     setError(null);
-    const data = { consultTypeId: type.id, startsAt: callMe ? null : startsAt, name, phone, email, reason, shareResults: share, screeningId: saved?.screeningId, ownerToken: saved?.ownerToken };
+    const data = { consultTypeId: type.id, otherTopic: isOther ? other.trim() : undefined, startsAt: callMe ? null : startsAt, name, phone, email, reason, shareResults: share, screeningId: saved?.screeningId, ownerToken: saved?.ownerToken };
     const form = new FormData();
     form.set("data", JSON.stringify(data));
     if (voice) form.set("voice", voice, `voice.${voice.type.includes("mp4") ? "m4a" : voice.type.includes("ogg") ? "ogg" : "webm"}`);
@@ -170,12 +173,12 @@ export function BookingForm({ types, preselect, defaultReason }: { types: Type[]
 
   const steps: Step[] = [
     {
-      key: "what", title: "What can we help you with?", hint: "We'll match you with the right doctor for your concern and show you the fee before you pay.", valid: !!type,
+      key: "what", title: "What can we help you with?", hint: "We'll match you with the right doctor for your concern and show you the fee before you pay.", valid: !!type && (!isOther || other.trim().length >= 3),
       content: (
         <div className="flex flex-col gap-5">
           {groups.map((g) => (
             <div key={g}>
-              <p className="mb-2 text-xs font-semibold tracking-[0.06em] text-subtle uppercase">{g}</p>
+              <p className="mb-2 text-xs font-semibold tracking-[0.06em] text-subtle uppercase">{g === "Something else" ? "Not on the list?" : g}</p>
               <div className="flex flex-col gap-2" role="radiogroup" aria-label={g}>
                 {types.filter((t) => t.grp === g).map((t) => (
                   <AnswerTile key={t.id} layout="rows" label={t.name} selected={typeId === t.id} onClick={() => { setTypeId(t.id); setDanger(null); }} />
@@ -183,6 +186,13 @@ export function BookingForm({ types, preselect, defaultReason }: { types: Type[]
               </div>
             </div>
           ))}
+          {isOther && (
+            <div className="flex flex-col gap-1.5">
+              <label htmlFor="other-topic" className="text-sm font-semibold">What do you need help with?</label>
+              <input id="other-topic" autoFocus maxLength={80} value={other} onChange={(e) => setOther(e.target.value)} placeholder="e.g. A lump on my neck, or my child's cough" className={inputCls} />
+              <p className="text-xs text-subtle">A few words is enough. You can explain more in the next step.</p>
+            </div>
+          )}
         </div>
       ),
     },
@@ -230,7 +240,7 @@ export function BookingForm({ types, preselect, defaultReason }: { types: Type[]
             <span className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-primary-soft text-primary"><Icon name="stethoscope" size={24} strokeWidth={2} /></span>
             <div className="flex-1">
               <p className="text-xl font-semibold">A {type.doctor_type.toLowerCase()}</p>
-              <p className="text-sm text-muted">For: &ldquo;{type.name}&rdquo;</p>
+              <p className="text-sm text-muted">For: &ldquo;{typeLabel}&rdquo;</p>
             </div>
           </div>
           <dl className="mt-5 grid grid-cols-2 gap-3 text-sm">
@@ -340,7 +350,7 @@ export function BookingForm({ types, preselect, defaultReason }: { types: Type[]
       content: type && (
         <>
           <dl className="grid gap-2.5 rounded-[var(--radius-lg)] bg-surface-2 p-4 text-sm">
-            <div className="flex justify-between gap-4"><dt className="text-muted">Help with</dt><dd className="text-right font-medium">{type.name}</dd></div>
+            <div className="flex justify-between gap-4"><dt className="text-muted">Help with</dt><dd className="text-right font-medium">{typeLabel}</dd></div>
             <div className="flex justify-between gap-4"><dt className="text-muted">You&apos;ll see</dt><dd className="text-right font-medium">A {type.doctor_type.toLowerCase()}</dd></div>
             <div className="flex justify-between gap-4"><dt className="text-muted">When</dt><dd className="text-right font-medium">{startsAt ? `${longDay.format(new Date(startsAt))}, ${time.format(new Date(startsAt))}` : "We'll call to agree a time"}</dd></div>
             <div className="flex justify-between gap-4"><dt className="text-muted">Your message</dt><dd className="text-right font-medium">{voice ? "Voice note" : ""}{voice && reason.trim() ? " + text" : reason.trim() ? "Text" : ""}</dd></div>
