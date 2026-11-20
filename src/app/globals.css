@@ -161,3 +161,12 @@ h1, h2, h3, .font-display {
 /* Mannequin (src/components/mannequin.tsx) */
 .mq-beat { transform-box: fill-box; transform-origin: center; animation: hc-beat 1.4s ease-in-out infinite; }
 .mq-pulse-soft { transform-box: fill-box; transform-origin: center; animation: qs-breathe 4s ease-in-out infinite; }
+/* Hero mannequin: slow, gentle life. Still for reduced motion (global rule above). */
+.mq-anim .mq-sway { transform-box: view-box; transform-origin: 150px 556px; animation: mq-sway 12s ease-in-out infinite; }
+.mq-anim .mq-breathe { transform-box: view-box; transform-origin: 150px 556px; animation: mq-breathe 5.5s ease-in-out infinite; }
+.mq-anim .mq-head { transform-box: view-box; transform-origin: 150px 94px; animation: mq-head 10s ease-in-out infinite; }
+.mq-anim .mq-arm { transform-box: view-box; transform-origin: 209px 140px; animation: mq-arm 8s ease-in-out infinite; }
+@keyframes mq-sway { 0%,100% { transform: rotate(-.2deg) } 50% { transform: rotate(.2deg) } }
+@keyframes mq-breathe { 0%,100% { transform: scale(1, 1) } 45% { transform: scale(1.006, 1.012) } }
+@keyframes mq-head { 0%,100% { transform: rotate(0) } 22% { transform: rotate(-3.5deg) } 48%,52% { transform: rotate(0) } 76% { transform: rotate(3deg) } }
+@keyframes mq-arm { 0%,100% { transform: rotate(0) } 40%,55% { transform: rotate(-4deg) } }

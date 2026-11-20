@@ -246,7 +246,7 @@ function Reveal({ results, saved }: { results: Results; saved: SavedScreening | 
               results.heartNote && <p className="mt-3 text-center text-[15px] leading-snug font-medium">{results.heartNote}</p>
             )}
             {results.cards.find((c) => c.id === "heart")?.next.kind === "test" && (
-              <ButtonLink href="/home-tests?test=bp-check" className="mt-4" icon="home">Book a home BP check</ButtonLink>
+              <ButtonLink href="/home-tests?test=bp-check" className="mt-4" icon="home">Book a BP check</ButtonLink>
             )}
           </>
         )}
@@ -278,7 +278,7 @@ function Reveal({ results, saved }: { results: Results; saved: SavedScreening | 
         <p className="mt-1 text-[15px] text-muted">Tap a point to see your result there and how to improve it.</p>
         <div className="mt-6">
           <BodyMap mode="results"
-            results={Object.fromEntries(results.cards.map((c) => [c.id, { status: c.status, value: c.value }]))} />
+            results={Object.fromEntries(results.cards.map((c) => [c.id, { status: c.status, value: c.value, summary: c.summary }]))} />
         </div>
       </section>
 

@@ -43,6 +43,12 @@ console.log("consult types:", (await db.query("select count(*)::int n from consu
   console.log("new-style paid, no reschedule flag:", JSON.stringify((await db.query(`select status, needs_reschedule from mark_booking_paid('HC-cap1', 500000)`)).rows));
 }
 await db.exec(fs.readFileSync(new URL("../migrations/20261120000000_voice_notes.sql", import.meta.url), "utf8"));
+{
+  await db.exec("update consult_types set price_naira = 7000 where code = 'results-review'");
+  const mc = fs.readFileSync(new URL("../migrations/20261122000000_more_consult_types.sql", import.meta.url), "utf8");
+  await db.exec(mc); await db.exec(mc);
+  console.log("new consult types:", JSON.stringify((await db.query("select code, price_naira from consult_types where grp = 'Healthy habits' or code = 'medicine-check' order by sort")).rows));
+}
 await db.exec(fs.readFileSync(new URL("../migrations/20261120000000_voice_notes.sql", import.meta.url), "utf8"));
 console.log("voice bucket private:", JSON.stringify((await db.query("select id, public from storage.buckets")).rows));
 console.log("packages:", (await db.query("select count(*)::int n from home_tests where is_bundle and active")).rows[0].n, "single tests:", (await db.query("select count(*)::int n from home_tests where not is_bundle and active")).rows[0].n);

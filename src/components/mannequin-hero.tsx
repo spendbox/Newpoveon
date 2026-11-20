@@ -21,7 +21,7 @@ export function MannequinHero({ compact = false }: { compact?: boolean }) {
   const chips = compact ? CHIPS.filter((c) => c.area === "mind" || c.area === "heart") : CHIPS;
   return (
     <div className={`relative mx-auto ${compact ? "w-[190px]" : "w-full max-w-[300px]"}`} aria-hidden="true">
-      <div style={compact ? { maskImage: "linear-gradient(to bottom, black 75%, transparent)", WebkitMaskImage: "linear-gradient(to bottom, black 75%, transparent)" } : undefined}><Mannequin crop={compact ? "upper" : "full"} className="h-auto w-full" /></div>
+      <div style={compact ? { maskImage: "linear-gradient(to bottom, black 75%, transparent)", WebkitMaskImage: "linear-gradient(to bottom, black 75%, transparent)" } : undefined}><Mannequin animate crop={compact ? "upper" : "full"} className="h-auto w-full" /></div>
       {chips.map((c) => {
         const p = pos(c.area);
         return (
