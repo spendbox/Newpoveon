@@ -6,6 +6,8 @@ import { supabaseConfigured } from "@/lib/supabase/server";
 import { getAccount } from "./data";
 import { weekScore } from "@/lib/plan/engine";
 import { isActive, loadPlan } from "@/lib/plan/server";
+import { discountLabel } from "@/lib/plan/perks";
+import { loadPlanSettings } from "@/lib/plan/settings";
 import { OverviewPanel, PageHead } from "./panels";
 
 export const metadata: Metadata = { title: "My dashboard", robots: { index: false } };
@@ -24,7 +26,7 @@ export default async function AccountPage() {
   const loaded = await loadPlan(user.id).catch(() => null);
   const planSummary = loaded && isActive(loaded.plan)
     ? { active: true, week: loaded.goals[0]?.progress.week ?? 1, pct: (() => { const s = weekScore(loaded.goals.map((g) => g.progress)); return s.needed ? Math.round((s.done / s.needed) * 100) : 0; })() }
-    : { active: false };
+    : { active: false, perk: discountLabel((await loadPlanSettings()).discount) };
   const latest = history[0];
   const fmt = new Intl.DateTimeFormat("en-NG", { dateStyle: "medium", timeZone: site.timeZone });
   return (

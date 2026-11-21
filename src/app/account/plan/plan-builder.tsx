@@ -17,7 +17,7 @@ const ORDER: Area[] = ["move", "sleep", "weight", "eat", "calm"];
  * Build (or edit) a personal plan in a few short steps: pick up to 3 areas, set each one up
  * around the person's day, see week 1, then pay once for the year.
  */
-export function PlanBuilder({ hints, existing, active, price, expired }: { hints: Hints; existing: Goal[]; active: boolean; price: number; expired: boolean }) {
+export function PlanBuilder({ hints, existing, active, price, expired, perkLabel = "" }: { hints: Hints; existing: Goal[]; active: boolean; price: number; expired: boolean; perkLabel?: string }) {
   const router = useRouter();
   const find = <T,>(a: Area) => existing.find((g) => g.area === a)?.settings as T | undefined;
   const [areas, setAreas] = useState<Area[]>(existing.length ? existing.map((g) => g.area) : hints.recs.slice(0, 2).map((r) => r.area));
@@ -170,7 +170,7 @@ export function PlanBuilder({ hints, existing, active, price, expired }: { hints
           <div className="rounded-[var(--radius-lg)] bg-primary-soft p-4">
             <p className="font-semibold">What you get for {ngn(price)} a year</p>
             <ul className="mt-2 flex flex-col gap-1.5 text-sm">
-              {["A daily check-off for each goal, in seconds", "A weekly review that steps up, holds or eases back your targets", "Sunday summaries and a midweek nudge by email, if you need one", "A re-check every 3 months to see your scores move"].map((x) => <li key={x} className="flex gap-2"><Icon name="check" size={16} strokeWidth={2.6} className="mt-0.5 shrink-0 text-primary" />{x}</li>)}
+              {[...(perkLabel ? [`${perkLabel} every doctor consultation while your plan is active`] : []), "A daily check-off for each goal, in seconds", "A weekly review that steps up, holds or eases back your targets", "Sunday summaries and a midweek nudge by email, if you need one", "A re-check every 3 months to see your scores move"].map((x) => <li key={x} className="flex gap-2"><Icon name="check" size={16} strokeWidth={2.6} className="mt-0.5 shrink-0 text-primary" />{x}</li>)}
             </ul>
             <p className="mt-2 text-xs text-muted">One payment for 12 months. It doesn&apos;t renew automatically. Secure payment by Paystack.</p>
           </div>

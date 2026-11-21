@@ -5,6 +5,9 @@ import { initializeTransaction, paystackConfigured } from "@/lib/paystack";
 import { canManageScreening } from "@/lib/share/access";
 import { currentUser, supabaseAdmin, supabaseConfigured } from "@/lib/supabase/server";
 import { randomToken } from "@/lib/tokens";
+import { memberPrice } from "@/lib/plan/perks";
+import { isActive, type PlanRow } from "@/lib/plan/server";
+import { loadPlanSettings } from "@/lib/plan/settings";
 
 /**
  * Book a goal-based consult: the price comes from the consult type the person chose
@@ -67,7 +70,6 @@ export async function POST(req: Request) {
     const otherTopic = type.code === "something-else" ? cleanText(b.otherTopic, 80) : "";
     if (type.code === "something-else" && otherTopic.length < 3) return json({ error: "Please tell us in a few words what you need help with." }, 400);
     const typeName = otherTopic ? `Something else: ${otherTopic}` : type.name;
-    const amount = type.price_naira * 100;
 
     // The time must be one we actually offer and still have room for.
     let startsAt: string | null = null;
@@ -95,15 +97,29 @@ export async function POST(req: Request) {
       screeningId = data?.id ?? null;
     }
 
+    // Health plan members pay less (set in Admin → Consults and fees). Worked out here, never in the browser.
+    let price = type.price_naira;
+    if (user) {
+      const { data: plan } = await sb.from("plans").select("status, paid_until").eq("user_id", user.id).maybeSingle();
+      if (plan && isActive(plan as PlanRow)) price = memberPrice(price, (await loadPlanSettings()).discount);
+    }
+    const amount = price * 100;
+    const discountKobo = (type.price_naira - price) * 100;
+
     const reference = `HC-${randomToken(9)}`;
-    const { data: booking, error } = await sb
-      .from("bookings")
-      .insert({
-        user_id: user?.id ?? null, name, phone, email, reason, share_results: shareResults, screening_id: screeningId,
-        amount_kobo: amount, paystack_reference: reference, consult_type_id: type.id, consult_type_name: typeName, doctor_type: type.doctor_type,
-      })
-      .select("id")
-      .single();
+    const row = {
+      user_id: user?.id ?? null, name, phone, email, reason, share_results: shareResults, screening_id: screeningId,
+      amount_kobo: amount, paystack_reference: reference, consult_type_id: type.id, consult_type_name: typeName, doctor_type: type.doctor_type,
+      ...(discountKobo > 0 ? { discount_kobo: discountKobo } : {}),
+    };
+    let ins = await sb.from("bookings").insert(row).select("id").single();
+    if (ins.error && /discount_kobo/.test(ins.error.message ?? "")) {
+      // Database not yet updated with SQL 14: book anyway, the price is still right.
+      const { discount_kobo: _d, ...rest } = row as typeof row & { discount_kobo?: number };
+      void _d;
+      ins = await sb.from("bookings").insert(rest).select("id").single();
+    }
+    const { data: booking, error } = ins;
     if (error) throw error;
 
     if (voice) {
