@@ -14,7 +14,7 @@ import { ShareSection } from "./share-section";
 import { Steps } from "@/components/steps";
 import { isComplete } from "@/lib/questions";
 import { computeResults, type Results } from "@/lib/scoring/results";
-import { loadProgress, loadSaved, saveSaved, type Progress, type SavedScreening } from "@/lib/storage";
+import { loadPrefill, loadProgress, loadSaved, saveSaved, type Progress, type SavedScreening } from "@/lib/storage";
 
 export function ResultsView() {
   const [progress, setProgress] = useState<Progress | null | undefined>(undefined);
@@ -67,8 +67,9 @@ export function ResultsView() {
 
 function EmailGate({ progress, onDone }: { progress: Progress; onDone: (s: SavedScreening | null) => void }) {
   const prior = typeof window !== "undefined" ? loadSaved() : null;
-  const [email, setEmail] = useState(prior?.email ?? "");
-  const [phone, setPhone] = useState(prior?.phone ?? "");
+  const pre = typeof window !== "undefined" ? loadPrefill() : null;
+  const [email, setEmail] = useState(pre?.email ?? prior?.email ?? "");
+  const [phone, setPhone] = useState(pre?.phone ?? prior?.phone ?? "");
   const [consent, setConsent] = useState(false);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);

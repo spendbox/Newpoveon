@@ -2,6 +2,7 @@ export const dynamic = "force-dynamic";
 import type { Metadata } from "next";
 import { redirect } from "next/navigation";
 import { supabaseConfigured } from "@/lib/supabase/server";
+import { ButtonLink } from "@/components/ui";
 import { getAccount } from "../data";
 import { ProgressPanel, PageHead } from "../panels";
 
@@ -12,7 +13,7 @@ export default async function Page() {
   const { history } = await getAccount();
   return (
     <>
-      <PageHead eyebrow="My health" title="My progress" sub="How your scores are changing over time." />
+      <PageHead eyebrow="My health" title="My progress" sub="How your scores are changing over time." action={<ButtonLink href="/account/retake" icon="sparkle">Retake the check</ButtonLink>} />
       <ProgressPanel history={history} />
     </>
   );

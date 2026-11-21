@@ -9,7 +9,6 @@ import { TrendLine } from "@/components/trend-line";
 import { ButtonLink, Notice, ResultCard } from "@/components/ui";
 import { formatWhen } from "@/lib/email";
 import type { ResultCard as ResultCardData, Results, Status } from "@/lib/scoring/results";
-import { UseLatestAnswers } from "./account-actions";
 
 export type Row = { id: string; created_at: string; heart_age: number | null; risk_percent: number | null; results: Results; answers: Record<string, unknown> };
 export type Booking = { id: string; slot_starts_at: string | null; status: string; consult_type_name?: string | null };
@@ -66,8 +65,26 @@ export function OverviewPanel({ history }: { history: Row[] }) {
     if (c) tiles.push({ id, icon, label, value: c.value, tone: c.status });
   }
 
+  // We suggest a re-check every 3 months.
+  const nextDue = new Date(new Date(latest.created_at).getTime() + 91 * 864e5);
+  // eslint-disable-next-line react-hooks/purity -- server render, fresh each request
+  const isDue = nextDue.getTime() <= Date.now();
   return (
     <div className="flex flex-col gap-8">
+      <section className={`flex flex-col gap-3 rounded-[var(--radius-xl)] border p-5 sm:flex-row sm:items-center sm:justify-between ${isDue ? "border-sun bg-sun-soft" : "border-line bg-surface"}`} aria-label="Your next check">
+        <div className="flex items-center gap-3">
+          <span className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-[var(--radius-md)] ${isDue ? "bg-sun text-ink" : "bg-primary-soft text-primary"}`}><Icon name="calendar" size={20} strokeWidth={2} /></span>
+          <div>
+            <p className="font-semibold">{isDue ? "It's time for your re-check" : `Next check: ${dateFmt.format(nextDue)}`}</p>
+            <p className="text-sm text-muted">Your last answers are filled in, so it only takes a few minutes.</p>
+          </div>
+        </div>
+        <div className="flex shrink-0 flex-col items-stretch gap-1.5 sm:items-end">
+          <ButtonLink href="/account/retake" icon="sparkle" variant={isDue ? "primary" : "secondary"}>Retake the check</ButtonLink>
+          <Link href="/account/edit" className="text-center text-sm font-semibold text-primary hover:underline">Or just update one answer</Link>
+        </div>
+      </section>
+
       {r.wellbeing ? (
         <WellbeingHero w={r.wellbeing} date={short.format(new Date(latest.created_at))}>
           {wb.length >= 2 && <p className="mt-3 text-sm text-white/70">{wb.at(-1)! - wb.at(-2)! >= 0 ? "Up" : "Down"} {Math.abs(wb.at(-1)! - wb.at(-2)!)} points since your last check.</p>}
@@ -79,7 +96,7 @@ export function OverviewPanel({ history }: { history: Row[] }) {
             <p className="mt-1 font-display text-2xl font-semibold text-white">Add it in 1 minute</p>
             <p className="mt-1 text-[15px] text-white/75">Five quick questions about the last two weeks.</p>
           </div>
-          <UseLatestAnswers answers={latest.answers} />
+          <ButtonLink href="/account/retake" variant="secondary" icon="sparkle" className="shrink-0">Add it now</ButtonLink>
         </section>
       )}
 

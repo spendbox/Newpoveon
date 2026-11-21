@@ -1,9 +1,8 @@
 export const dynamic = "force-dynamic";
 import type { Metadata } from "next";
 import { site } from "@/config/site";
-import { ButtonLink, Logo, Notice } from "@/components/ui";
+import { Logo, Notice } from "@/components/ui";
 import { supabaseConfigured } from "@/lib/supabase/server";
-import { UseLatestAnswers } from "./account-actions";
 import { getAccount } from "./data";
 import { OverviewPanel, PageHead } from "./panels";
 
@@ -24,13 +23,7 @@ export default async function AccountPage() {
   const fmt = new Intl.DateTimeFormat("en-NG", { dateStyle: "medium", timeZone: site.timeZone });
   return (
     <>
-      <PageHead eyebrow="Your health dashboard" title="Hello again" sub={latest ? `Last check ${fmt.format(new Date(latest.created_at))}` : undefined}
-        action={latest && (
-          <div className="flex flex-col gap-2 sm:flex-row">
-            <UseLatestAnswers answers={latest.answers} />
-            <ButtonLink href="/account/edit" variant="secondary" icon="edit">Update answers</ButtonLink>
-          </div>
-        )} />
+      <PageHead eyebrow="Your health dashboard" title="Hello again" sub={latest ? `Last check ${fmt.format(new Date(latest.created_at))}` : undefined} />
       <OverviewPanel history={history} />
     </>
   );
