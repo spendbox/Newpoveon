@@ -1,5 +1,6 @@
 import { handleError, json, readJson } from "@/lib/http";
-import { currentUser, supabaseAdmin, supabaseUser } from "@/lib/supabase/server";
+import { currentUser, supabaseUser } from "@/lib/supabase/server";
+import { deleteUserAndData } from "@/lib/delete-user";
 
 /**
  * Deletes the account and every screening saved with its email.
@@ -12,14 +13,7 @@ export async function POST(req: Request) {
     if (confirm !== "DELETE") return json({ error: "Please confirm" }, 400);
     const user = await currentUser();
     if (!user?.email) return json({ error: "Not logged in" }, 401);
-    const sb = supabaseAdmin();
-    const email = user.email.toLowerCase();
-    await sb.from("screenings").delete().eq("user_id", user.id);
-    await sb.from("screenings").delete().eq("email", email);
-    await sb.from("bookings").update({ user_id: null, screening_id: null }).eq("user_id", user.id);
-    await sb.from("service_requests").update({ user_id: null }).eq("user_id", user.id);
-    const { error } = await sb.auth.admin.deleteUser(user.id); // profile is removed with it
-    if (error) throw error;
+    await deleteUserAndData(user.id, user.email);
     await (await supabaseUser()).auth.signOut();
     return json({ ok: true });
   } catch (e) {

@@ -59,7 +59,7 @@ export default async function PlansPage() {
 
                         <details className="mt-3">
                           <summary className="cursor-pointer text-sm font-semibold text-primary">What&apos;s included ({items.length} lines)</summary>
-                          <table className="mt-2 w-full text-sm">
+                          <div className="overflow-x-auto"><table className="mt-2 w-full min-w-[420px] text-sm">
                             <thead><tr className="text-left text-xs text-muted"><th className="py-1">Building block</th><th>Unit cost</th><th>Qty / year</th><th>Line cost</th><th /></tr></thead>
                             <tbody>
                               {items.map((i) => {
@@ -81,7 +81,7 @@ export default async function PlansPage() {
                                 );
                               })}
                             </tbody>
-                          </table>
+                          </table></div>
                           <form action={savePlanItem} className="mt-2 flex flex-wrap items-end gap-2">
                             <input type="hidden" name="plan_id" value={p.id} />
                             <label className="text-sm font-semibold">Add a block<select name="component_id" className={aInput}>{components.filter((c) => c.active && !items.some((i) => i.component_id === c.id)).map((c) => <option key={c.id} value={c.id}>{c.name}</option>)}</select></label>
