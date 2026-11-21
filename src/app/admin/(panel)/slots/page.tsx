@@ -3,6 +3,7 @@ import { availableSlots, loadBookingSettings } from "@/lib/consults";
 import { supabaseAdmin } from "@/lib/supabase/server";
 import { addException, addRule, deleteException, deleteRule, saveBookingSettings } from "../../actions";
 import { aBtn, aBtnQuiet, aInput, Badge, Card, H1 } from "../../ui";
+import { clockTime } from "@/lib/time";
 
 const DAYS = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
 const ORDER = [1, 2, 3, 4, 5, 6, 0];
@@ -17,7 +18,8 @@ export default async function AvailabilityPage() {
     availableSlots(),
     sb.from("bookings").select("id, name, slot_starts_at, status, consult_type_name").gte("slot_starts_at", new Date().toISOString()).in("status", ["paid", "pending_payment"]).order("slot_starts_at").limit(30),
   ]);
-  const fmt = new Intl.DateTimeFormat("en-NG", { weekday: "short", day: "numeric", month: "short", hour: "numeric", minute: "2-digit", timeZone: "Africa/Lagos" });
+  const day = new Intl.DateTimeFormat("en-NG", { weekday: "short", day: "numeric", month: "short", timeZone: "Africa/Lagos" });
+  const fmt = { format: (d: Date) => `${day.format(d)}, ${clockTime(d)}` };
   return (
     <>
       <H1 sub="Set the hours you take consults each week. They repeat every week. A booked time disappears straight away. Times are Lagos time.">Availability</H1>
