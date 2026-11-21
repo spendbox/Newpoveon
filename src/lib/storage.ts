@@ -55,3 +55,8 @@ export function clearSaved() {
     window.localStorage.removeItem(SAVED_KEY);
   } catch {}
 }
+
+/** Contact details to pre-fill on the results step (set when a signed-in person retakes the check). */
+const PREFILL_KEY = "hc.prefill.v1";
+export const loadPrefill = () => safeGet<{ email: string; phone?: string }>(PREFILL_KEY);
+export const savePrefill = (p: { email: string; phone?: string }) => safeSet(PREFILL_KEY, p);

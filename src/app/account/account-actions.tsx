@@ -1,22 +1,7 @@
 "use client";
 import { useState } from "react";
-import { useRouter } from "next/navigation";
 import { Button, inputCls, Notice } from "@/components/ui";
-import type { Answers } from "@/lib/questions";
-import { clearProgress, clearSaved, saveProgress } from "@/lib/storage";
-
-/** Load the saved answers into the questionnaire, to take the whole check again with them filled in. */
-export function UseLatestAnswers({ answers }: { answers: Record<string, unknown> }) {
-  const router = useRouter();
-  return (
-    <Button variant="secondary" icon="arrowRight" onClick={() => {
-      saveProgress({ answers: answers as Answers, currentId: null, startedAt: new Date().toISOString(), finished: false });
-      router.push("/check");
-    }}>
-      Retake the check
-    </Button>
-  );
-}
+import { clearProgress, clearSaved } from "@/lib/storage";
 
 export function DeleteAccount() {
   const [open, setOpen] = useState(false);
