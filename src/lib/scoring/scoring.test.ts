@@ -4,7 +4,7 @@ import { heartAge, isExtrapolated, whoCvdRisk, whoCvdRiskRaw, whoRiskBand, type 
 import { auditC, bmi, bmiClass, bpClass, findrisc, findriscBand, gad2Positive, gad7, phq2Positive, phq9, stopBang, waistToHeight, whtrClass, who5 } from "./tools";
 import { computeResults, shareSummary } from "./results";
 import { HEART_AGE_REFERENCE } from "@/config/site";
-import { sanitizeAnswers, visibleQuestions, type Answers } from "@/lib/questions";
+import { QUESTION_BY_ID, ageFromDob, ageOf, isValidAnswer, sanitizeAnswers, visibleQuestions, type Answers } from "@/lib/questions";
 
 describe("WHO 2019 non-lab model, Western Sub-Saharan Africa", () => {
   it("matches an independent Python re-implementation built from the authors' Stata code and data file", () => {
@@ -263,5 +263,42 @@ describe("WHO-5 Well-Being Index (Topp 2015)", () => {
     const r = computeResults({ age: 25, sex: "female", who1: "4", who2: "3", who3: "3", who4: "2", who5: "4" } as never);
     expect(r.wellbeing).toEqual({ score: 64, band: "good" });
     expect(r.cards[0].id).toBe("wellbeing");
+  });
+});
+
+describe("Date of birth → age", () => {
+  const today = new Date("2026-11-21T10:00:00Z");
+  it("counts full years, turning older on the birthday (Nigeria time)", () => {
+    expect(ageFromDob("1990-11-21", today)).toBe(36);
+    expect(ageFromDob("1990-11-22", today)).toBe(35);
+    expect(ageFromDob("1990-12-01", today)).toBe(35);
+    // 11:30 pm UTC on 20 Nov is already 21 Nov in Lagos.
+    expect(ageFromDob("1990-11-21", new Date("2026-11-20T23:30:00Z"))).toBe(36);
+  });
+  it("rejects dates that don't exist", () => {
+    expect(ageFromDob("1990-02-30", today)).toBeNull();
+    expect(ageFromDob("1990-13-01", today)).toBeNull();
+    expect(ageFromDob("not-a-date", today)).toBeNull();
+  });
+  it("handles 29 February", () => {
+    expect(ageFromDob("2000-02-29", new Date("2026-02-28T12:00:00Z"))).toBe(25);
+    expect(ageFromDob("2000-02-29", new Date("2026-03-01T12:00:00Z"))).toBe(26);
+  });
+  it("uses the date of birth when given, or the typed age on older answers", () => {
+    expect(ageOf({ dob: "1980-01-15" } as Answers, today)).toBe(46);
+    expect(ageOf({ age: 45 } as Answers, today)).toBe(45);
+  });
+  it("only accepts adults 18 to 100", () => {
+    const q = QUESTION_BY_ID.dob;
+    expect(isValidAnswer(q, "1990-05-05")).toBe(true);
+    expect(isValidAnswer(q, "2015-05-05")).toBe(false);
+    expect(isValidAnswer(q, "1900-05-05")).toBe(false);
+    expect(isValidAnswer(q, 45)).toBe(false);
+  });
+  it("scores with the age worked out from the date of birth", () => {
+    const { age: _drop, ...rest } = healthy;
+    void _drop;
+    const born = `${new Date().getUTCFullYear() - 46}-01-01`;
+    expect(computeResults({ ...rest, dob: born }).age).toBe(46);
   });
 });

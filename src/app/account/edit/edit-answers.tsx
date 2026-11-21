@@ -4,6 +4,7 @@ import { useRouter } from "next/navigation";
 import { AnswerTile } from "@/components/client";
 import { Button, inputCls, Notice } from "@/components/ui";
 import { SupportScreen } from "@/components/support-screen";
+import { DobInput, formatDob } from "@/components/dob-input";
 import { type Answers, type AnswerValue, type BpValue, type Question, isComplete, pruneAnswers, visibleQuestions } from "@/lib/questions";
 
 function display(q: Question, v: AnswerValue | undefined): string {
@@ -11,6 +12,7 @@ function display(q: Question, v: AnswerValue | undefined): string {
   if (q.kind === "choice") return q.options.find((o) => o.value === v)?.label ?? String(v);
   if (q.kind === "multi") return (v as string[]).map((x) => q.options.find((o) => o.value === x)?.label ?? x).join(", ");
   if (q.kind === "bp") return `${(v as BpValue).sbp}/${(v as BpValue).dbp} mmHg`;
+  if (q.kind === "dob") return formatDob(v as string);
   return v === "unknown" ? q.skipLabel ?? "Unknown" : `${v} ${q.unit}`;
 }
 
@@ -102,6 +104,7 @@ function Editor({ q, value, onChange }: { q: Question; value: AnswerValue | unde
       </div>
     );
   }
+  if (q.kind === "dob") return <DobInput idPrefix={`e-${q.id}`} value={typeof value === "string" ? value : undefined} minAge={q.minAge} maxAge={q.maxAge} onChange={onChange} />;
   if (q.kind === "bp") {
     const commit = (n: BpValue) => {
       setBp(n);

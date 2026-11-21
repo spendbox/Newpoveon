@@ -3,7 +3,7 @@
  * results, on the phone and on the server (the server always recomputes; it never trusts the browser).
  */
 import { EXTENDED_MIN_AGE, HEART_AGE_REFERENCE } from "@/config/site";
-import { type Answers, type BpValue, num, str } from "@/lib/questions";
+import { type Answers, type BpValue, ageOf, num, str } from "@/lib/questions";
 import { heartAge, isExtrapolated, whoCvdRisk, whoRiskBand, WHO_MAX_AGE, type HeartAge, type Sex } from "./who-cvd";
 import {
   auditC, bmi as calcBmi, bmiClass, bpClass, FINDRISC_BAND_RISK, findrisc, gad2Positive, gad7, meetsSleepGuideline,
@@ -79,7 +79,7 @@ const test = (testCode: string, label: string): NextStep => ({ kind: "test", tes
 const pct = (p: number) => Math.round(p * 1000) / 10;
 
 export function computeResults(a: Answers): Results {
-  const age = num(a, "age") ?? 0;
+  const age = ageOf(a) ?? 0;
   const sex = (str(a, "sex") ?? "female") as Sex;
   const height = num(a, "height");
   const weight = num(a, "weight");
