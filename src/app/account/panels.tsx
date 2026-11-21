@@ -46,7 +46,7 @@ export function NoChecksYet() {
 
 /* ------------------------------------------------------------------ Overview */
 
-export type PlanSummary = { active: boolean; pct?: number; week?: number } | null;
+export type PlanSummary = { active: boolean; pct?: number; week?: number; perk?: string } | null;
 
 export function OverviewPanel({ history, plan = null }: { history: Row[]; plan?: PlanSummary }) {
   const latest = history[0];
@@ -108,7 +108,7 @@ export function OverviewPanel({ history, plan = null }: { history: Row[]; plan?:
           {plan?.active ? (
             <><span className="block font-semibold">My plan · week {plan.week}</span><span className="block text-sm text-ink/70">{plan.pct}% done this week. Tap to tick off today.</span></>
           ) : (
-            <><span className="block font-semibold">Turn your results into a plan</span><span className="block text-sm text-ink/70">Moving, sleep, weight or eating, with a daily check-off and a weekly review.</span></>
+            <><span className="block font-semibold">Turn your results into a plan</span><span className="block text-sm text-ink/70">Moving, sleep, weight or eating, with a daily check-off and a weekly review{plan?.perk ? `. Plus ${plan.perk} every doctor consultation.` : "."}</span></>
           )}
         </span>
         <Icon name="arrowRight" size={18} strokeWidth={2} className="shrink-0 text-primary transition-transform group-hover:translate-x-0.5" />

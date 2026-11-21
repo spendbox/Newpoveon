@@ -303,3 +303,20 @@ export async function deleteUser(f: FormData) {
   revalidatePath("/admin");
   redirect("/admin/users?deleted=1");
 }
+
+/* ---------------- Health plan price and member discount ---------------- */
+export async function savePlanPerks(f: FormData) {
+  await requireAdmin();
+  const type = ["none", "percent", "fixed"].includes(String(f.get("plan_discount_type"))) ? String(f.get("plan_discount_type")) : "fixed";
+  const price = Math.round(Number(f.get("plan_price_naira") || 1500));
+  let value = Math.round(Number(f.get("plan_discount_value") || 0));
+  if (!Number.isFinite(price) || price < 100 || price > 1_000_000) throw new Error("The plan price must be between ₦100 and ₦1,000,000.");
+  if (!Number.isFinite(value) || value < 0) value = 0;
+  if (type === "percent") value = Math.min(100, value);
+  value = Math.min(1_000_000, value);
+  const { error } = await supabaseAdmin().from("booking_settings").upsert({ id: 1, plan_price_naira: price, plan_discount_type: type, plan_discount_value: value, updated_at: new Date().toISOString() });
+  if (error) throw new Error("Couldn't save. Has SQL 14 been run?");
+  revalidatePath("/admin/consults");
+  revalidatePath("/doctor");
+  revalidatePath("/account/plan");
+}

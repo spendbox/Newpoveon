@@ -125,3 +125,9 @@ console.log("anon inserts screening:", await as("anon", null, ins(null, "evil@x.
   console.log("u1 inserts a log directly:", JSON.stringify(await as("authenticated", u1, `insert into plan_logs (goal_id, user_id, day) values ('${g1}', '${u1}', '2026-11-21')`)));
   console.log("anon sees plan logs:", (await as("anon", null, "select id from plan_logs")).length);
 }
+{
+  const dk = fs.readFileSync(new URL("../migrations/20261127000000_plan_member_discount.sql", import.meta.url), "utf8");
+  await db.exec(dk); await db.exec(dk);
+  console.log("plan perks:", JSON.stringify((await db.query("select plan_price_naira, plan_discount_type, plan_discount_value from booking_settings")).rows));
+  try { await db.exec("update booking_settings set plan_discount_type='percent', plan_discount_value=150"); console.log("150% allowed?!"); } catch { console.log("150% discount refused: ok"); }
+}

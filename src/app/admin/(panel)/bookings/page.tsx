@@ -56,7 +56,7 @@ export default async function BookingsPage({ searchParams }: PageProps<"/admin/b
                   {b.needs_reschedule && <Badge tone="warn">needs new time</Badge>}
                 </div>
               </div>
-              <p className="mt-2 text-sm"><span className="font-semibold">Needs help with:</span> {b.consult_type_name ?? "General consult"}{b.doctor_type ? ` · ${b.doctor_type}` : ""} · ₦{(b.amount_kobo / 100).toLocaleString("en-NG")}</p>
+              <p className="mt-2 text-sm"><span className="font-semibold">Needs help with:</span> {b.consult_type_name ?? "General consult"}{b.doctor_type ? ` · ${b.doctor_type}` : ""} · ₦{(b.amount_kobo / 100).toLocaleString("en-NG")}{b.discount_kobo ? ` (plan member, ₦${(b.discount_kobo / 100).toLocaleString("en-NG")} off)` : ""}</p>
               <p className="text-sm"><span className="font-semibold">In their words:</span> {b.reason}</p>
               {b.voice_note_path && signed.get(b.voice_note_path) && (
                 <div className="mt-2"><p className="text-xs font-semibold text-muted">Voice note</p>{signed.get(b.voice_note_path) ? <div className="mt-1 max-w-md"><AudioPlayer src={signed.get(b.voice_note_path)!} /></div> : <p className="text-sm text-muted">Couldn&apos;t load the recording. Refresh the page.</p>}</div>

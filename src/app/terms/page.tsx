@@ -2,11 +2,17 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { site } from "@/config/site";
 import { LegalPage } from "@/components/legal-page";
+import { discountLabel } from "@/lib/plan/perks";
+import { loadPlanSettings } from "@/lib/plan/settings";
 
 export const metadata: Metadata = { title: "Terms of use", description: "The terms for using Poveon's health check, doctor consults and other services." };
 
-export default function TermsPage() {
+export const dynamic = "force-dynamic";
+
+export default async function TermsPage() {
   const L = site.legal;
+  const plan = await loadPlanSettings();
+  const perk = discountLabel(plan.discount);
   const mail = <a href={`mailto:${L.email}`}>{L.email}</a>;
   return (
     <LegalPage
@@ -77,9 +83,10 @@ export default function TermsPage() {
           id: "plan", title: "Personal plans",
           body: (
             <ul>
-              <li>A personal plan costs <strong>₦{site.planPriceNaira.toLocaleString("en-NG")} for 12 months</strong>, paid once through Paystack. It does <strong>not</strong> renew automatically; we&apos;ll remind you before it ends.</li>
+              <li>A personal plan costs <strong>₦{plan.price.toLocaleString("en-NG")} for 12 months</strong>, paid once through Paystack. It does <strong>not</strong> renew automatically; we&apos;ll remind you before it ends.</li>
               <li>Your plan gives general lifestyle guidance based on published guidelines. It is not medical treatment. If you have a heart condition, diabetes, are pregnant, or get chest pain, dizziness or unusual breathlessness when active, talk to a doctor before starting or stepping up.</li>
               <li>You can ask for a <strong>full refund within 7 days</strong> of paying by emailing {mail}.</li>
+              {perk && <li>While your plan is active, you get <strong>{perk}</strong> every doctor consultation, applied automatically when you book while logged in. We may change this perk for future bookings; it never changes a consult you have already paid for.</li>}
               <li>You can change your plan or switch off reminder emails at any time.</li>
             </ul>
           ),

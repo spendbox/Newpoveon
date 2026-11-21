@@ -93,7 +93,7 @@ export async function confirmBookingPayment(reference: string, source: "webhook"
       const t = teamEmail("New paid doctor consult", {
         Name: booking.name, Phone: booking.phone, Email: booking.email,
         Consult: booking.consult_type_name ? `${booking.consult_type_name} (${booking.doctor_type ?? "doctor"})` : undefined,
-        Paid: `₦${(booking.amount_kobo / 100).toLocaleString("en-NG")}`,
+        Paid: `₦${(booking.amount_kobo / 100).toLocaleString("en-NG")}`, "Plan member discount": booking.discount_kobo ? `₦${(booking.discount_kobo / 100).toLocaleString("en-NG")}` : undefined,
         When: booking.slot_starts_at ? formatWhen(booking.slot_starts_at) : "No slot chosen: call to agree a time",
         "Needs a new time": booking.needs_reschedule ? "YES" : "no",
         "Shared results": booking.share_results && booking.screening_id ? "Yes (see admin)" : "No",

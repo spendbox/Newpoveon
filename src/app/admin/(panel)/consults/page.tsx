@@ -1,6 +1,8 @@
 export const dynamic = "force-dynamic";
 import { supabaseAdmin } from "@/lib/supabase/server";
-import { saveConsultType } from "../../actions";
+import { savePlanPerks, saveConsultType } from "../../actions";
+import { loadPlanSettings } from "@/lib/plan/settings";
+import { discountLabel, memberPrice } from "@/lib/plan/perks";
 import { aBtn, aInput, Badge, Card, H1 } from "../../ui";
 
 type T = { id?: string; code: string; name: string; description: string | null; grp: string; doctor_type: string; duration_min: number; price_naira: number | null; urgent_check: boolean; credit_to_plan: boolean; active: boolean; sort: number };
@@ -30,8 +32,32 @@ function Form({ t }: { t?: T }) {
 export default async function ConsultsPage() {
   const { data } = await supabaseAdmin().from("consult_types").select("*").order("sort");
   const rows = (data ?? []) as T[];
+  const perks = await loadPlanSettings();
+  const example = rows.find((r) => r.code === "doctor-consult" && r.price_naira != null) ?? rows.find((r) => r.price_naira != null);
   return (
     <>
+      <Card className="mb-6">
+        <h2 className="text-lg font-semibold">Health plan</h2>
+        <p className="mt-1 text-sm text-muted">The yearly plan price, and the discount members get on every consult while their plan is active. A discounted consult never costs less than ₦100.</p>
+        <form action={savePlanPerks} className="mt-3 grid gap-3 md:grid-cols-[1fr_1.4fr_1fr_auto] md:items-end">
+          <label className="text-sm font-semibold">Plan price per year (₦)<input name="plan_price_naira" inputMode="numeric" required defaultValue={perks.price} className={aInput} /></label>
+          <fieldset className="text-sm font-semibold">
+            <legend className="mb-1">Member discount on consults</legend>
+            <div className="flex flex-wrap gap-3 font-medium">
+              {([["fixed", "Amount (₦)"], ["percent", "Percent (%)"], ["none", "No discount"]] as const).map(([v, l]) => (
+                <label key={v} className="flex items-center gap-1.5"><input type="radio" name="plan_discount_type" value={v} defaultChecked={perks.discount.type === v} /> {l}</label>
+              ))}
+            </div>
+          </fieldset>
+          <label className="text-sm font-semibold">Discount value<input name="plan_discount_value" inputMode="numeric" defaultValue={perks.discount.value} className={aInput} /></label>
+          <button className={aBtn}>Save</button>
+        </form>
+        <p className="mt-3 text-sm text-muted">
+          Now: <b>{discountLabel(perks.discount) || "no discount"}</b>
+          {example?.price_naira != null && discountLabel(perks.discount) && <> · e.g. &ldquo;{example.name}&rdquo; ₦{example.price_naira.toLocaleString("en-NG")} → <b>₦{memberPrice(example.price_naira, perks.discount).toLocaleString("en-NG")}</b> for members</>}
+        </p>
+      </Card>
+
       <H1 sub="What people can book help with, which doctor they see, and the fee. A type with no fee is hidden from the booking page. Fees are only shown after someone says what they need.">Consults and fees</H1>
       <div className="flex flex-col gap-2">
         {rows.map((t) => (

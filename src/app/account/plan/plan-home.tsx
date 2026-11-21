@@ -29,8 +29,8 @@ function reviewLine(g: GoalView): string | null {
  * The plan, day to day: tick things off, see the week fill up, and see how next week will adjust.
  * Every number here is worked out on the server from what's been ticked off.
  */
-export function PlanHome({ goals, today, paidUntil, reminders, startsOn, recheckDue }: {
-  goals: GoalView[]; today: string; paidUntil: string; reminders: boolean; startsOn: string; recheckDue: boolean;
+export function PlanHome({ goals, today, paidUntil, reminders, startsOn, recheckDue, perkLabel = "" }: {
+  goals: GoalView[]; today: string; paidUntil: string; reminders: boolean; startsOn: string; recheckDue: boolean; perkLabel?: string;
 }) {
   const router = useRouter();
   const [pending, setPending] = useState<string | null>(null);
@@ -72,6 +72,13 @@ export function PlanHome({ goals, today, paidUntil, reminders, startsOn, recheck
       </section>
 
       {error && <Notice tone="warn">{error}</Notice>}
+      {perkLabel && (
+        <Link href="/doctor" className="flex items-center gap-3 rounded-[var(--radius-xl)] border border-primary/30 bg-primary-soft p-4">
+          <Icon name="stethoscope" size={20} strokeWidth={2} className="shrink-0 text-primary" />
+          <span className="flex-1 text-[15px]"><b>Member perk:</b> {perkLabel} every doctor consultation, applied automatically when you book.</span>
+          <Icon name="arrowRight" size={16} strokeWidth={2} className="shrink-0 text-primary" />
+        </Link>
+      )}
       {recheckDue && (
         <Notice tone="good">It&apos;s been 3 months. <Link href="/account/retake" className="font-semibold underline">Retake the check</Link> to see how your scores have moved.</Notice>
       )}

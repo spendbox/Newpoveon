@@ -9,6 +9,7 @@ import { Steps, type Step } from "@/components/steps";
 import { VoiceNote } from "@/components/voice-note";
 import { loadSaved } from "@/lib/storage";
 import { clockTime } from "@/lib/time";
+import { memberPrice, type Discount } from "@/lib/plan/perks";
 import { whatsappLink } from "@/lib/whatsapp";
 
 type Type = { id: string; code: string; name: string; description: string | null; grp: string; doctor_type: string; duration_min: number; price_naira: number | null; urgent_check: boolean; credit_to_plan: boolean };
@@ -50,7 +51,9 @@ function useNow() {
   return now;
 }
 
-export function BookingForm({ types, preselect, defaultReason }: { types: Type[]; preselect: string | null; defaultReason: string }) {
+export type Perk = { isMember: boolean; discount: Discount; label: string; planPrice: number } | null;
+
+export function BookingForm({ types, preselect, defaultReason, perk = null }: { types: Type[]; preselect: string | null; defaultReason: string; perk?: Perk }) {
   const router = useRouter();
   // A topic is only set when someone arrives from a guide or result card (e.g. "Help me stop smoking").
   const [topicId, setTopicId] = useState<string | null>(types.find((t) => t.code === preselect)?.id ?? null);
@@ -117,6 +120,8 @@ export function BookingForm({ types, preselect, defaultReason }: { types: Type[]
   // Everyone else books a general consult: no categories to choose from.
   const general = types.find((t) => t.code === "doctor-consult") ?? types.find((t) => t.code === "new-symptom") ?? types[0] ?? null;
   const type = topic ?? general;
+  const fee = type?.price_naira ?? null;
+  const pay = fee != null && perk?.isMember ? memberPrice(fee, perk.discount) : fee;
   const totalBytes = (voice?.size ?? 0) + files.reduce((n, f) => n + f.size, 0);
   const tooBig = totalBytes > 4_000_000;
   const byDay = useMemo(() => {
@@ -363,12 +368,21 @@ export function BookingForm({ types, preselect, defaultReason }: { types: Type[]
             <div className="flex justify-between gap-4"><dt className="text-muted">You&apos;ll see</dt><dd className="text-right font-medium">A {type.doctor_type.toLowerCase()}, about {type.duration_min} min</dd></div>
             <div className="flex justify-between gap-4"><dt className="text-muted">Starts</dt><dd className="text-right font-medium">{startsAt ? `${longDay.format(new Date(startsAt))}, ${time.format(new Date(startsAt))}` : "We'll call to agree a start time"}</dd></div>
             <div className="flex justify-between gap-4"><dt className="text-muted">Your message</dt><dd className="text-right font-medium">{[voice && "Voice note", reason.trim() && "Note", files.length && `${files.length} file${files.length > 1 ? "s" : ""}`].filter(Boolean).join(" + ")}</dd></div>
-            <div className="flex justify-between gap-4 border-t border-line pt-2.5"><dt className="text-muted">Fee</dt><dd className="text-right text-base font-semibold tabular">{type.price_naira != null ? ngn(type.price_naira) : "—"}</dd></div>
+            <div className="flex justify-between gap-4 border-t border-line pt-2.5"><dt className="text-muted">Fee</dt><dd className="text-right text-base font-semibold tabular">
+              {pay != null && fee != null && pay < fee ? <><span className="mr-2 text-sm font-normal text-subtle line-through">{ngn(fee)}</span>{ngn(pay)}</> : fee != null ? ngn(fee) : "—"}
+            </dd></div>
+            {pay != null && fee != null && pay < fee && <p className="text-right text-xs font-semibold text-good-text">Health plan member: {perk!.label}</p>}
           </dl>
           <label className="flex items-start gap-3">
             <input type="checkbox" className="mt-0.5 h-5 w-5 shrink-0 accent-[#136F58]" checked={share} onChange={(e) => setShare(e.target.checked)} />
             <span className="text-sm">Share my Poveon results with the doctor.<span className="block text-xs text-subtle">{saved ? "Your latest saved results will be attached." : "If you've saved results with us, they'll be attached."}</span></span>
           </label>
+          {perk && !perk.isMember && fee != null && memberPrice(fee, perk.discount) < fee && (
+            <a href="/account/plan" className="flex items-start gap-3 rounded-[var(--radius-lg)] border border-primary/30 bg-primary-soft p-4">
+              <Icon name="target" size={20} strokeWidth={2} className="mt-0.5 shrink-0 text-primary" />
+              <span className="text-sm"><b className="text-ink">Activate the yearly health plan ({ngn(perk.planPrice)}) and get {perk.label} all consultations.</b> <span className="text-muted">This consult would be {ngn(memberPrice(fee, perk.discount))}. Get the plan first, then come back to book.</span></span>
+            </a>
+          )}
           <p className="flex items-center gap-1.5 text-xs text-subtle"><Icon name="shield" size={14} /> Secure payment by Paystack. Card, bank transfer or USSD.</p>
         </>
       ),
@@ -377,7 +391,7 @@ export function BookingForm({ types, preselect, defaultReason }: { types: Type[]
 
   return (
     <>
-      <Steps variant="full" steps={steps} onSubmit={submit} onExit={() => setLeaving(true)} submitLabel={type?.price_naira != null ? `Pay ${ngn(type.price_naira)} and book` : "Book"} busy={busy} error={error} />
+      <Steps variant="full" steps={steps} onSubmit={submit} onExit={() => setLeaving(true)} submitLabel={pay != null ? `Pay ${ngn(pay)} and book` : "Book"} busy={busy} error={error} />
       {leaving && (
         <div className="fixed inset-0 z-50 flex items-end justify-center bg-ink/40 p-4 sm:items-center" role="dialog" aria-modal="true" aria-labelledby="leave-title" onClick={() => setLeaving(false)}>
           <div className="w-full max-w-sm rounded-[var(--radius-xl)] bg-surface p-6 shadow-[var(--shadow-lg)]" onClick={(e) => e.stopPropagation()}>

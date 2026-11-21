@@ -3,6 +3,7 @@ import { handleError, json } from "@/lib/http";
 import { initializeTransaction, paystackConfigured } from "@/lib/paystack";
 import { currentUser, supabaseAdmin, supabaseConfigured } from "@/lib/supabase/server";
 import { randomToken } from "@/lib/tokens";
+import { loadPlanSettings } from "@/lib/plan/settings";
 
 /** Start a Paystack payment for a year of the personal plan. The price is set on the server. */
 export async function POST() {
@@ -16,7 +17,7 @@ export async function POST() {
     const { count } = await sb.from("plan_goals").select("*", { count: "exact", head: true }).eq("plan_id", plan.id).eq("active", true);
     if (!count) return json({ error: "Please choose at least one area first." }, 400);
     const reference = `PL-${randomToken(9)}`;
-    const amountKobo = site.planPriceNaira * 100;
+    const amountKobo = (await loadPlanSettings()).price * 100;
     const { error } = await sb.from("plan_purchases").insert({ user_id: user.id, plan_id: plan.id, reference, amount_kobo: amountKobo });
     if (error) throw error;
     const tx = await initializeTransaction({
