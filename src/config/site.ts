@@ -8,6 +8,18 @@ export const site = {
   appName: "Poveon",
   /** The company / platform name. */
   companyName: "Poveon",
+  /** Legal details shown in the privacy notice, terms and emails. */
+  legal: {
+    name: "Poveon LTD",
+    rc: "RC 8921141",
+    address: "Yaba, Lagos, Nigeria",
+    email: "notifications@poveon.com",
+    phone: "09167015451",
+    phoneIntl: "+2349167015451",
+    dpo: "Wilson",
+    /** Date the current privacy notice and terms took effect. */
+    effective: "21 November 2026",
+  },
   tagline: "Friendly health screening for Nigerians",
 
   /** Public web address, used in emails and share links (env: NEXT_PUBLIC_SITE_URL). */

@@ -18,7 +18,8 @@ const mmss = (s: number) => `${Math.floor(s / 60)}:${String(Math.floor(s % 60)).
  * Record a short voice note (up to 2 minutes), play it back, re-record or delete it.
  * The recording stays on the phone until the form is sent.
  */
-export function VoiceNote({ value, onChange }: { value: Blob | null; onChange: (b: Blob | null) => void }) {
+/** `hero`: a big, centred record button for when the voice note is the main way to explain. */
+export function VoiceNote({ value, onChange, hero = false }: { value: Blob | null; onChange: (b: Blob | null) => void; hero?: boolean }) {
   const [state, setState] = useState<"idle" | "recording" | "denied" | "unsupported">("idle");
   const [seconds, setSeconds] = useState(0);
   const [url, setUrl] = useState<string | null>(null);
@@ -79,7 +80,7 @@ export function VoiceNote({ value, onChange }: { value: Blob | null; onChange: (
   if (state === "unsupported") return <p className="text-sm text-muted">Voice notes don&apos;t work in this browser. Please type instead.</p>;
 
   return (
-    <div className="rounded-[var(--radius-lg)] border border-line bg-surface p-4">
+    <div className={`rounded-[var(--radius-lg)] border border-line bg-surface ${hero ? "p-5" : "p-4"}`}>
       {state === "recording" ? (
         <div className="flex items-center gap-4">
           <button type="button" onClick={stop} aria-label="Stop recording" className="flex h-14 w-14 shrink-0 items-center justify-center rounded-full bg-act-text text-white">
@@ -99,6 +100,15 @@ export function VoiceNote({ value, onChange }: { value: Blob | null; onChange: (
             <button type="button" onClick={start} className="inline-flex min-h-[40px] items-center gap-1.5 rounded-full border border-line px-4 text-sm font-medium hover:bg-surface-2"><Icon name="mic" size={16} strokeWidth={2} /> Record again</button>
             <button type="button" onClick={() => onChange(null)} className="inline-flex min-h-[40px] items-center gap-1.5 rounded-full border border-line px-4 text-sm font-medium text-act-text hover:bg-act-bg"><Icon name="trash" size={16} strokeWidth={2} /> Delete</button>
           </div>
+        </div>
+      ) : hero ? (
+        <div className="flex flex-col items-center py-4 text-center">
+          <button type="button" onClick={start} aria-label="Record a voice note" className="relative flex h-24 w-24 items-center justify-center rounded-full bg-primary text-white shadow-[var(--shadow-lg)] transition-transform hover:bg-primary-hover active:scale-95">
+            <span className="absolute inset-0 animate-ping rounded-full bg-primary/25 [animation-duration:2.4s]" aria-hidden="true" />
+            <Icon name="mic" size={38} strokeWidth={2} />
+          </button>
+          <p className="mt-4 text-lg font-semibold">Tap to record</p>
+          <p className="mt-0.5 max-w-xs text-sm text-muted">{state === "denied" ? "We couldn't use your microphone. Allow it in your browser settings, or write a note instead." : `Say it in your own words, in any language. Up to ${VOICE_MAX_SECONDS / 60} minutes.`}</p>
         </div>
       ) : (
         <div className="flex items-center gap-4">
