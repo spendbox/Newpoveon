@@ -111,3 +111,17 @@ console.log("u1 tries to mark has_password:", await as("authenticated", u1, `upd
 console.log("u1 updates own name:", JSON.stringify(await as("authenticated", u1, `update profiles set full_name='Ada' where id='${u1}' returning full_name`)));
 console.log("u1 calls reserve_slot:", await as("authenticated", u1, `select reserve_slot('${slot}','${bid}',30)`));
 console.log("anon inserts screening:", await as("anon", null, ins(null, "evil@x.com")));
+{
+  // Personal plans: own rows readable, nothing writable from the browser.
+  const pl = fs.readFileSync(new URL("../migrations/20261126000000_personal_plans.sql", import.meta.url), "utf8");
+  await db.exec(pl); await db.exec(pl);
+  const p1 = (await db.query(`insert into plans (user_id, status) values ('${u1}', 'draft') returning id`)).rows[0].id;
+  await db.query(`insert into plans (user_id, status) values ('${u2}', 'active')`);
+  const g1 = (await db.query(`insert into plan_goals (plan_id, user_id, area, settings) values ('${p1}', '${u1}', 'move', '{}') returning id`)).rows[0].id;
+  await db.query(`insert into plan_logs (goal_id, user_id, day) values ('${g1}', '${u1}', '2026-11-20')`);
+  console.log("u1 sees plans:", (await as("authenticated", u1, "select user_id from plans")).length);
+  console.log("u1 marks own plan paid:", JSON.stringify(await as("authenticated", u1, `update plans set status='active', paid_until='2030-01-01' where user_id='${u1}' returning id`)));
+  console.log("u1 plan status still:", (await db.query(`select status from plans where id='${p1}'`)).rows[0].status);
+  console.log("u1 inserts a log directly:", JSON.stringify(await as("authenticated", u1, `insert into plan_logs (goal_id, user_id, day) values ('${g1}', '${u1}', '2026-11-21')`)));
+  console.log("anon sees plan logs:", (await as("anon", null, "select id from plan_logs")).length);
+}

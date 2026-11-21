@@ -8,7 +8,7 @@ import { ScoreTile, WellbeingHero } from "@/components/score-widgets";
 import { TrendLine } from "@/components/trend-line";
 import { ButtonLink, Notice, ResultCard } from "@/components/ui";
 import { formatWhen } from "@/lib/email";
-import type { ResultCard as ResultCardData, Results, Status } from "@/lib/scoring/results";
+import { displayValue, type ResultCard as ResultCardData, type Results, type Status } from "@/lib/scoring/results";
 
 export type Row = { id: string; created_at: string; heart_age: number | null; risk_percent: number | null; results: Results; answers: Record<string, unknown> };
 export type Booking = { id: string; slot_starts_at: string | null; status: string; consult_type_name?: string | null };
@@ -46,7 +46,9 @@ export function NoChecksYet() {
 
 /* ------------------------------------------------------------------ Overview */
 
-export function OverviewPanel({ history }: { history: Row[] }) {
+export type PlanSummary = { active: boolean; pct?: number; week?: number } | null;
+
+export function OverviewPanel({ history, plan = null }: { history: Row[]; plan?: PlanSummary }) {
   const latest = history[0];
   if (!latest) return <NoChecksYet />;
   const r = latest.results;
@@ -58,7 +60,7 @@ export function OverviewPanel({ history }: { history: Row[] }) {
   const tiles: { id: ResultCardData["id"]; icon: IconName; label: string; value: string; note?: string; tone: Status | "neutral" }[] = [];
   const h = card(r, "heart");
   tiles.push(r.heart
-    ? { id: "heart", icon: "heart", label: "Heart age", value: `${r.heart.heartAge.kind === "below" ? "Under " : r.heart.heartAge.kind === "above" ? "Over " : ""}${r.heart.heartAge.value}`, note: `${r.heart.riskPercent}% 10-year risk`, tone: h?.status ?? "neutral" }
+    ? { id: "heart", icon: "heart", label: "Heart age", value: `${r.heart.heartAge.kind === "below" ? "Under " : r.heart.heartAge.kind === "above" ? "Over " : ""}${r.heart.heartAge.value} years`, note: `${r.heart.riskPercent}% 10-year risk`, tone: h?.status ?? "neutral" }
     : { id: "heart", icon: "heart", label: "Heart age", value: r.age < EXTENDED_MIN_AGE ? `From ${EXTENDED_MIN_AGE}` : h?.value ?? "Not yet", note: r.age < EXTENDED_MIN_AGE ? "Not calculated under 30" : undefined, tone: h?.status ?? "neutral" });
   for (const [id, icon, label] of [["diabetes", "drop", "Diabetes risk"], ["bp", "gauge", "Blood pressure"]] as const) {
     const c = card(r, id);
@@ -99,6 +101,18 @@ export function OverviewPanel({ history }: { history: Row[] }) {
           <ButtonLink href="/account/retake" variant="secondary" icon="sparkle" className="shrink-0">Add it now</ButtonLink>
         </section>
       )}
+
+      <Link href="/account/plan" className="group flex items-center gap-4 rounded-[var(--radius-xl)] border border-primary/30 bg-primary-soft p-5 transition-shadow hover:shadow-[var(--shadow-md)]">
+        <span className="flex h-12 w-12 shrink-0 items-center justify-center rounded-[var(--radius-md)] bg-primary text-white"><Icon name="target" size={24} strokeWidth={2} /></span>
+        <span className="min-w-0 flex-1">
+          {plan?.active ? (
+            <><span className="block font-semibold">My plan · week {plan.week}</span><span className="block text-sm text-ink/70">{plan.pct}% done this week. Tap to tick off today.</span></>
+          ) : (
+            <><span className="block font-semibold">Turn your results into a plan</span><span className="block text-sm text-ink/70">Moving, sleep, weight or eating, with a daily check-off and a weekly review.</span></>
+          )}
+        </span>
+        <Icon name="arrowRight" size={18} strokeWidth={2} className="shrink-0 text-primary transition-transform group-hover:translate-x-0.5" />
+      </Link>
 
       <section aria-labelledby="scores">
         <div className="flex items-center justify-between">
@@ -148,7 +162,7 @@ export function ResultsPanel({ history }: { history: Row[] }) {
       <section className="rounded-[var(--radius-xl)] border border-line bg-surface p-5 md:p-8" aria-labelledby="map">
         <h2 id="map" className="text-xl font-semibold">Body map</h2>
         <p className="mt-1 text-[15px] text-muted">Tap a point to see your result there and how to improve it.</p>
-        <div className="mt-6"><BodyMap mode="results" results={Object.fromEntries(latest.results.cards.map((c) => [c.id, { status: c.status, value: c.value, summary: c.summary }]))} /></div>
+        <div className="mt-6"><BodyMap mode="results" results={Object.fromEntries(latest.results.cards.map((c) => [c.id, { status: c.status, value: displayValue(c), summary: c.summary }]))} /></div>
       </section>
       <section aria-labelledby="all">
         <h2 id="all" className="text-xl font-semibold">Every result</h2>

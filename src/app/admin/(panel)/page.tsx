@@ -35,7 +35,7 @@ export default async function AdminHome() {
   const since7 = new Date(now - 7 * 864e5).toISOString();
   const nowIso = new Date(now).toISOString();
   const sb = supabaseAdmin();
-  const [users, users7, completed, completed30, saved, paid, upcomingN, unpaid, newReqs, placeholders, upcoming, recentUsers, recentReqs] = await Promise.all([
+  const [users, users7, completed, completed30, saved, paid, upcomingN, unpaid, newReqs, placeholders, upcoming, recentUsers, recentReqs, planMembers] = await Promise.all([
     count("profiles"),
     count("profiles", (q) => q.gte("created_at", since7)),
     count("events", (q) => q.eq("type", "completed")),
@@ -49,6 +49,7 @@ export default async function AdminHome() {
     sb.from("bookings").select("id, name, phone, slot_starts_at, consult_type_name, needs_reschedule").eq("status", "paid").or(`slot_starts_at.gte."${nowIso}",slot_starts_at.is.null`).order("slot_starts_at", { ascending: true, nullsFirst: true }).limit(6).then((r) => r.data ?? []),
     sb.from("profiles").select("id, email, full_name, created_at").order("created_at", { ascending: false }).limit(5).then((r) => r.data ?? []),
     sb.from("service_requests").select("id, kind, name, created_at").eq("status", "new").order("created_at", { ascending: false }).limit(5).then((r) => r.data ?? []),
+    count("plans", (q) => q.eq("status", "active")).catch(() => 0),
   ]);
   const fmt = new Intl.DateTimeFormat("en-NG", { dateStyle: "medium", timeZone: site.timeZone });
   const KIND: Record<string, string> = { home_test: "Lab test", medication: "Medication", family_care: "Family care" };
@@ -62,7 +63,7 @@ export default async function AdminHome() {
       </div>
 
       <div className="grid grid-cols-2 gap-3 lg:grid-cols-4">
-        <Stat icon="user" label="Registered users" value={users} sub={`${users7} new this week`} href="/admin/users" tint="bg-primary-soft text-primary" />
+        <Stat icon="user" label="Registered users" value={users} sub={`${users7} new this week · ${planMembers} on a plan`} href="/admin/users" tint="bg-primary-soft text-primary" />
         <Stat icon="clipboard" label="Checks completed" value={completed} sub={`${completed30} in the last 30 days · ${saved.toLocaleString("en-NG")} saved`} tint="bg-lavender-soft text-lavender" />
         <Stat icon="stethoscope" label="Upcoming consults" value={upcomingN} sub={`${paid} paid in total · ${unpaid} unpaid`} href="/admin/bookings" tint="bg-coral-soft text-act-text" />
         <Stat icon="box" label="New requests" value={newReqs} sub="Lab tests, medicines and family care" href="/admin/requests" tint="bg-sun-soft text-check-text" />

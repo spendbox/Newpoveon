@@ -6,8 +6,10 @@ import { Icon } from "@/components/icons";
 import { Mannequin } from "@/components/mannequin";
 import { ButtonLink, Logo } from "@/components/ui";
 import { WhatsAppButton } from "@/components/whatsapp-catalog";
-import { STATUS_LABEL } from "@/lib/scoring/results";
+import { STATUS_LABEL, type ResultCard, type Results } from "@/lib/scoring/results";
+import { currentUser, supabaseConfigured, supabaseUser } from "@/lib/supabase/server";
 import { YourResult } from "./your-result";
+import { AccountLink } from "@/components/account-link";
 
 export function generateStaticParams() {
   return LEARN_ORDER.map((slug) => ({ slug }));
@@ -25,12 +27,22 @@ export default async function LearnPage({ params }: PageProps<"/learn/[slug]">) 
   const { slug } = await params;
   const t = LEARN[slug as LearnSlug];
   if (!t) notFound();
+  // Signed in: show the result saved to the account (the same one the dashboard shows).
+  let saved: ResultCard | null | undefined = undefined;
+  if (supabaseConfigured()) {
+    const user = await currentUser();
+    if (user) {
+      const sb = await supabaseUser();
+      const { data } = await sb.from("screenings").select("results").order("created_at", { ascending: false }).limit(1).maybeSingle();
+      saved = ((data?.results as Results | undefined)?.cards ?? []).find((c) => c.id === t.slug) ?? null;
+    }
+  }
 
   return (
     <main className="mx-auto w-full max-w-5xl px-5 pt-6 pb-20">
       <div className="flex items-center justify-between">
         <Logo />
-        <Link href="/learn" className="text-sm font-medium text-muted hover:text-ink">All topics</Link>
+        <div className="flex items-center gap-3"><Link href="/learn" className="hidden text-sm font-medium text-muted hover:text-ink sm:inline">All topics</Link><AccountLink /></div>
       </div>
 
       {/* Hero */}
@@ -49,7 +61,7 @@ export default async function LearnPage({ params }: PageProps<"/learn/[slug]">) 
 
       <div className="mt-6 grid gap-6 md:grid-cols-[1fr_320px]">
         <div className="flex flex-col gap-6">
-          <section className="md:hidden"><YourResult slug={t.slug} /></section>
+          <section className="md:hidden"><YourResult slug={t.slug} saved={saved} /></section>
 
           <section className="rounded-[var(--radius-xl)] border border-line bg-surface p-6" aria-labelledby="what">
             <h2 id="what" className="text-2xl font-semibold">What it is</h2>
@@ -113,7 +125,7 @@ export default async function LearnPage({ params }: PageProps<"/learn/[slug]">) 
         </div>
 
         <aside className="flex flex-col gap-4 md:sticky md:top-6 md:self-start">
-          <div className="hidden md:block"><YourResult slug={t.slug} /></div>
+          <div className="hidden md:block"><YourResult slug={t.slug} saved={saved} /></div>
           {t.test && (
             <div className="rounded-[var(--radius-xl)] border border-line bg-surface p-5">
               <span className="flex h-10 w-10 items-center justify-center rounded-[var(--radius-md)] bg-lavender-soft text-lavender"><Icon name="flask" size={20} strokeWidth={2} /></span>

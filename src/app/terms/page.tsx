@@ -74,6 +74,17 @@ export default function TermsPage() {
           ),
         },
         {
+          id: "plan", title: "Personal plans",
+          body: (
+            <ul>
+              <li>A personal plan costs <strong>₦{site.planPriceNaira.toLocaleString("en-NG")} for 12 months</strong>, paid once through Paystack. It does <strong>not</strong> renew automatically; we&apos;ll remind you before it ends.</li>
+              <li>Your plan gives general lifestyle guidance based on published guidelines. It is not medical treatment. If you have a heart condition, diabetes, are pregnant, or get chest pain, dizziness or unusual breathlessness when active, talk to a doctor before starting or stepping up.</li>
+              <li>You can ask for a <strong>full refund within 7 days</strong> of paying by emailing {mail}.</li>
+              <li>You can change your plan or switch off reminder emails at any time.</li>
+            </ul>
+          ),
+        },
+        {
           id: "tests", title: "Lab tests and medicines",
           body: (
             <ul>

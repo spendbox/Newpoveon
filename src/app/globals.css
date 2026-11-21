@@ -181,3 +181,7 @@ h1, h2, h3, .font-display {
 @keyframes pv-left { from { opacity: 0; transform: translate(-55%, 0) rotate(25deg) scale(.7); } }
 @keyframes pv-big { from { opacity: 0; transform: translate(30%, 30%) rotate(-20deg) scale(.75); } }
 @keyframes pv-word { from { opacity: 0; transform: translateX(-6px); } }
+
+/* Landing headline: each question glides up and comes into focus. */
+.rh-line { animation: rh-in .7s cubic-bezier(.2,.8,.2,1) both; }
+@keyframes rh-in { from { opacity: 0; transform: translateY(.45em); filter: blur(6px); } to { opacity: 1; transform: none; filter: none; } }

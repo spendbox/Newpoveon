@@ -4,7 +4,7 @@ import { Icon, type IconName } from "./icons";
 import { PoveonMark } from "./poveon-mark";
 import { site } from "@/config/site";
 import type { ResultCard as ResultCardData, Status } from "@/lib/scoring/results";
-import { STATUS_LABEL } from "@/lib/scoring/results";
+import { displayValue, STATUS_LABEL } from "@/lib/scoring/results";
 
 const base = "inline-flex items-center justify-center gap-2 whitespace-nowrap font-semibold transition-[background,box-shadow,transform,border-color] duration-150 disabled:cursor-not-allowed disabled:opacity-40";
 const primary = `${base} min-h-[54px] rounded-[var(--radius-md)] bg-primary px-6 text-[17px] text-white shadow-[var(--shadow-sm)] hover:bg-primary-hover hover:shadow-[var(--shadow-md)] active:translate-y-px`;
@@ -83,7 +83,7 @@ export function ResultCard({ card }: { card: ResultCardData }) {
         <h3 className="font-body text-sm font-medium tracking-normal text-muted">{card.topic}</h3>
         <StatusLabel status={card.status} />
       </div>
-      <p className="font-display text-xl leading-6 font-semibold">{card.value}</p>
+      <p className="font-display text-xl leading-6 font-semibold">{displayValue(card)}</p>
       <p className="text-[15px] leading-6 text-ink/90">{card.summary}</p>
       <p className="text-xs leading-5 text-subtle">{card.basis} An estimate, not a diagnosis.</p>
       <div className="mt-1 flex flex-wrap items-center gap-x-4 gap-y-2">

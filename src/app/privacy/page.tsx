@@ -36,6 +36,7 @@ export default function PrivacyPage() {
                 <li><strong>Contact details</strong>: your email address, and your phone or WhatsApp number if you give it.</li>
                 <li><strong>Account details</strong>: your email and a password (stored only in scrambled, &ldquo;hashed&rdquo; form by our database provider; we can never see it).</li>
                 <li><strong>Doctor consult details</strong>: your name, phone, email, the time you choose, your voice note, any written note, and any photos or documents you attach (for example lab results or a prescription).</li>
+                <li><strong>Your plan</strong>, if you have one: the areas you chose, your settings (such as your wake-up time or starting weight), the days you tick off and the weights you log.</li>
                 <li><strong>Messages</strong> you send us by email or WhatsApp, for example to request a lab test or medicine.</li>
               </ul>
               <p><strong>Information from others:</strong> Paystack tells us whether your payment succeeded, the amount and a reference. <strong>We never see or store your card or bank details.</strong></p>
@@ -62,6 +63,7 @@ export default function PrivacyPage() {
                 <li><strong>To provide a doctor consult you book</strong>, including sharing your voice note, note, attachments and (if you choose) your latest results with the doctor: to perform our <strong>contract</strong> with you, and with your <strong>explicit consent</strong> for the health information involved.</li>
                 <li><strong>To take payments and keep accounting records:</strong> to perform our contract with you, and to meet our <strong>legal obligations</strong> under Nigerian tax and company law.</li>
                 <li><strong>To send you emails you need</strong>, such as your results, login codes and booking confirmations: to perform our contract with you.</li>
+                <li><strong>To run your plan</strong>, including working out each week&apos;s targets and sending your Sunday summary and midweek nudge: to perform our contract with you. You can switch the emails off at any time on your plan page.</li>
                 <li><strong>To keep the service safe and working</strong> (for example preventing fraud and fixing faults): our <strong>legitimate interests</strong>, which we balance against your rights.</li>
                 <li><strong>In an emergency</strong>, if we believe someone&apos;s life is at risk: to protect their <strong>vital interests</strong>.</li>
               </ul>
@@ -106,6 +108,7 @@ export default function PrivacyPage() {
             <ul>
               <li><strong>Health check results:</strong> until you delete them or ask us to. If you have an account, you can delete everything yourself in <Link href="/account/settings">Settings</Link>.</li>
               <li><strong>Accounts:</strong> until you delete your account.</li>
+              <li><strong>Your plan and what you tick off:</strong> until you delete your account.</li>
               <li><strong>Consult records</strong> (including voice notes, notes and attachments): for as long as needed to provide your care and to meet medical record-keeping duties, after which they are deleted.</li>
               <li><strong>Payment and booking records:</strong> for up to 6 years, as required by Nigerian tax and accounting law. If you delete your account, these records are kept but are no longer linked to it.</li>
               <li><strong>Anonymous counts</strong> of checks started and finished: these contain nothing that identifies you.</li>
