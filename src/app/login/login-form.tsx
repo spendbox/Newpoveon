@@ -7,10 +7,11 @@ import { PasswordInput } from "@/components/client";
 type Step = "email" | "password" | "code";
 const MIN = 10;
 
-export function LoginForm({ next }: { next: string }) {
+/** `changeEmail`: used on Settings to change the password of the signed-in account (sends a code to that email). */
+export function LoginForm({ next, changeEmail }: { next: string; changeEmail?: string }) {
   const router = useRouter();
   const [step, setStep] = useState<Step>("email");
-  const [email, setEmail] = useState("");
+  const [email, setEmail] = useState(changeEmail ?? "");
   const [password, setPassword] = useState("");
   const [code, setCode] = useState("");
   const [newPass, setNewPass] = useState("");
@@ -53,7 +54,13 @@ export function LoginForm({ next }: { next: string }) {
 
   return (
     <div className="mt-6">
-      {step === "email" && (
+      {step === "email" && changeEmail && (
+        <div className="flex flex-col gap-3">
+          {error && <Notice tone="warn">{error}</Notice>}
+          <Button type="button" variant="secondary" disabled={busy} onClick={() => start(undefined, true)} icon="shield">{busy ? "Sending…" : "Email me a code"}</Button>
+        </div>
+      )}
+      {step === "email" && !changeEmail && (
         <form onSubmit={start} className="flex flex-col gap-4">
           <Field id="l-email" label="Email address">
             <input id="l-email" type="email" autoComplete="email" required className={inputCls} value={email} onChange={(e) => setEmail(e.target.value)} />
@@ -88,7 +95,7 @@ export function LoginForm({ next }: { next: string }) {
           <Button type="submit" disabled={busy || code.length < 6 || newPass.length < MIN} iconRight="arrowRight">{busy ? "Saving…" : forgot ? "Save new password" : "Create my account"}</Button>
           <div className="flex flex-wrap gap-4 text-sm">
             <button type="button" onClick={() => start(undefined, forgot)} disabled={busy} className="font-medium text-primary hover:underline">Send a new code</button>
-            <button type="button" onClick={back} className="text-muted hover:underline">Use a different email</button>
+            {!changeEmail && <button type="button" onClick={back} className="text-muted hover:underline">Use a different email</button>}
           </div>
         </form>
       )}
