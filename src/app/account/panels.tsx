@@ -46,7 +46,9 @@ export function NoChecksYet() {
 
 /* ------------------------------------------------------------------ Overview */
 
-export function OverviewPanel({ history }: { history: Row[] }) {
+export type PlanSummary = { active: boolean; pct?: number; week?: number } | null;
+
+export function OverviewPanel({ history, plan = null }: { history: Row[]; plan?: PlanSummary }) {
   const latest = history[0];
   if (!latest) return <NoChecksYet />;
   const r = latest.results;
@@ -99,6 +101,18 @@ export function OverviewPanel({ history }: { history: Row[] }) {
           <ButtonLink href="/account/retake" variant="secondary" icon="sparkle" className="shrink-0">Add it now</ButtonLink>
         </section>
       )}
+
+      <Link href="/account/plan" className="group flex items-center gap-4 rounded-[var(--radius-xl)] border border-primary/30 bg-primary-soft p-5 transition-shadow hover:shadow-[var(--shadow-md)]">
+        <span className="flex h-12 w-12 shrink-0 items-center justify-center rounded-[var(--radius-md)] bg-primary text-white"><Icon name="target" size={24} strokeWidth={2} /></span>
+        <span className="min-w-0 flex-1">
+          {plan?.active ? (
+            <><span className="block font-semibold">My plan · week {plan.week}</span><span className="block text-sm text-ink/70">{plan.pct}% done this week. Tap to tick off today.</span></>
+          ) : (
+            <><span className="block font-semibold">Turn your results into a plan</span><span className="block text-sm text-ink/70">Moving, sleep, weight or eating, with a daily check-off and a weekly review.</span></>
+          )}
+        </span>
+        <Icon name="arrowRight" size={18} strokeWidth={2} className="shrink-0 text-primary transition-transform group-hover:translate-x-0.5" />
+      </Link>
 
       <section aria-labelledby="scores">
         <div className="flex items-center justify-between">

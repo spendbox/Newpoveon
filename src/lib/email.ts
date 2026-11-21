@@ -31,7 +31,7 @@ export async function sendEmail(to: string | string[], subject: string, html: st
 
 /* ------------------------------------------------------------------ Layout */
 
-function layout(title: string, body: string) {
+export function layout(title: string, body: string) {
   return `<!doctype html><html><body style="margin:0;background:#F6F8F7;font-family:Inter,Arial,sans-serif;color:#10221D">
 <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background:#F6F8F7"><tr><td align="center" style="padding:24px 12px">
 <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="max-width:520px">
@@ -46,7 +46,7 @@ ${body}
 </table></td></tr></table></body></html>`;
 }
 
-const button = (href: string, label: string) =>
+export const button = (href: string, label: string) =>
   `<a href="${href}" style="display:inline-block;background:#136F58;color:#FFFFFF;border-radius:12px;padding:14px 22px;font-weight:600;text-decoration:none;font-size:16px">${esc(label)}</a>`;
 
 /* ------------------------------------------------------------------ Login code */

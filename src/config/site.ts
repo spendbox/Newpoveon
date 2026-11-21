@@ -30,6 +30,8 @@ export const site = {
 
   /** How long an unpaid booking holds a time slot before it is released. */
   slotHoldMinutes: 30,
+  /** Yearly price of a personal plan, in naira (env: PLAN_PRICE_NAIRA). */
+  planPriceNaira: Number(process.env.PLAN_PRICE_NAIRA) || 1500,
 
   /** Where team notifications go (env: TEAM_NOTIFICATION_EMAIL). Server only. */
   teamEmail: process.env.TEAM_NOTIFICATION_EMAIL || "",
