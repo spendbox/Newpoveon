@@ -1,7 +1,7 @@
 import { SideNav, type NavGroup } from "@/components/side-nav";
 
 const GROUPS: NavGroup[] = [
-  { title: "", items: [["/account", "Overview", "home"], ["/account/retake", "Retake the check", "sparkle"]] },
+  { title: "", items: [["/account", "Overview", "home"]] },
   { title: "My health", items: [["/account/results", "Results", "clipboard"], ["/account/progress", "Progress", "gauge"], ["/account/checkups", "Check-ups", "shield"]] },
   { title: "Care", items: [["/account/bookings", "Doctor bookings", "stethoscope"], ["/home-tests", "Lab tests", "flask"], ["/medication", "Medication", "box"]] },
   { title: "Account", items: [["/account/edit", "My answers", "edit"], ["/account/settings", "Settings", "user"]] },
