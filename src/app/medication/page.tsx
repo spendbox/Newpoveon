@@ -28,7 +28,7 @@ export default function MedicationPage() {
           <span className="flex h-10 w-10 items-center justify-center rounded-[var(--radius-md)] bg-primary-soft text-primary"><Icon name="shield" size={20} strokeWidth={2} /></span>
           <h2 id="verify-title" className="text-2xl font-semibold md:text-3xl">Is your medicine real?</h2>
         </div>
-        <p className="mt-2 max-w-2xl text-[16px] text-muted">Every genuine medicine sold in Nigeria has a NAFDAC number on the pack. Check it on NAFDAC&apos;s website in under a minute, whoever you bought it from. Here&apos;s how:</p>
+        <p className="mt-2 max-w-2xl text-[16px] text-muted">Every genuine medicine sold in Nigeria has a NAFDAC number on the pack. Check it on NAFDAC&apos;s website in under a minute. Here&apos;s how:</p>
         <div className="mt-5"><NafdacDemo /></div>
         <a href={NAFDAC_CHECK_URL} target="_blank" rel="noopener noreferrer" className="mt-5 inline-flex min-h-[54px] w-full items-center justify-center gap-2 rounded-[var(--radius-md)] bg-primary px-6 text-[17px] font-semibold text-white shadow-[var(--shadow-sm)] hover:bg-primary-hover md:w-auto">
           Open the NAFDAC website <Icon name="arrowRight" size={18} strokeWidth={2} />

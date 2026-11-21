@@ -1,6 +1,8 @@
 "use server";
 import { revalidatePath } from "next/cache";
 import { supabaseAdmin } from "@/lib/supabase/server";
+import { redirect } from "next/navigation";
+import { deleteUserAndData } from "@/lib/delete-user";
 import { requireAdmin } from "./guard";
 
 const str = (f: FormData, k: string, max = 500) => String(f.get(k) ?? "").trim().slice(0, max);
@@ -284,4 +286,20 @@ export async function saveCareOption(f: FormData) {
   if (id) await supabaseAdmin().from("care_options").update(row).eq("id", id);
   else await supabaseAdmin().from("care_options").insert(row);
   revalidatePricing();
+}
+
+/* ---------------- Users ---------------- */
+/** Delete a registered user and their saved checks. The admin must type the user's email to confirm. */
+export async function deleteUser(f: FormData) {
+  await requireAdmin();
+  const id = uuid(f, "id");
+  const confirm = str(f, "confirm", 320).toLowerCase();
+  const sb = supabaseAdmin();
+  const { data: profile } = await sb.from("profiles").select("email").eq("id", id).maybeSingle();
+  const email = (profile?.email ?? "").toLowerCase();
+  if (!email || confirm !== email) redirect(`/admin/users?error=confirm&open=${id}`);
+  await deleteUserAndData(id, email);
+  revalidatePath("/admin/users");
+  revalidatePath("/admin");
+  redirect("/admin/users?deleted=1");
 }

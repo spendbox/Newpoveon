@@ -12,8 +12,10 @@ const VIEWS = { upcoming: "Paid · upcoming", done: "Done", unpaid: "Unpaid", al
 export default async function BookingsPage({ searchParams }: PageProps<"/admin/bookings">) {
   const sp = await searchParams;
   const view = (typeof sp.view === "string" && sp.view in VIEWS ? sp.view : "upcoming") as keyof typeof VIEWS;
+  const email = typeof sp.q === "string" ? sp.q.trim().toLowerCase().slice(0, 320) : "";
   let q = supabaseAdmin().from("bookings").select("*, screenings(results, created_at)").limit(200);
-  if (view === "upcoming") q = q.eq("status", "paid").order("slot_starts_at", { ascending: true, nullsFirst: true });
+  if (email) q = q.eq("email", email).order("created_at", { ascending: false });
+  else if (view === "upcoming") q = q.eq("status", "paid").order("slot_starts_at", { ascending: true, nullsFirst: true });
   else if (view === "done") q = q.eq("status", "completed").order("slot_starts_at", { ascending: false });
   else if (view === "unpaid") q = q.eq("status", "pending_payment").order("created_at", { ascending: false });
   else q = q.order("created_at", { ascending: false });
@@ -28,7 +30,8 @@ export default async function BookingsPage({ searchParams }: PageProps<"/admin/b
   return (
     <>
       <H1 sub={`Consult fees are set per type in Consults. Payments are confirmed by Paystack on the server.`}>Doctor bookings</H1>
-      <Tabs active={view} items={Object.entries(VIEWS).map(([k, label]) => ({ key: k, label, href: `/admin/bookings?view=${k}` }))} />
+      {email && <p className="mb-4 rounded-lg bg-ground px-4 py-2 text-sm font-medium">All bookings for {email} · <a href="/admin/bookings" className="underline">Show everyone</a></p>}
+      <Tabs active={email ? "" : view} items={Object.entries(VIEWS).map(([k, label]) => ({ key: k, label, href: `/admin/bookings?view=${k}` }))} />
       <div className="flex flex-col gap-3">
         {(rows ?? []).length === 0 && <Card>Nothing here yet.</Card>}
         {(rows ?? []).map((b) => {
