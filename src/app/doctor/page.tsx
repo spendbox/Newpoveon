@@ -1,11 +1,9 @@
 export const dynamic = "force-dynamic";
 import type { Metadata } from "next";
-import Link from "next/link";
-import { Icon } from "@/components/icons";
 import { Logo } from "@/components/ui";
 import { bookableConsultTypes, type ConsultType } from "@/lib/consults";
 import { supabaseConfigured } from "@/lib/supabase/server";
-import { BookingForm } from "./booking-form";
+import { BookingForm, LeaveBookingButton } from "./booking-form";
 
 export const metadata: Metadata = { title: "Get help with a health concern" };
 
@@ -25,7 +23,7 @@ export default async function DoctorPage({ searchParams }: PageProps<"/doctor">)
     <main className="mx-auto w-full max-w-[640px] px-5">
       <div className="flex h-[72px] items-center justify-between">
         <Logo />
-        <Link href="/" aria-label="Close" className="flex h-10 w-10 items-center justify-center rounded-full border border-line bg-surface hover:bg-surface-2"><Icon name="close" size={18} strokeWidth={2} /></Link>
+        <LeaveBookingButton />
       </div>
       <BookingForm types={types} preselect={preselect} defaultReason={sp.reason === "support" ? "I'd like to talk to someone about how I've been feeling." : ""} />
     </main>

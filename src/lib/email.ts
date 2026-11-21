@@ -40,7 +40,7 @@ function layout(title: string, body: string) {
 <h1 style="margin:0 0 12px;font-size:24px;line-height:28px">${esc(title)}</h1>
 ${body}
 </td></tr>
-<tr><td style="padding:16px 4px;font-size:12px;color:#5E706A">${esc(site.appName)}. Results are estimates, not diagnoses. In an emergency call 112.
+<tr><td style="padding:16px 4px;font-size:12px;color:#5E706A">${esc(site.legal.name)}, ${esc(site.legal.rc)}, ${esc(site.legal.address)}. Results are estimates, not diagnoses. In an emergency call 112.
 <br><a href="${site.siteUrl}/privacy" style="color:#5E706A">Privacy</a></td></tr>
 </table></td></tr></table></body></html>`;
 }

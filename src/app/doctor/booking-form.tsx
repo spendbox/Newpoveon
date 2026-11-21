@@ -1,10 +1,10 @@
 "use client";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { Icon } from "@/components/icons";
 import { AnswerTile } from "@/components/client";
 import { AttachmentsInput } from "@/components/attachments-input";
-import { Field, inputCls, Notice } from "@/components/ui";
+import { Button, Field, inputCls, Notice } from "@/components/ui";
 import { Steps, type Step } from "@/components/steps";
 import { VoiceNote } from "@/components/voice-note";
 import { loadSaved } from "@/lib/storage";
@@ -74,6 +74,29 @@ export function BookingForm({ types, preselect, defaultReason }: { types: Type[]
   const [saved, setSaved] = useState<ReturnType<typeof loadSaved>>(null);
   const [myTz, setMyTz] = useState<string | null>(null);
   const now = useNow();
+  const [leaving, setLeaving] = useState(false);
+  const allowLeave = useRef(false);
+  const dirty = !!voice || reason.trim().length > 0 || files.length > 0;
+
+  // The ✕ in the page header asks the same question.
+  useEffect(() => {
+    const ask = () => (types.length ? setLeaving(true) : router.push("/"));
+    window.addEventListener("hc:leave-booking", ask);
+    return () => window.removeEventListener("hc:leave-booking", ask);
+  }, [types.length, router]);
+  // Closing the tab or refreshing with a recording in progress: let the browser warn.
+  useEffect(() => {
+    if (!dirty) return;
+    const warn = (e: BeforeUnloadEvent) => { if (!allowLeave.current) e.preventDefault(); };
+    window.addEventListener("beforeunload", warn);
+    return () => window.removeEventListener("beforeunload", warn);
+  }, [dirty]);
+  useEffect(() => {
+    if (!leaving) return;
+    const onKey = (e: KeyboardEvent) => e.key === "Escape" && setLeaving(false);
+    document.addEventListener("keydown", onKey);
+    return () => document.removeEventListener("keydown", onKey);
+  }, [leaving]);
 
   useEffect(() => {
     const s = loadSaved();
@@ -211,8 +234,9 @@ export function BookingForm({ types, preselect, defaultReason }: { types: Type[]
     },
   ];
 
+  // Safety first: danger signs are checked before anything else.
   if (type?.urgent_check) {
-    steps.push({
+    steps.unshift({
       key: "safety", title: "First, a quick safety check", hint: "Do you have any of these right now?", valid: danger === "no",
       content: (
         <>
@@ -236,11 +260,11 @@ export function BookingForm({ types, preselect, defaultReason }: { types: Type[]
 
   steps.push(
     {
-      key: "time", title: "When suits you?", valid: Boolean(startsAt || callMe || (slots && slots.length === 0)),
+      key: "time", title: "When should your consult start?", hint: `Pick a start time. Your doctor will call you then, and the consult lasts about ${type?.duration_min ?? 20} minutes.`, valid: Boolean(startsAt || callMe || (slots && slots.length === 0)),
       content: slots === null ? (
         <p className="text-muted">Finding times…</p>
       ) : slots.length === 0 ? (
-        <Notice>No times are open online right now. Carry on and we&apos;ll call you to agree a time.</Notice>
+        <Notice>No start times are open online right now. Carry on and we&apos;ll call you to agree when your consult starts.</Notice>
       ) : (
         <>
           <div className="flex items-center justify-between gap-3 rounded-[var(--radius-lg)] bg-surface-2 px-4 py-3">
@@ -310,11 +334,11 @@ export function BookingForm({ types, preselect, defaultReason }: { types: Type[]
           )}
 
           {startsAt && (
-            <p className="flex items-center gap-2 rounded-[var(--radius-md)] bg-primary-soft px-4 py-3 text-sm font-medium text-primary"><Icon name="check" size={16} strokeWidth={2.6} /> {longDay.format(new Date(startsAt))} at {time.format(new Date(startsAt))}</p>
+            <p className="flex items-center gap-2 rounded-[var(--radius-md)] bg-primary-soft px-4 py-3 text-sm font-medium text-primary"><Icon name="check" size={16} strokeWidth={2.6} /> Starts {longDay.format(new Date(startsAt))} at {time.format(new Date(startsAt))}, ends about {time.format(new Date(new Date(startsAt).getTime() + (type?.duration_min ?? 20) * 60000))}</p>
           )}
           <label className="flex items-center gap-2 text-sm">
             <input type="checkbox" className="h-5 w-5 accent-[#136F58]" checked={callMe} onChange={(e) => { setCallMe(e.target.checked); if (e.target.checked) setStartsAt(null); }} />
-            None of these suit me. Call me to agree a time.
+            None of these work. Call me to agree a start time.
           </label>
         </>
       ),
@@ -336,7 +360,7 @@ export function BookingForm({ types, preselect, defaultReason }: { types: Type[]
           <dl className="grid gap-2.5 rounded-[var(--radius-lg)] bg-surface-2 p-4 text-sm">
             {topic && <div className="flex justify-between gap-4"><dt className="text-muted">About</dt><dd className="text-right font-medium">{topic.name}</dd></div>}
             <div className="flex justify-between gap-4"><dt className="text-muted">You&apos;ll see</dt><dd className="text-right font-medium">A {type.doctor_type.toLowerCase()}, about {type.duration_min} min</dd></div>
-            <div className="flex justify-between gap-4"><dt className="text-muted">When</dt><dd className="text-right font-medium">{startsAt ? `${longDay.format(new Date(startsAt))}, ${time.format(new Date(startsAt))}` : "We'll call to agree a time"}</dd></div>
+            <div className="flex justify-between gap-4"><dt className="text-muted">Starts</dt><dd className="text-right font-medium">{startsAt ? `${longDay.format(new Date(startsAt))}, ${time.format(new Date(startsAt))}` : "We'll call to agree a start time"}</dd></div>
             <div className="flex justify-between gap-4"><dt className="text-muted">Your message</dt><dd className="text-right font-medium">{[voice && "Voice note", reason.trim() && "Note", files.length && `${files.length} file${files.length > 1 ? "s" : ""}`].filter(Boolean).join(" + ")}</dd></div>
             <div className="flex justify-between gap-4 border-t border-line pt-2.5"><dt className="text-muted">Fee</dt><dd className="text-right text-base font-semibold tabular">{type.price_naira != null ? ngn(type.price_naira) : "—"}</dd></div>
           </dl>
@@ -350,5 +374,31 @@ export function BookingForm({ types, preselect, defaultReason }: { types: Type[]
     },
   );
 
-  return <Steps variant="full" steps={steps} onSubmit={submit} onExit={() => router.push("/")} submitLabel={type?.price_naira != null ? `Pay ${ngn(type.price_naira)} and book` : "Book"} busy={busy} error={error} />;
+  return (
+    <>
+      <Steps variant="full" steps={steps} onSubmit={submit} onExit={() => setLeaving(true)} submitLabel={type?.price_naira != null ? `Pay ${ngn(type.price_naira)} and book` : "Book"} busy={busy} error={error} />
+      {leaving && (
+        <div className="fixed inset-0 z-50 flex items-end justify-center bg-ink/40 p-4 sm:items-center" role="dialog" aria-modal="true" aria-labelledby="leave-title" onClick={() => setLeaving(false)}>
+          <div className="w-full max-w-sm rounded-[var(--radius-xl)] bg-surface p-6 shadow-[var(--shadow-lg)]" onClick={(e) => e.stopPropagation()}>
+            <h2 id="leave-title" className="text-xl font-semibold">Stop booking?</h2>
+            <p className="mt-1 text-[15px] text-muted">{dirty ? "Your voice note, note and files won't be saved, and no consult will be booked." : "No consult will be booked."}</p>
+            <div className="mt-5 flex flex-col gap-2">
+              <Button autoFocus onClick={() => setLeaving(false)}>Keep booking</Button>
+              <Button variant="secondary" onClick={() => { allowLeave.current = true; router.push("/"); }}>Yes, leave</Button>
+            </div>
+          </div>
+        </div>
+      )}
+    </>
+  );
+}
+
+/** The ✕ in the booking page header: asks before leaving. */
+export function LeaveBookingButton() {
+  return (
+    <button type="button" onClick={() => window.dispatchEvent(new Event("hc:leave-booking"))} aria-label="Close"
+      className="flex h-10 w-10 items-center justify-center rounded-full border border-line bg-surface hover:bg-surface-2">
+      <Icon name="close" size={18} strokeWidth={2} />
+    </button>
+  );
 }

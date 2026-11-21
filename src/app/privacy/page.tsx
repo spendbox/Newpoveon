@@ -1,44 +1,160 @@
 import type { Metadata } from "next";
+import Link from "next/link";
 import { site } from "@/config/site";
-import { Logo } from "@/components/ui";
+import { LegalPage } from "@/components/legal-page";
 
-export const metadata: Metadata = { title: "Privacy notice" };
+export const metadata: Metadata = { title: "Privacy notice", description: "How Poveon LTD collects, uses and protects your personal and health information." };
 
-/** PLACEHOLDER TEXT — to be reviewed by Poveon and a Nigerian data-protection adviser before launch. */
 export default function PrivacyPage() {
+  const L = site.legal;
+  const mail = <a href={`mailto:${L.email}`}>{L.email}</a>;
   return (
-    <main className="mx-auto w-full max-w-2xl px-6 pt-7">
-      <Logo />
-      <article className="mt-6 flex flex-col gap-4 text-[16px] leading-relaxed [&_h2]:mt-4 [&_h2]:text-2xl">
-        <p className="rounded-[var(--radius-md)] bg-check-bg px-4 py-3 text-sm font-semibold text-check-text">Draft for review. [POVEON TO REVIEW WITH A DATA PROTECTION ADVISER BEFORE LAUNCH]</p>
-        <h1 className="text-[34px] leading-tight">Privacy notice</h1>
-        <p>This notice explains how {site.companyName} ([COMPANY LEGAL NAME], [REGISTERED ADDRESS], RC [NUMBER]) uses your information when you use {site.appName}. We follow the Nigeria Data Protection Act 2023 (NDPA).</p>
-        <h2>What we collect</h2>
-        <ul className="list-disc pl-6">
-          <li>Your answers to the health questions, and the results we calculate.</li>
-          <li>Your email, and your phone or WhatsApp number if you give it.</li>
-          <li>If you book a doctor or request a service: your name, phone, email, address, reason and appointment time.</li>
-          <li>Payment confirmations from Paystack (we never see or store your card details).</li>
-          <li>Simple counts of how many checks are started and finished, with no answers or identifiers attached.</li>
-        </ul>
-        <h2>Before you give us your email</h2>
-        <p>While you answer, your answers are kept only on your own device. Nothing is sent to us until you enter your email and tick the consent box.</p>
-        <h2>Why we use it, and our legal basis</h2>
-        <p>Health information is sensitive personal data. We use it only with your consent, to show and email your results, to keep your history if you have an account, and, if you choose, to share your results with the doctor you book. We use booking and payment details to provide the service you paid for.</p>
-        <h2>Who we share it with</h2>
-        <p>Only the service providers we need: Supabase (secure database), Resend (email delivery), Paystack (payments) and Vercel (hosting). They process data only on our instructions. [CONFIRM DATA LOCATIONS AND CROSS-BORDER TRANSFER SAFEGUARDS UNDER NDPA PART VIII.] We do not sell your data and we do not use advertising or analytics tools that receive your health answers.</p>
-        <h2>Share links</h2>
-        <p>If you create a share link, anyone with the link can see a short summary (heart age, diabetes risk and activity). Mood, worry and alcohol results are never included. You can turn the link off at any time.</p>
-        <h2>How long we keep it</h2>
-        <p>[RETENTION PERIOD, e.g. results kept until you delete them or for X years of inactivity.] Payment and booking records may be kept for [X] years for accounting and legal reasons.</p>
-        <h2>Your rights</h2>
-        <p>You can ask to see, correct, move or delete your data, and withdraw consent at any time. With an account, you can delete everything yourself from My account. Otherwise email [PRIVACY EMAIL]. You can also complain to the Nigeria Data Protection Commission.</p>
-        <h2>Security</h2>
-        <p>Data is encrypted in transit, access is restricted so people only ever see their own results, and only authorised staff can see bookings and requests.</p>
-        <h2>Contact</h2>
-        <p>Data protection officer: [NAME], [EMAIL], [PHONE].</p>
-        <p className="text-sm text-subtle">Last updated: [DATE]</p>
-      </article>
-    </main>
+    <LegalPage
+      title="Privacy notice"
+      intro={
+        <p>
+          This notice explains what personal information {L.name} (&ldquo;Poveon&rdquo;, &ldquo;we&rdquo;, &ldquo;us&rdquo;) collects when you use our website and services, why we use it, who we share it with, and the rights you have. We are the data controller for your information, and we process it in line with the <strong>Nigeria Data Protection Act 2023</strong> (NDPA) and the rules of the Nigeria Data Protection Commission (NDPC).
+        </p>
+      }
+      sections={[
+        {
+          id: "who", title: "Who we are",
+          body: (
+            <>
+              <p>{L.name} is a company registered in Nigeria ({L.rc}), with its office in {L.address}. Poveon offers a free online health check, doctor consults, and help arranging lab tests and medicines.</p>
+              <p>Our Data Protection Officer is <strong>{L.dpo}</strong>. You can reach them at {mail} or on <a href={`tel:${L.phoneIntl}`}>{L.phone}</a>.</p>
+            </>
+          ),
+        },
+        {
+          id: "collect", title: "What we collect",
+          body: (
+            <>
+              <p><strong>Information you give us:</strong></p>
+              <ul>
+                <li><strong>Health check answers</strong>, such as your date of birth, sex, height, weight, waist, blood pressure, smoking, activity, sleep, alcohol, mood, worry and wellbeing, and the results we calculate from them.</li>
+                <li><strong>Contact details</strong>: your email address, and your phone or WhatsApp number if you give it.</li>
+                <li><strong>Account details</strong>: your email and a password (stored only in scrambled, &ldquo;hashed&rdquo; form by our database provider; we can never see it).</li>
+                <li><strong>Doctor consult details</strong>: your name, phone, email, the time you choose, your voice note, any written note, and any photos or documents you attach (for example lab results or a prescription).</li>
+                <li><strong>Messages</strong> you send us by email or WhatsApp, for example to request a lab test or medicine.</li>
+              </ul>
+              <p><strong>Information from others:</strong> Paystack tells us whether your payment succeeded, the amount and a reference. <strong>We never see or store your card or bank details.</strong></p>
+              <p><strong>Information collected automatically:</strong> a simple count of how many health checks are started and finished, with no answers or identifiers attached; and the basic technical logs every website keeps (such as IP address and browser type) for security and to fix problems. We do <strong>not</strong> use advertising cookies, and no analytics or advertising company receives your health answers.</p>
+            </>
+          ),
+        },
+        {
+          id: "device", title: "What stays on your phone",
+          body: (
+            <>
+              <p>While you answer the health check, your answers are saved only on your own device so you don&apos;t lose your place. <strong>Nothing is sent to us until you enter your email and tick the consent box</strong> to see your results.</p>
+              <p>We use a small number of essential cookies and browser storage: to keep you logged in, to keep your place in the check, and to remember settings like whether you have seen the logo animation. You can clear these at any time in your browser settings.</p>
+            </>
+          ),
+        },
+        {
+          id: "why", title: "Why we use it, and our legal basis",
+          body: (
+            <>
+              <p>Health information is <strong>sensitive personal data</strong> under the NDPA, so we take extra care with it.</p>
+              <ul>
+                <li><strong>To show and email your results, and keep your history:</strong> based on your <strong>explicit consent</strong>, which you give when you tick the consent box. You can withdraw it at any time (see section 9).</li>
+                <li><strong>To provide a doctor consult you book</strong>, including sharing your voice note, note, attachments and (if you choose) your latest results with the doctor: to perform our <strong>contract</strong> with you, and with your <strong>explicit consent</strong> for the health information involved.</li>
+                <li><strong>To take payments and keep accounting records:</strong> to perform our contract with you, and to meet our <strong>legal obligations</strong> under Nigerian tax and company law.</li>
+                <li><strong>To send you emails you need</strong>, such as your results, login codes and booking confirmations: to perform our contract with you.</li>
+                <li><strong>To keep the service safe and working</strong> (for example preventing fraud and fixing faults): our <strong>legitimate interests</strong>, which we balance against your rights.</li>
+                <li><strong>In an emergency</strong>, if we believe someone&apos;s life is at risk: to protect their <strong>vital interests</strong>.</li>
+              </ul>
+              <p>We do not send marketing messages without your permission, and we never sell your information.</p>
+            </>
+          ),
+        },
+        {
+          id: "automated", title: "How your scores are worked out",
+          body: (
+            <>
+              <p>Your results are calculated automatically from your answers using published, validated screening tools (such as the WHO cardiovascular risk charts, FINDRISC, PHQ-9, GAD-7, AUDIT-C, STOP-Bang and the WHO-5 Well-Being Index). They are <strong>estimates, not a diagnosis</strong>, and they are not used to make any decision about you that has legal or similarly significant effects.</p>
+              <p>You can always ask one of our doctors to review your results with you.</p>
+            </>
+          ),
+        },
+        {
+          id: "share", title: "Who we share it with",
+          body: (
+            <>
+              <p>We share only what is needed, only with:</p>
+              <ul>
+                <li><strong>Our doctors</strong>, for consults you book.</li>
+                <li><strong>Service providers</strong> that run parts of Poveon for us and may only use your information on our instructions: <strong>Supabase</strong> (secure database and file storage), <strong>Vercel</strong> (website hosting), <strong>Resend</strong> (email delivery) and <strong>Paystack</strong> (payments).</li>
+                <li><strong>Partner labs and pharmacies</strong>, only when you ask us to arrange a test or medicine, and only the details they need to do it.</li>
+                <li><strong>WhatsApp</strong>, only when you choose to message us there. WhatsApp is run by Meta under its own privacy policy.</li>
+                <li><strong>Authorities</strong>, if the law requires it, for example a valid court order.</li>
+              </ul>
+              <p><strong>Share links:</strong> if you create a share link for your results, anyone with the link can see a short summary: your age, heart age and heart risk, diabetes risk and activity. Mood, worry, wellbeing, alcohol and sleep results are never included. You can switch the link off at any time.</p>
+            </>
+          ),
+        },
+        {
+          id: "abroad", title: "Storing information outside Nigeria",
+          body: (
+            <p>Some of our service providers store or process information on servers outside Nigeria, for example in the European Union or the United States. When this happens, we rely on the safeguards allowed by Part VIII of the NDPA: transfers to countries with adequate data protection, or contracts that require the provider to protect your information to the standard Nigerian law expects. You can ask us for more details.</p>
+          ),
+        },
+        {
+          id: "keep", title: "How long we keep it",
+          body: (
+            <ul>
+              <li><strong>Health check results:</strong> until you delete them or ask us to. If you have an account, you can delete everything yourself in <Link href="/account/settings">Settings</Link>.</li>
+              <li><strong>Accounts:</strong> until you delete your account.</li>
+              <li><strong>Consult records</strong> (including voice notes, notes and attachments): for as long as needed to provide your care and to meet medical record-keeping duties, after which they are deleted.</li>
+              <li><strong>Payment and booking records:</strong> for up to 6 years, as required by Nigerian tax and accounting law. If you delete your account, these records are kept but are no longer linked to it.</li>
+              <li><strong>Anonymous counts</strong> of checks started and finished: these contain nothing that identifies you.</li>
+            </ul>
+          ),
+        },
+        {
+          id: "rights", title: "Your rights",
+          body: (
+            <>
+              <p>Under the NDPA you have the right to:</p>
+              <ul>
+                <li>be told how your information is used (this notice);</li>
+                <li>get a copy of your information;</li>
+                <li>have wrong information corrected;</li>
+                <li>have your information deleted;</li>
+                <li>restrict or object to how we use it;</li>
+                <li>receive your information in a common format and move it to another provider;</li>
+                <li><strong>withdraw your consent at any time</strong>, without affecting anything we did before;</li>
+                <li>not be subject to decisions made solely by automated means that significantly affect you.</li>
+              </ul>
+              <p>To use any of these rights, email {mail} or call <a href={`tel:${L.phoneIntl}`}>{L.phone}</a>. We will reply within 30 days. If you are unhappy with how we handle your information, you can complain to the <strong>Nigeria Data Protection Commission</strong> (ndpc.gov.ng).</p>
+            </>
+          ),
+        },
+        {
+          id: "security", title: "How we protect it",
+          body: (
+            <ul>
+              <li>Information is encrypted when it travels between your device and us.</li>
+              <li>Database rules make sure each person can only ever see their own results.</li>
+              <li>Voice notes and attachments are kept in private storage that only authorised staff can open, using links that expire after an hour.</li>
+              <li>Only authorised staff can see bookings and requests, and the admin area shows no health answers except what you share for a consult.</li>
+            </ul>
+          ),
+        },
+        {
+          id: "children", title: "Children",
+          body: <p>Poveon is for adults aged 18 and over. We don&apos;t knowingly collect information from children. If you think a child has used Poveon, contact us and we will delete their information.</p>,
+        },
+        {
+          id: "changes", title: "Changes to this notice",
+          body: <p>We may update this notice from time to time. We will show the new effective date at the top, and tell you by email or on the site if the changes are significant.</p>,
+        },
+        {
+          id: "contact", title: "Contact us",
+          body: <p>Questions about privacy or your information: our Data Protection Officer, {L.dpo}, at {mail}, on <a href={`tel:${L.phoneIntl}`}>{L.phone}</a>, or by post to {L.name}, {L.address}.</p>,
+        },
+      ]}
+    />
   );
 }

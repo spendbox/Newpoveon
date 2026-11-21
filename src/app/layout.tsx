@@ -34,6 +34,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
           <p>
             {site.appName} gives estimates, not diagnoses. In an emergency call <a href="tel:112" className="underline">112</a>.
           </p>
+          <p className="mt-1">© {new Date().getFullYear()} {site.legal.name} · {site.legal.rc} · {site.legal.address}</p>
           <nav className="mt-2 flex flex-wrap justify-center gap-x-4 gap-y-1" aria-label="Footer">
             <Link href="/privacy" className="underline">Privacy</Link>
             <Link href="/terms" className="underline">Terms</Link>
