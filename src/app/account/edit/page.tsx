@@ -1,12 +1,11 @@
 export const dynamic = "force-dynamic";
 import type { Metadata } from "next";
 import { redirect } from "next/navigation";
-import { Logo } from "@/components/ui";
 import type { Answers } from "@/lib/questions";
 import { currentUser, supabaseConfigured, supabaseUser } from "@/lib/supabase/server";
 import { EditAnswers } from "./edit-answers";
 
-export const metadata: Metadata = { title: "Update my answers", robots: { index: false } };
+export const metadata: Metadata = { title: "My answers", robots: { index: false } };
 
 export default async function EditPage() {
   if (!supabaseConfigured()) redirect("/account");
@@ -20,11 +19,11 @@ export default async function EditPage() {
     answers = (data?.answers ?? {}) as Answers;
   }
   return (
-    <main className="mx-auto w-full max-w-[430px] px-6 pt-7 md:max-w-2xl">
-      <Logo />
-      <h1 className="mt-6 text-[30px] leading-[1.05]">Update my answers</h1>
+    <div className="max-w-2xl">
+      <p className="text-[13px] font-semibold tracking-[0.06em] text-primary uppercase">Account</p>
+      <h1 className="mt-1 text-[30px] leading-[1.05] font-bold md:text-4xl">My answers</h1>
       <p className="mt-1 text-muted">Change anything that&apos;s different now, like your weight, smoking or a new blood pressure reading. Your scores will be recalculated and added to your history.</p>
       <EditAnswers initial={answers} />
-    </main>
+    </div>
   );
 }
