@@ -13,7 +13,7 @@ import { WellbeingHero } from "@/components/score-widgets";
 import { ShareSection } from "./share-section";
 import { Steps } from "@/components/steps";
 import { isComplete } from "@/lib/questions";
-import { computeResults, type Results } from "@/lib/scoring/results";
+import { computeResults, displayValue, type Results } from "@/lib/scoring/results";
 import { loadPrefill, loadProgress, loadSaved, saveSaved, type Progress, type SavedScreening } from "@/lib/storage";
 
 export function ResultsView() {
@@ -267,7 +267,7 @@ function Reveal({ results, saved }: { results: Results; saved: SavedScreening | 
             >
               <StatusLabel status={c.status} />
               <span className="text-[13px] text-muted">{c.topic}</span>
-              <span className="font-display text-[18px] leading-[22px] font-semibold">{c.value}</span>
+              <span className="font-display text-[18px] leading-[22px] font-semibold">{displayValue(c)}</span>
             </motion.a>
           ))}
         </div>
@@ -279,7 +279,7 @@ function Reveal({ results, saved }: { results: Results; saved: SavedScreening | 
         <p className="mt-1 text-[15px] text-muted">Tap a point to see your result there and how to improve it.</p>
         <div className="mt-6">
           <BodyMap mode="results"
-            results={Object.fromEntries(results.cards.map((c) => [c.id, { status: c.status, value: c.value, summary: c.summary }]))} />
+            results={Object.fromEntries(results.cards.map((c) => [c.id, { status: c.status, value: displayValue(c), summary: c.summary }]))} />
         </div>
       </section>
 

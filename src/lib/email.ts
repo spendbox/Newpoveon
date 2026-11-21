@@ -1,7 +1,7 @@
 import "server-only";
 import { Resend } from "resend";
 import { site } from "@/config/site";
-import { STATUS_LABEL, type Results } from "@/lib/scoring/results";
+import { displayValue, STATUS_LABEL, type Results } from "@/lib/scoring/results";
 import { clockTime } from "@/lib/time";
 
 export const emailConfigured = () => Boolean(process.env.RESEND_API_KEY);
@@ -84,7 +84,7 @@ export function resultsEmail(r: Results) {
       (c) => `<tr><td style="padding:6px 0"><div style="background:${c.status === "good" ? "#E6F4EE" : "#FFF4DC"};border-radius:16px;padding:12px 14px">
 <div style="font-size:12px;font-weight:800;color:${c.status === "good" ? "#116149" : "#7A4A00"}">${c.status === "good" ? "&#10003;" : "&#9888;"} ${STATUS_LABEL[c.status]}</div>
 <div style="font-size:13px;font-weight:700;color:#5E706A">${esc(c.topic)}</div>
-<div style="font-size:18px;font-weight:800">${esc(c.value)}</div>
+<div style="font-size:18px;font-weight:800">${esc(displayValue(c))}</div>
 <div style="font-size:14px;margin-top:4px">${esc(c.summary)}</div>
 <div style="font-size:12px;color:#5E706A;margin-top:4px">${esc(c.basis)} An estimate, not a diagnosis.</div>
 <div style="font-size:14px;font-weight:800;margin-top:6px">Next step: ${esc(c.next.label)} · <a href="${site.siteUrl}/learn/${c.id}" style="color:#136F58">Learn more</a></div></div></td></tr>`,
@@ -103,7 +103,7 @@ ${button(`${site.siteUrl}/doctor`, "Get help from a doctor")}
     `Your ${site.appName} results`,
     r.wellbeing ? `Wellbeing score: ${r.wellbeing.score}/100 (WHO-5).` : "",
     r.heart ? `Heart age: ${r.heart.heartAge.value} (you're ${r.age}). 10-year risk: ${r.heart.riskPercent}%.` : r.heartNote ?? "",
-    ...r.cards.map((c) => `- ${c.topic}: ${STATUS_LABEL[c.status]} — ${c.value}. ${c.summary} (${c.basis}) Next: ${c.next.label}`),
+    ...r.cards.map((c) => `- ${c.topic}: ${STATUS_LABEL[c.status]} — ${displayValue(c)}. ${c.summary} (${c.basis}) Next: ${c.next.label}`),
     "Every result is an estimate, not a diagnosis.",
     `Talk to a doctor: ${site.siteUrl}/doctor`,
   ].join("\n");

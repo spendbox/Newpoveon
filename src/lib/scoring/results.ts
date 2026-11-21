@@ -143,7 +143,7 @@ export function computeResults(a: Answers): Results {
     const status: Status = risk < 0.1 ? "good" : risk < 0.2 ? "check" : "act";
     const haText = ha.kind === "below" ? `under ${ha.value}` : ha.kind === "above" ? `over ${ha.value}` : String(ha.value);
     cards.push({
-      id: "heart", topic: "Heart age", status, value: `${haText} · ${pct(risk)}% risk`, sensitive: false,
+      id: "heart", topic: "Heart age", status, value: `${haText} years`, sensitive: false,
       summary: `Your chance of a heart attack or stroke in the next 10 years is about ${pct(risk)}%: roughly ${Math.max(1, Math.round(risk * 100))} in 100 people with your numbers. ${status === "good" ? "That's a low risk." : status === "check" ? "That's a raised risk, and it can come down." : "That's a high risk. Treatment lowers it."}`,
       basis: early
         ? "Early estimate: uses the WHO 2019 risk charts (non-lab, West Africa) below age 40, younger than the ages they were tested on."
@@ -365,6 +365,18 @@ export function prevention(a: Answers, age: number, sex: Sex, bmi: number | null
 }
 
 /** The only details allowed on share cards and share pages (no mood, worry or alcohol). */
+/**
+ * A result's headline in plain words. Older saved heart results read "36 · 0.9% risk";
+ * show those as "36 years" too, so every screen says the same thing.
+ */
+export function displayValue(c: Pick<ResultCard, "id" | "value">): string {
+  if (c.id === "heart") {
+    const m = /^((?:under |over )?\d+) · [\d.]+% risk$/.exec(c.value);
+    if (m) return `${m[1]} years`;
+  }
+  return c.value;
+}
+
 export function shareSummary(r: Results) {
   return {
     age: r.age,

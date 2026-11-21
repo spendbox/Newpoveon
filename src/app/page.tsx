@@ -3,6 +3,8 @@ import { features } from "@/config/site";
 import { Icon, type IconName } from "@/components/icons";
 import { Logo, Overline } from "@/components/ui";
 import { StartButton } from "./start-button";
+import { AccountLink } from "@/components/account-link";
+import { RotatingHeadline } from "@/components/rotating-headline";
 import { MannequinHero } from "@/components/mannequin-hero";
 import { BodyMap } from "@/components/body-map";
 
@@ -24,7 +26,7 @@ export default function HomePage() {
         <nav className="flex items-center gap-1" aria-label="Main">
           <Link href="/doctor" className="hidden rounded-full px-3 py-2 text-[15px] font-medium text-muted hover:text-ink md:inline-block">Get help</Link>
           <Link href="/home-tests" className="hidden rounded-full px-3 py-2 text-[15px] font-medium text-muted hover:text-ink md:inline-block">Lab tests</Link>
-          <Link href="/account" className="whitespace-nowrap rounded-full border border-line bg-surface px-4 py-2 text-[15px] font-medium hover:border-line-strong">Log in</Link>
+          <AccountLink />
         </nav>
       </header>
 
@@ -32,9 +34,7 @@ export default function HomePage() {
       <section className="grid items-center gap-4 pt-6 pb-8 md:grid-cols-[1.05fr_1fr] md:gap-10 md:pt-10 md:pb-20">
         <div>
           <div className="mb-4 md:hidden"><MannequinHero compact /></div>
-          <h1 className="text-[40px] leading-[1.02] font-bold md:text-[64px]">
-            Let&apos;s check in <span className="text-primary">on you</span>
-          </h1>
+          <RotatingHeadline className="text-[40px] leading-[1.04] font-bold md:text-[64px]" />
           <p className="mt-4 max-w-md text-[17px] leading-relaxed text-muted md:text-lg">
             <span className="md:hidden">Your wellbeing score, heart age and more in 10 minutes. Free.</span>
             <span className="hidden md:inline">Answer a few quick questions and find out your wellbeing score, heart age, diabetes risk and more. No sign-up needed.</span>
