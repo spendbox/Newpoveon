@@ -3,6 +3,7 @@ import { useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import { Icon } from "@/components/icons";
 import { AnswerTile } from "@/components/client";
+import { AttachmentsInput } from "@/components/attachments-input";
 import { Field, inputCls, Notice } from "@/components/ui";
 import { Steps, type Step } from "@/components/steps";
 import { VoiceNote } from "@/components/voice-note";
@@ -50,10 +51,13 @@ function useNow() {
 
 export function BookingForm({ types, preselect, defaultReason }: { types: Type[]; preselect: string | null; defaultReason: string }) {
   const router = useRouter();
-  const [typeId, setTypeId] = useState<string | null>(types.find((t) => t.code === preselect)?.id ?? null);
+  // A topic is only set when someone arrives from a guide or result card (e.g. "Help me stop smoking").
+  const [topicId, setTopicId] = useState<string | null>(types.find((t) => t.code === preselect)?.id ?? null);
   const [danger, setDanger] = useState<"yes" | "no" | null>(null);
   const [reason, setReason] = useState(defaultReason);
-  const [other, setOther] = useState("");
+  const [showNote, setShowNote] = useState(!!defaultReason);
+  const [files, setFiles] = useState<File[]>([]);
+  const [showFiles, setShowFiles] = useState(false);
   const [voice, setVoice] = useState<Blob | null>(null);
   const [slots, setSlots] = useState<Slot[] | null>(null);
   const [day, setDay] = useState<string | null>(null);
@@ -85,10 +89,12 @@ export function BookingForm({ types, preselect, defaultReason }: { types: Type[]
     fetch("/api/slots").then((r) => r.json()).then((d) => setSlots(d.slots ?? [])).catch(() => setSlots([]));
   }, []);
 
-  const type = types.find((t) => t.id === typeId) ?? null;
-  const isOther = type?.code === "something-else";
-  const typeLabel = isOther && other.trim() ? other.trim() : type?.name ?? "";
-  const groups = useMemo(() => [...new Set(types.map((t) => t.grp))], [types]);
+  const topic = types.find((t) => t.id === topicId) ?? null;
+  // Everyone else books a general consult: no categories to choose from.
+  const general = types.find((t) => t.code === "doctor-consult") ?? types.find((t) => t.code === "new-symptom") ?? types[0] ?? null;
+  const type = topic ?? general;
+  const totalBytes = (voice?.size ?? 0) + files.reduce((n, f) => n + f.size, 0);
+  const tooBig = totalBytes > 4_000_000;
   const byDay = useMemo(() => {
     const m = new Map<string, Slot[]>();
     for (const s of slots ?? []) {
@@ -108,10 +114,11 @@ export function BookingForm({ types, preselect, defaultReason }: { types: Type[]
     if (!type) return;
     setBusy(true);
     setError(null);
-    const data = { consultTypeId: type.id, otherTopic: isOther ? other.trim() : undefined, startsAt: callMe ? null : startsAt, name, phone, email, reason, shareResults: share, screeningId: saved?.screeningId, ownerToken: saved?.ownerToken };
+    const data = { consultTypeId: type.id, startsAt: callMe ? null : startsAt, name, phone, email, reason, shareResults: share, screeningId: saved?.screeningId, ownerToken: saved?.ownerToken };
     const form = new FormData();
     form.set("data", JSON.stringify(data));
     if (voice) form.set("voice", voice, `voice.${voice.type.includes("mp4") ? "m4a" : voice.type.includes("ogg") ? "ogg" : "webm"}`);
+    files.forEach((f) => form.append("attachment", f, f.name));
     const res = await fetch("/api/bookings", { method: "POST", body: form }).catch(() => null);
     const d = res ? await res.json().catch(() => ({})) : {};
     if (res?.ok && d.authorizationUrl) {
@@ -173,27 +180,33 @@ export function BookingForm({ types, preselect, defaultReason }: { types: Type[]
 
   const steps: Step[] = [
     {
-      key: "what", title: "What can we help you with?", hint: "We'll match you with the right doctor for your concern and show you the fee before you pay.", valid: !!type && (!isOther || other.trim().length >= 3),
+      key: "talk", title: "What's going on?", hint: "Record a voice note. It's the quickest way to tell your doctor. Only your doctor will hear it.",
+      valid: (reason.trim().length > 2 || !!voice) && !tooBig,
       content: (
-        <div className="flex flex-col gap-5">
-          {groups.map((g) => (
-            <div key={g}>
-              <p className="mb-2 text-xs font-semibold tracking-[0.06em] text-subtle uppercase">{g === "Something else" ? "Not on the list?" : g}</p>
-              <div className="flex flex-col gap-2" role="radiogroup" aria-label={g}>
-                {types.filter((t) => t.grp === g).map((t) => (
-                  <AnswerTile key={t.id} layout="rows" label={t.name} selected={typeId === t.id} onClick={() => { setTypeId(t.id); setDanger(null); }} />
-                ))}
-              </div>
-            </div>
-          ))}
-          {isOther && (
-            <div className="flex flex-col gap-1.5">
-              <label htmlFor="other-topic" className="text-sm font-semibold">What do you need help with?</label>
-              <input id="other-topic" autoFocus maxLength={80} value={other} onChange={(e) => setOther(e.target.value)} placeholder="e.g. A lump on my neck, or my child's cough" className={inputCls} />
-              <p className="text-xs text-subtle">A few words is enough. You can explain more in the next step.</p>
-            </div>
+        <>
+          {topic && (
+            <p className="flex items-center gap-2 self-start rounded-full bg-primary-soft py-1 pr-1 pl-3 text-sm font-medium text-primary">
+              About: {topic.name}
+              <button type="button" onClick={() => setTopicId(null)} aria-label="Remove this topic" className="flex h-7 w-7 items-center justify-center rounded-full hover:bg-primary/10"><Icon name="close" size={12} strokeWidth={2.4} /></button>
+            </p>
           )}
-        </div>
+          <VoiceNote hero value={voice} onChange={setVoice} />
+          <div className="grid grid-cols-2 gap-2">
+            <button type="button" onClick={() => setShowNote(!showNote)} aria-expanded={showNote}
+              className={`flex min-h-[48px] items-center justify-center gap-2 rounded-[var(--radius-md)] border px-3 text-[15px] font-semibold whitespace-nowrap ${showNote ? "border-primary bg-primary-soft text-primary" : "border-line bg-surface hover:bg-surface-2"}`}>
+              <Icon name="edit" size={18} strokeWidth={2} /> {voice ? "Add a note" : "Write instead"}
+            </button>
+            <button type="button" onClick={() => setShowFiles(!showFiles)} aria-expanded={showFiles || files.length > 0}
+              className={`flex min-h-[48px] items-center justify-center gap-2 rounded-[var(--radius-md)] border px-3 text-[15px] font-semibold whitespace-nowrap ${showFiles || files.length ? "border-primary bg-primary-soft text-primary" : "border-line bg-surface hover:bg-surface-2"}`}>
+              <Icon name="link" size={18} strokeWidth={2} /> {files.length ? `${files.length} file${files.length > 1 ? "s" : ""}` : "Add a file"}
+            </button>
+          </div>
+          {showNote && (
+            <Field id="b-reason" label="Your note"><textarea id="b-reason" rows={4} className={`${inputCls} py-3`} value={reason} onChange={(e) => setReason(e.target.value)} maxLength={1000} placeholder="e.g. Fever and headache for 3 days, worse at night" /></Field>
+          )}
+          {(showFiles || files.length > 0) && <AttachmentsInput files={files} onChange={setFiles} />}
+          {tooBig && <Notice tone="warn">That&apos;s a bit too much to send at once. Please remove a file or record a shorter note.</Notice>}
+        </>
       ),
     },
   ];
@@ -222,35 +235,6 @@ export function BookingForm({ types, preselect, defaultReason }: { types: Type[]
   }
 
   steps.push(
-    {
-      key: "more", title: "Tell us a little more", hint: "Record a voice note or type, whichever is easier. Only your doctor hears or reads it.", valid: reason.trim().length > 2 || !!voice,
-      content: (
-        <>
-          <VoiceNote value={voice} onChange={setVoice} />
-          <div className="flex items-center gap-3 text-xs font-semibold tracking-[0.06em] text-subtle uppercase"><span className="h-px flex-1 bg-line" />or type<span className="h-px flex-1 bg-line" /></div>
-          <Field id="b-reason" label="What's going on?"><textarea id="b-reason" rows={4} className={`${inputCls} py-3`} value={reason} onChange={(e) => setReason(e.target.value)} maxLength={1000} placeholder="e.g. Fever and headache for 3 days, worse at night" /></Field>
-        </>
-      ),
-    },
-    {
-      key: "match", title: "Here's who you'll see", valid: true,
-      content: type && (
-        <div className="rounded-[var(--radius-xl)] border border-line bg-surface p-5">
-          <div className="flex items-start gap-3">
-            <span className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-primary-soft text-primary"><Icon name="stethoscope" size={24} strokeWidth={2} /></span>
-            <div className="flex-1">
-              <p className="text-xl font-semibold">A {type.doctor_type.toLowerCase()}</p>
-              <p className="text-sm text-muted">For: &ldquo;{typeLabel}&rdquo;</p>
-            </div>
-          </div>
-          <dl className="mt-5 grid grid-cols-2 gap-3 text-sm">
-            <div className="rounded-[var(--radius-md)] bg-surface-2 p-3"><dt className="text-muted">Consult</dt><dd className="text-base font-semibold">About {type.duration_min} min</dd></div>
-            <div className="rounded-[var(--radius-md)] bg-surface-2 p-3"><dt className="text-muted">Your fee</dt><dd className="text-base font-semibold tabular">{type.price_naira != null ? ngn(type.price_naira) : "—"}</dd></div>
-          </dl>
-          <p className="mt-4 text-sm text-muted">By phone or video. If you need tests or medicines, your doctor will arrange them.</p>
-        </div>
-      ),
-    },
     {
       key: "time", title: "When suits you?", valid: Boolean(startsAt || callMe || (slots && slots.length === 0)),
       content: slots === null ? (
@@ -350,10 +334,10 @@ export function BookingForm({ types, preselect, defaultReason }: { types: Type[]
       content: type && (
         <>
           <dl className="grid gap-2.5 rounded-[var(--radius-lg)] bg-surface-2 p-4 text-sm">
-            <div className="flex justify-between gap-4"><dt className="text-muted">Help with</dt><dd className="text-right font-medium">{typeLabel}</dd></div>
-            <div className="flex justify-between gap-4"><dt className="text-muted">You&apos;ll see</dt><dd className="text-right font-medium">A {type.doctor_type.toLowerCase()}</dd></div>
+            {topic && <div className="flex justify-between gap-4"><dt className="text-muted">About</dt><dd className="text-right font-medium">{topic.name}</dd></div>}
+            <div className="flex justify-between gap-4"><dt className="text-muted">You&apos;ll see</dt><dd className="text-right font-medium">A {type.doctor_type.toLowerCase()}, about {type.duration_min} min</dd></div>
             <div className="flex justify-between gap-4"><dt className="text-muted">When</dt><dd className="text-right font-medium">{startsAt ? `${longDay.format(new Date(startsAt))}, ${time.format(new Date(startsAt))}` : "We'll call to agree a time"}</dd></div>
-            <div className="flex justify-between gap-4"><dt className="text-muted">Your message</dt><dd className="text-right font-medium">{voice ? "Voice note" : ""}{voice && reason.trim() ? " + text" : reason.trim() ? "Text" : ""}</dd></div>
+            <div className="flex justify-between gap-4"><dt className="text-muted">Your message</dt><dd className="text-right font-medium">{[voice && "Voice note", reason.trim() && "Note", files.length && `${files.length} file${files.length > 1 ? "s" : ""}`].filter(Boolean).join(" + ")}</dd></div>
             <div className="flex justify-between gap-4 border-t border-line pt-2.5"><dt className="text-muted">Fee</dt><dd className="text-right text-base font-semibold tabular">{type.price_naira != null ? ngn(type.price_naira) : "—"}</dd></div>
           </dl>
           <label className="flex items-start gap-3">

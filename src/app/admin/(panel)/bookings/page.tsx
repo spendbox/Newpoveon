@@ -27,6 +27,13 @@ export default async function BookingsPage({ searchParams }: PageProps<"/admin/b
     const { data: urls } = await supabaseAdmin().storage.from("voice-notes").createSignedUrls(paths, 3600);
     (urls ?? []).forEach((u) => u.signedUrl && u.path && signed.set(u.path, u.signedUrl));
   }
+  // Photos and PDFs people attached (private bucket, short-lived links).
+  const filePaths = (rows ?? []).flatMap((r) => (r.attachment_paths as string[] | null) ?? []);
+  const fileLinks = new Map<string, string>();
+  if (filePaths.length) {
+    const { data: urls } = await supabaseAdmin().storage.from("attachments").createSignedUrls(filePaths, 3600);
+    (urls ?? []).forEach((u) => u.signedUrl && u.path && fileLinks.set(u.path, u.signedUrl));
+  }
   return (
     <>
       <H1 sub={`Consult fees are set per type in Consults. Payments are confirmed by Paystack on the server.`}>Doctor bookings</H1>
@@ -53,6 +60,24 @@ export default async function BookingsPage({ searchParams }: PageProps<"/admin/b
               <p className="text-sm"><span className="font-semibold">In their words:</span> {b.reason}</p>
               {b.voice_note_path && signed.get(b.voice_note_path) && (
                 <div className="mt-2"><p className="text-xs font-semibold text-muted">Voice note</p>{signed.get(b.voice_note_path) ? <div className="mt-1 max-w-md"><AudioPlayer src={signed.get(b.voice_note_path)!} /></div> : <p className="text-sm text-muted">Couldn&apos;t load the recording. Refresh the page.</p>}</div>
+              )}
+              {((b.attachment_paths as string[] | null) ?? []).length > 0 && (
+                <div className="mt-2">
+                  <p className="text-xs font-semibold text-muted">Attachments</p>
+                  <div className="mt-1 flex flex-wrap gap-2">
+                    {(b.attachment_paths as string[]).map((path, i) => {
+                      const url = fileLinks.get(path);
+                      const isPdf = path.endsWith(".pdf");
+                      if (!url) return <span key={path} className="text-sm text-muted">File {i + 1} unavailable</span>;
+                      return isPdf ? (
+                        <a key={path} href={url} target="_blank" rel="noopener noreferrer" className="inline-flex min-h-[40px] items-center rounded-lg border border-line px-3 text-sm font-semibold hover:bg-ground">PDF {i + 1}</a>
+                      ) : (
+                        // eslint-disable-next-line @next/next/no-img-element -- short-lived private link
+                        <a key={path} href={url} target="_blank" rel="noopener noreferrer"><img src={url} alt={`Attachment ${i + 1}`} className="h-20 w-20 rounded-lg border border-line object-cover" /></a>
+                      );
+                    })}
+                  </div>
+                </div>
               )}
               <p className="text-xs text-muted">Ref {b.paystack_reference}{b.paid_at ? ` · paid ${formatWhen(b.paid_at)}` : ""}</p>
               {shared && (
