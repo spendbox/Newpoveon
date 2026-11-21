@@ -8,6 +8,7 @@ import { Button, Field, inputCls, Notice } from "@/components/ui";
 import { Steps, type Step } from "@/components/steps";
 import { VoiceNote } from "@/components/voice-note";
 import { loadSaved } from "@/lib/storage";
+import { clockTime } from "@/lib/time";
 import { whatsappLink } from "@/lib/whatsapp";
 
 type Type = { id: string; code: string; name: string; description: string | null; grp: string; doctor_type: string; duration_min: number; price_naira: number | null; urgent_check: boolean; credit_to_plan: boolean };
@@ -15,8 +16,8 @@ type Slot = { startsAt: string };
 
 const TZ = "Africa/Lagos";
 const dayKey = new Intl.DateTimeFormat("en-CA", { timeZone: TZ, year: "numeric", month: "2-digit", day: "2-digit" });
-const time = new Intl.DateTimeFormat("en-NG", { hour: "numeric", minute: "2-digit", timeZone: TZ });
-const clock = new Intl.DateTimeFormat("en-NG", { hour: "numeric", minute: "2-digit", second: "2-digit", timeZone: TZ });
+const time = { format: (d: Date) => clockTime(d, TZ) };
+const clock = { format: (d: Date) => clockTime(d, TZ, { seconds: true }) };
 const hour = new Intl.DateTimeFormat("en-GB", { hour: "numeric", hour12: false, timeZone: TZ });
 const longDay = new Intl.DateTimeFormat("en-NG", { weekday: "long", day: "numeric", month: "long", timeZone: TZ });
 const shortDay = new Intl.DateTimeFormat("en-NG", { weekday: "short", day: "numeric", month: "short", timeZone: "UTC" });
@@ -130,7 +131,7 @@ export function BookingForm({ types, preselect, defaultReason }: { types: Type[]
   const today = now ? dayKey.format(now) : days[0] ?? null;
   const tomorrow = today ? addDays(today, 1) : null;
   const activeDay = day ?? (today && byDay.has(today) ? today : days[0] ?? null);
-  const mine = myTz ? new Intl.DateTimeFormat("en-GB", { hour: "numeric", minute: "2-digit", timeZone: myTz }) : null;
+  const mine = myTz ? { format: (d: Date) => clockTime(d, myTz) } : null;
   const wa = whatsappLink("Hello, I'd like to talk to a doctor.");
 
   async function submit() {

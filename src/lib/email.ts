@@ -2,6 +2,7 @@ import "server-only";
 import { Resend } from "resend";
 import { site } from "@/config/site";
 import { STATUS_LABEL, type Results } from "@/lib/scoring/results";
+import { clockTime } from "@/lib/time";
 
 export const emailConfigured = () => Boolean(process.env.RESEND_API_KEY);
 
@@ -139,5 +140,6 @@ export function teamEmail(title: string, rows: Record<string, unknown>) {
 }
 
 export function formatWhen(iso: string) {
-  return new Intl.DateTimeFormat("en-NG", { weekday: "long", day: "numeric", month: "long", hour: "numeric", minute: "2-digit", timeZone: site.timeZone }).format(new Date(iso));
+  const d = new Date(iso);
+  return `${new Intl.DateTimeFormat("en-NG", { weekday: "long", day: "numeric", month: "long", timeZone: site.timeZone }).format(d)}, ${clockTime(d, site.timeZone)}`;
 }

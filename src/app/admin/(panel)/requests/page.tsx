@@ -3,6 +3,7 @@ import { site } from "@/config/site";
 import { supabaseAdmin } from "@/lib/supabase/server";
 import { setRequestStatus } from "../../actions";
 import { aBtn, aBtnQuiet, aInput, Badge, Card, H1, Tabs } from "../../ui";
+import { clockTime } from "@/lib/time";
 
 export default async function RequestsPage({ searchParams }: PageProps<"/admin/requests">) {
   const sp = await searchParams;
@@ -12,7 +13,8 @@ export default async function RequestsPage({ searchParams }: PageProps<"/admin/r
   if (kind !== "all") q = q.eq("kind", kind);
   q = show === "open" ? q.in("status", ["new", "in_progress"]) : q.in("status", ["handled", "cancelled"]);
   const { data: rows } = await q;
-  const fmt = new Intl.DateTimeFormat("en-NG", { dateStyle: "medium", timeStyle: "short", timeZone: site.timeZone });
+  const dayFmt = new Intl.DateTimeFormat("en-NG", { dateStyle: "medium", timeZone: site.timeZone });
+  const fmt = { format: (d: Date) => `${dayFmt.format(d)}, ${clockTime(d, site.timeZone)}` };
   return (
     <>
       <H1 sub="Home tests and medication deliveries. Your team is also emailed for each new one.">Requests</H1>
