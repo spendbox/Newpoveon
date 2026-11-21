@@ -41,3 +41,7 @@ So:
   PHQ-9 and GAD-7 <5 / 5–9 / ≥10; STOP-Bang low / intermediate / high; BMI healthy / outside healthy range / ≥30;
   waist-to-height <0.5 / ≥0.5 / ≥0.6; blood pressure <140/90 / — / ≥140/90.
   ⚠️ These mappings are our choice of where to draw "Worth checking" versus "Act on this", so they need clinical sign-off.
+
+## Age
+
+People enter their **date of birth**; age is worked out from it in full years on Nigeria time (`ageFromDob` in `src/lib/questions.ts`, with tests), every time results are calculated, so it never goes out of date between checks. Only adults aged 18 to 100 can continue. Checks saved before this change, which stored a typed age, still work.

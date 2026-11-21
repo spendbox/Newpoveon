@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 import { AnswerTile, ProgressWalker } from "@/components/client";
 import { QuestionArt } from "@/components/question-art";
+import { DobInput } from "@/components/dob-input";
 import { Icon } from "@/components/icons";
 import { Button, inputCls } from "@/components/ui";
 import { SupportScreen } from "@/components/support-screen";
@@ -172,6 +173,7 @@ export function Questionnaire() {
 
             {q.kind === "number" && <NumberInput key={q.id} q={q} value={value} onChange={(v) => setAnswer(q.id, v)} />}
             {q.kind === "bp" && <BpInput key={q.id} value={value as BpValue | undefined} onChange={(v) => setAnswer(q.id, v)} />}
+            {q.kind === "dob" && <DobInput key={q.id} value={value as string | undefined} minAge={q.minAge} maxAge={q.maxAge} onChange={(v) => setAnswer(q.id, v)} />}
           </div>
 
           {(q.kind !== "choice" || answered) && (

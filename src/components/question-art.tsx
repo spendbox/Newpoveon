@@ -332,7 +332,7 @@ const SCENES: Record<string, { bg: string; art: ReactNode }> = {
   ) },
 };
 
-const PHQ_GAD = (id: string) => (/^phq\d$/.test(id) ? "mood" : /^gad\d$/.test(id) ? "calm" : id);
+const PHQ_GAD = (id: string) => (id === "dob" ? "age" : /^phq\d$/.test(id) ? "mood" : /^gad\d$/.test(id) ? "calm" : id);
 
 export function QuestionArt({ id, fallback }: { id: string; fallback: IllustrationName }) {
   const scene = SCENES[PHQ_GAD(id)];

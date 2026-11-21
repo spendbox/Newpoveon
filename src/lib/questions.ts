@@ -63,7 +63,13 @@ export interface NumberQuestion extends Base {
 export interface BpQuestion extends Base {
   kind: "bp";
 }
-export type Question = ChoiceQuestion | MultiQuestion | NumberQuestion | BpQuestion;
+/** Date of birth, stored as "YYYY-MM-DD". Age is worked out from it every time, so it never goes stale. */
+export interface DobQuestion extends Base {
+  kind: "dob";
+  minAge: number;
+  maxAge: number;
+}
+export type Question = ChoiceQuestion | MultiQuestion | NumberQuestion | BpQuestion | DobQuestion;
 
 const yesNo: Option[] = [
   { value: "yes", label: "Yes", icon: "thumbUp" },
@@ -84,6 +90,27 @@ export const num = (a: Answers, id: string): number | null => {
   return typeof v === "number" && Number.isFinite(v) ? v : null;
 };
 export const str = (a: Answers, id: string): string | null => (typeof a[id] === "string" ? (a[id] as string) : null);
+
+/** Full years between a "YYYY-MM-DD" birth date and today (Nigeria time). Null if the date isn't real. */
+export function ageFromDob(dob: string, today: Date = new Date()): number | null {
+  const m = /^(\d{4})-(\d{2})-(\d{2})$/.exec(dob);
+  if (!m) return null;
+  const y = +m[1], mo = +m[2], d = +m[3];
+  const birth = new Date(Date.UTC(y, mo - 1, d));
+  if (birth.getUTCFullYear() !== y || birth.getUTCMonth() !== mo - 1 || birth.getUTCDate() !== d) return null;
+  const lagos = new Date(today.getTime() + 60 * 60 * 1000); // UTC+1, no daylight saving
+  const ty = lagos.getUTCFullYear(), tm = lagos.getUTCMonth() + 1, td = lagos.getUTCDate();
+  let age = ty - y;
+  if (tm < mo || (tm === mo && td < d)) age--;
+  return age;
+}
+
+/** The person's age: from their date of birth, or (for answers saved before we asked for it) the age they typed. */
+export function ageOf(a: Answers, today?: Date): number | null {
+  const dob = str(a, "dob");
+  if (dob) return ageFromDob(dob, today);
+  return num(a, "age");
+}
 
 const female = (a: Answers) => a.sex === "female";
 const phq2Score = (a: Answers) => Number(a.phq1 ?? 0) + Number(a.phq2 ?? 0);
@@ -107,7 +134,10 @@ const GAD_STEM = "Over the last 2 weeks, how often have you been bothered by:";
 
 export const QUESTIONS: Question[] = [
   /* ---------------- About you ---------------- */
-  { id: "age", topic: "About you", kind: "number", title: "How old are you?", unit: "years", min: 18, max: 100, placeholder: "e.g. 42", illustration: "aboutYou" },
+  {
+    id: "dob", topic: "About you", kind: "dob", title: "What's your date of birth?", minAge: 18, maxAge: 100,
+    help: "We use it to work out your age, so your results stay right every time you check.", illustration: "aboutYou",
+  },
   {
     id: "sex", topic: "About you", kind: "choice", title: "What sex are you?",
     help: "The heart and diabetes formulas we use are different for men and women.", illustration: "aboutYou",
@@ -350,6 +380,11 @@ export function isValidAnswer(q: Question, v: unknown): boolean {
       return Array.isArray(v) && v.length > 0 && v.every((x) => q.options.some((o) => o.value === x));
     case "number":
       return (q.skipLabel && v === "unknown") || (typeof v === "number" && v >= q.min && v <= q.max);
+    case "dob": {
+      if (typeof v !== "string") return false;
+      const age = ageFromDob(v);
+      return age !== null && age >= q.minAge && age <= q.maxAge;
+    }
     case "bp": {
       const b = v as BpValue;
       return !!b && typeof b === "object" && typeof b.sbp === "number" && typeof b.dbp === "number" && b.sbp >= 70 && b.sbp <= 260 && b.dbp >= 40 && b.dbp <= 160 && b.sbp > b.dbp;
