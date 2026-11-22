@@ -380,7 +380,7 @@ export function BookingForm({ types, preselect, defaultReason, perk = null }: { 
           {perk && !perk.isMember && fee != null && memberPrice(fee, perk.discount) < fee && (
             <a href="/account/plan" className="flex items-start gap-3 rounded-[var(--radius-lg)] border border-primary/30 bg-primary-soft p-4">
               <Icon name="target" size={20} strokeWidth={2} className="mt-0.5 shrink-0 text-primary" />
-              <span className="text-sm"><b className="text-ink">Activate the yearly health plan ({ngn(perk.planPrice)}) and get {perk.label} all consultations.</b> <span className="text-muted">This consult would be {ngn(memberPrice(fee, perk.discount))}. Get the plan first, then come back to book.</span></span>
+              <span className="text-sm"><b className="text-ink">Activate the yearly health plan ({ngn(perk.planPrice)}) and get {perk.label} all consultations.</b> <span className="text-muted">Get the plan first, then come back to book.</span></span>
             </a>
           )}
           <p className="flex items-center gap-1.5 text-xs text-subtle"><Icon name="shield" size={14} /> Secure payment by Paystack. Card, bank transfer or USSD.</p>

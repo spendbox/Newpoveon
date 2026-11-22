@@ -71,16 +71,44 @@ describe("eat", () => {
   });
 });
 
-describe("weight", () => {
-  const g: Goal = { area: "weight", settings: { startKg: 90, targetKg: weightTarget(90), weighDay: 0 } };
+describe("weight programme", () => {
+  const g: Goal = { area: "weight", settings: { startKg: 90, targetKg: weightTarget(90), weighDay: 0, moveStart: 0 } };
+  const wtick = (w: number, n: number, kg?: number): Log[] => Array.from({ length: n }, (_, i) => ({ day: addDays(START, w * 7 + i), done: true, value: kg !== undefined && i === n - 1 ? kg : null }));
   it("sets a safe 5% target and 0.5 kg a week", () => {
     expect(weightTarget(90)).toBe(85.5);
     expect(expectedWeight(g.settings as never, 4)).toBe(88);
     expect(expectedWeight(g.settings as never, 30)).toBe(85.5);
   });
-  it("tracks the latest weigh-in against the expected line", () => {
+  it("is a full programme: a plate habit, movement and a weigh-in, 5 days a week", () => {
+    const t = targetFor(g, 0, 0);
+    expect(t.days).toBe(5);
+    expect(t.steps.join(" ")).toMatch(/half your plate vegetables/);
+    expect(t.steps.join(" ")).toMatch(/Move for 10 minutes/);
+    expect(t.steps.at(-1)).toMatch(/Weigh yourself on Sunday/);
+  });
+  it("leaves movement to a separate Move goal when there is one", () => {
+    expect(targetFor(g, 0, 0, { hasMove: true }).steps.join(" ")).not.toMatch(/Move for/);
+  });
+  it("grows to two plates a day and more movement as they keep up", () => {
+    const p = progress(g, [...wtick(0, 5, 89.4), ...wtick(1, 5, 88.9)], START, "2026-11-17");
+    expect(p.level).toBe(2);
+    expect(p.target.headline).toMatch(/^2 plates a day \+ 15 min moving/);
+  });
+  it("adds one more change when the scale stalls for 2 weeks despite keeping up", () => {
+    const stalled = progress(g, [...wtick(0, 5, 90), ...wtick(1, 5, 89.9)], START, "2026-11-17");
+    expect(stalled.weight?.levers).toBe(1);
+    expect(stalled.target.steps.join(" ")).toMatch(/zobo/);
+    const losing = progress(g, [...wtick(0, 5, 89.4), ...wtick(1, 5, 88.9)], START, "2026-11-17");
+    expect(losing.weight?.levers).toBe(0);
+  });
+  it("doesn't add changes when someone isn't keeping up; it eases back instead", () => {
+    const p = progress({ ...g, settings: { ...(g.settings as object), moveStart: 0 } as never }, [...wtick(0, 1, 90), ...wtick(1, 1, 90)], START, "2026-11-17");
+    expect(p.weight?.levers).toBe(0);
+    expect(p.level).toBe(0);
+  });
+  it("tracks weight lost and whether it's on track", () => {
     const p = progress(g, [{ day: "2026-11-08", done: true, value: 89.6 }, { day: "2026-11-15", done: true, value: 89.2 }], START, "2026-11-17");
-    expect(p.weight).toMatchObject({ latest: 89.2, expected: 89, onTrack: true });
+    expect(p.weight).toMatchObject({ latest: 89.2, expected: 89, onTrack: true, lost: 0.8 });
   });
 });
 
@@ -96,7 +124,7 @@ import { cleanGoals } from "./validate";
 describe("server-side plan checks", () => {
   it("accepts known choices and recomputes the weight target", () => {
     const g = cleanGoals([{ area: "weight", settings: { startKg: 90, targetKg: 10, weighDay: 0 } }, { area: "eat", settings: { swaps: ["salt", "salt", "evil"] } }]);
-    expect(g).toEqual([{ area: "weight", settings: { startKg: 90, targetKg: 85.5, weighDay: 0 } }, { area: "eat", settings: { swaps: ["salt"] } }]);
+    expect(g).toEqual([{ area: "weight", settings: { startKg: 90, targetKg: 85.5, weighDay: 0, moveStart: 0 } }, { area: "eat", settings: { swaps: ["salt"] } }]);
   });
   it("rejects unknown areas, made-up choices and too many areas", () => {
     expect(cleanGoals([{ area: "hack", settings: {} }])).toBeNull();

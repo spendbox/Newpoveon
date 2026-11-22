@@ -23,9 +23,10 @@ export async function loadPlan(userId: string, today = lagosDay()) {
   const { data: logs } = ids.length ? await sb.from("plan_logs").select("goal_id, day, done, value").in("goal_id", ids) : { data: [] };
   const start = (plan as PlanRow).starts_on ?? mondayOf(today);
   const sorted = ((goals ?? []) as GoalRow[]).sort((a, b) => AREAS.indexOf(a.area) - AREAS.indexOf(b.area));
+  const ctx = { hasMove: sorted.some((g) => g.area === "move"), hasEat: sorted.some((g) => g.area === "eat") };
   const views: GoalView[] = sorted.map((g) => ({
     id: g.id, area: g.area, settings: g.settings,
-    progress: progress({ area: g.area, settings: g.settings }, ((logs ?? []) as (Log & { goal_id: string })[]).filter((l) => l.goal_id === g.id), start, today),
+    progress: progress({ area: g.area, settings: g.settings }, ((logs ?? []) as (Log & { goal_id: string })[]).filter((l) => l.goal_id === g.id), start, today, ctx),
   }));
   return { plan: plan as PlanRow, goals: views, today };
 }
@@ -123,7 +124,7 @@ export function weeklyEmail(goals: GoalView[], next: GoalView[], name?: string |
   const rows = goals.map((g, i) => {
     const p = g.progress, n = next[i]?.progress;
     const verdict = n && n.level > p.level ? "Stepping up next week" : n && n.level < p.level ? "Easing back next week" : "Same again next week";
-    const w = g.area === "weight" && p.weight?.latest != null ? ` · ${p.weight.latest} kg` : "";
+    const w = g.area === "weight" && p.weight?.latest != null ? ` · ${p.weight.latest} kg${p.weight.lost != null && p.weight.lost > 0 ? `, down ${p.weight.lost} kg so far` : ""}` : "";
     return `<tr><td style="padding:8px 0;border-bottom:1px solid #E1E9E5"><b>${esc(AREA_INFO[g.area].title)}</b>: ${Math.min(p.thisWeek.done, p.thisWeek.needed)} of ${p.thisWeek.needed}${w}<br><span style="color:#5E706A;font-size:13px">${verdict}${n ? `: ${esc(n.target.headline)}` : ""}</span></td></tr>`;
   }).join("");
   const pct = s.needed ? Math.round((s.done / s.needed) * 100) : 0;

@@ -37,11 +37,11 @@ export function PlanBuilder({ hints, existing, active, price, expired, perkLabel
     switch (area) {
       case "move": return { area, settings: move };
       case "sleep": return { area, settings: sleep };
-      case "weight": return { area, settings: { startKg: kg, targetKg: weightTarget(kg || 0), weighDay: weight.weighDay } };
+      case "weight": return { area, settings: { startKg: kg, targetKg: weightTarget(kg || 0), weighDay: weight.weighDay, moveStart: Math.min(6, hints.moveStart) } };
       case "eat": return { area, settings: { swaps: hints.swaps.filter((s) => swaps.includes(s)) } };
       case "calm": return { area, settings: calm };
     }
-  }), [chosen, move, sleep, kg, weight.weighDay, swaps, calm, hints.swaps]);
+  }), [chosen, move, sleep, kg, weight.weighDay, swaps, calm, hints.swaps, hints.moveStart]);
 
   function toggleArea(a: Area) {
     setAreas((cur) => (cur.includes(a) ? cur.filter((x) => x !== a) : cur.length >= MAX_AREAS ? cur : [...cur, a]));
@@ -114,7 +114,7 @@ export function PlanBuilder({ hints, existing, active, price, expired, perkLabel
   });
 
   if (chosen.includes("weight")) steps.push({
-    key: "weight", title: "Losing weight", hint: "Weighing once a week, on the same day, is enough. Daily weights go up and down.", valid: kg >= 30 && kg <= 250,
+    key: "weight", title: "Losing weight", hint: "A complete programme: a simple plate habit, daily movement and a weekly weigh-in. It adds one more change if the scale stops moving while you're keeping up.", valid: kg >= 30 && kg <= 250,
     content: (
       <>
         <Field id="p-kg" label="Your weight today (kg)">
@@ -156,7 +156,7 @@ export function PlanBuilder({ hints, existing, active, price, expired, perkLabel
       <>
         <ul className="flex flex-col gap-3">
           {goals.map((g) => {
-            const t = targetFor(g, g.area === "move" ? move.startLevel : g.area === "sleep" ? sleep.startLevel : 0, 0);
+            const t = targetFor(g, g.area === "move" ? move.startLevel : g.area === "sleep" ? sleep.startLevel : 0, 0, { hasMove: chosen.includes("move"), hasEat: chosen.includes("eat") });
             return (
               <li key={g.area} className="rounded-[var(--radius-lg)] border border-line bg-surface p-4">
                 <p className="flex items-center gap-2 font-semibold"><Icon name={AREA_INFO[g.area].icon as IconName} size={18} strokeWidth={2} className="text-primary" />{AREA_INFO[g.area].title}</p>
