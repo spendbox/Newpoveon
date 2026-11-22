@@ -205,7 +205,7 @@ h1, h2, h3, .font-display {
 
 /* Trusted tools strip on the home page: a slow, endless scroll that pauses on touch or hover. */
 .tt-track { animation: tt-scroll 45s linear infinite; }
-.tt-viewport:hover .tt-track, .tt-viewport:active .tt-track { animation-play-state: paused; }
+.tt-viewport:hover .tt-track, .tt-viewport:active .tt-track, .tt-viewport:focus-within .tt-track, .tt-track.tt-paused { animation-play-state: paused; }
 @keyframes tt-scroll { to { transform: translateX(calc(-50% - 6px)); } }
 @media (prefers-reduced-motion: reduce) {
   .tt-track { animation: none; }
