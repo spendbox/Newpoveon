@@ -5,7 +5,6 @@ import { Icon, type IconName } from "@/components/icons";
 import { Logo, Overline } from "@/components/ui";
 import { StartButton } from "./start-button";
 import { AccountLink } from "@/components/account-link";
-import { loadPlanSettings } from "@/lib/plan/settings";
 import { MannequinHero } from "@/components/mannequin-hero";
 import { BodyMap } from "@/components/body-map";
 
@@ -21,9 +20,7 @@ const FINDINGS: { icon: IconName; title: string; text: string; tint: string }[] 
 
 export const dynamic = "force-dynamic";
 
-export default async function HomePage() {
-  const offer = await loadPlanSettings().catch(() => null);
-  const price = `₦${(offer?.price ?? 1500).toLocaleString("en-NG")}`, months = offer?.months ?? 3;
+export default function HomePage() {
   return (
     <main className="mx-auto w-full max-w-6xl px-5 md:px-8">
       <header className="flex items-center justify-between gap-3 py-5">
@@ -45,7 +42,7 @@ export default async function HomePage() {
           </h1>
           <p className="mt-4 max-w-md text-[17px] leading-relaxed text-balance text-muted md:text-lg">
             <span className="md:hidden"><span className="whitespace-nowrap">Your wellbeing score, heart age</span><br /><span className="whitespace-nowrap">and more, in 10 minutes.</span></span>
-            <span className="hidden md:inline">Answer a few quick questions and find out your wellbeing score, heart age, diabetes risk and more. Answer for free, then unlock your results and a {months}-month personal plan for {price}.</span>
+            <span className="hidden md:inline">Answer a few quick questions and find out your wellbeing score, heart age, diabetes risk and more.</span>
           </p>
           <div className="mt-7 max-w-sm">
             <StartButton />
