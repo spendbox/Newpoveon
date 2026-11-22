@@ -36,6 +36,8 @@ export default function PrivacyPage() {
                 <li><strong>Contact details</strong>: your email address, and your phone or WhatsApp number if you give it.</li>
                 <li><strong>Account details</strong>: your email (we create an account for it when you pay for a check, so your results and plan are kept) and a password (stored only in scrambled, &ldquo;hashed&rdquo; form by our database provider; we can never see it).</li>
                 <li><strong>Doctor consult details</strong>: your name, phone, email, the time you choose, your voice note, any written note, and any photos or documents you attach (for example lab results or a prescription).</li>
+                <li><strong>Lab results</strong> for a test you ask us to arrange, such as the Biological Age Check: the results our team enters from the lab report, the lab&apos;s name and reference, the date of the test and the biological age we work out from them. Each entry records which staff member made it, so results can be checked.</li>
+                <li><strong>Your Poveon ID</strong>: a short code (like PV-7K3M9Q) given to every account, so we can match your WhatsApp messages and lab results to the right account. It contains no personal information.</li>
                 <li><strong>Your plan</strong>, if you have one: the areas you chose, your settings (such as your wake-up time or starting weight), the days you tick off and the weights you log.</li>
                 <li><strong>Messages</strong> you send us by email or WhatsApp, for example to request a lab test or medicine.</li>
               </ul>
@@ -109,6 +111,7 @@ export default function PrivacyPage() {
               <li><strong>Health check results:</strong> until you delete them or ask us to. If you have an account, you can delete everything yourself in <Link href="/account/settings">Settings</Link>.</li>
               <li><strong>Accounts:</strong> until you delete your account.</li>
               <li><strong>Your plan and what you tick off:</strong> until you delete your account.</li>
+              <li><strong>Biological age and other lab results:</strong> until you delete your account. They are deleted with it.</li>
               <li><strong>Consult records</strong> (including voice notes, notes and attachments): for as long as needed to provide your care and to meet medical record-keeping duties, after which they are deleted.</li>
               <li><strong>Payment and booking records:</strong> for up to 6 years, as required by Nigerian tax and accounting law. If you delete your account, these records are kept but are no longer linked to it.</li>
               <li><strong>Anonymous counts</strong> of checks started and finished: these contain nothing that identifies you.</li>

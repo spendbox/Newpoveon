@@ -8,7 +8,7 @@ import { aBtnQuiet, aInput, Badge, Card, H1 } from "../../ui";
 import { SubmitButton } from "@/components/buttons";
 
 const PER_PAGE = 25;
-type Profile = { id: string; email: string; full_name: string | null; phone: string | null; role: string; created_at: string };
+type Profile = { id: string; email: string; full_name: string | null; phone: string | null; role: string; created_at: string; member_code?: string | null };
 
 /** Registered users: who they are, when they joined, how much they've used. No health answers are shown. */
 export default async function UsersPage({ searchParams }: PageProps<"/admin/users">) {
@@ -18,12 +18,18 @@ export default async function UsersPage({ searchParams }: PageProps<"/admin/user
   const open = typeof sp.open === "string" ? sp.open : null;
   const sb = supabaseAdmin();
 
-  let query = sb.from("profiles").select("id, email, full_name, phone, role, created_at", { count: "exact" }).order("created_at", { ascending: false });
-  if (q) {
-    const safe = q.replace(/[%,()]/g, " ");
-    query = query.or(`email.ilike.%${safe}%,full_name.ilike.%${safe}%,phone.ilike.%${safe}%`);
-  }
-  const { data, count } = await query.range((page - 1) * PER_PAGE, page * PER_PAGE - 1);
+  // Member IDs arrive with SQL 17; without it, the list works as before.
+  const run = (cols: string, withCode: boolean) => {
+    let query = sb.from("profiles").select(cols, { count: "exact" }).order("created_at", { ascending: false });
+    if (q) {
+      const safe = q.replace(/[%,()]/g, " ");
+      query = query.or(`email.ilike.%${safe}%,full_name.ilike.%${safe}%,phone.ilike.%${safe}%${withCode ? `,member_code.ilike.%${safe}%` : ""}`);
+    }
+    return query.range((page - 1) * PER_PAGE, page * PER_PAGE - 1);
+  };
+  let res = await run("id, email, full_name, phone, role, created_at, member_code", true);
+  if (res.error) res = await run("id, email, full_name, phone, role, created_at", false);
+  const { data, count } = res as unknown as { data: Profile[] | null; count: number | null };
   const users = (data ?? []) as Profile[];
   const ids = users.map((u) => u.id);
 
@@ -64,7 +70,7 @@ export default async function UsersPage({ searchParams }: PageProps<"/admin/user
       </div>
 
       <form className="mb-4 flex gap-2" role="search">
-        <input name="q" defaultValue={q} placeholder="Search by email, name or phone" className={aInput} aria-label="Search users" />
+        <input name="q" defaultValue={q} placeholder="Search by member ID, email, name or phone" className={aInput} aria-label="Search users" />
         <SubmitButton className={aBtnQuiet}>Search</SubmitButton>
         {q && <Link href="/admin/users" className={`${aBtnQuiet} inline-flex items-center`}>Clear</Link>}
       </form>
@@ -85,7 +91,7 @@ export default async function UsersPage({ searchParams }: PageProps<"/admin/user
                     </span>
                     <span className="min-w-0 flex-1">
                       <span className="block truncate font-semibold">{u.full_name || u.email}</span>
-                      <span className="block truncate text-sm text-muted">{u.full_name ? u.email : "No name yet"}{u.phone ? ` · ${u.phone}` : ""}</span>
+                      <span className="block truncate text-sm text-muted">{u.member_code && <b className="font-mono text-ink">{u.member_code} · </b>}{u.full_name ? u.email : "No name yet"}{u.phone ? ` · ${u.phone}` : ""}</span>
                     </span>
                     <span className="hidden shrink-0 flex-col items-end text-xs text-subtle sm:flex">
                       <span>Joined {fmt.format(new Date(u.created_at))}</span>
@@ -105,6 +111,7 @@ export default async function UsersPage({ searchParams }: PageProps<"/admin/user
                       <a href={`mailto:${u.email}`} className={`${aBtnQuiet} inline-flex items-center gap-1.5`}><Icon name="chat" size={16} strokeWidth={2} /> Email</a>
                       {u.phone && <a href={`tel:${u.phone}`} className={`${aBtnQuiet} inline-flex items-center gap-1.5`}><Icon name="phone" size={16} strokeWidth={2} /> Call</a>}
                       <Link href={`/admin/bookings?q=${encodeURIComponent(u.email)}`} className={`${aBtnQuiet} inline-flex items-center gap-1.5`}><Icon name="stethoscope" size={16} strokeWidth={2} /> Bookings</Link>
+                      {u.member_code && <Link href={`/admin/bio-age?code=${encodeURIComponent(u.member_code)}`} className={`${aBtnQuiet} inline-flex items-center gap-1.5`}><Icon name="dna" size={16} strokeWidth={2} /> Biological age</Link>}
                     </div>
                     <form action={deleteUser} className="mt-5 rounded-lg border border-act-text/20 bg-act-bg p-3">
                       <input type="hidden" name="id" value={u.id} />

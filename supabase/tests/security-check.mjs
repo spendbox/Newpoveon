@@ -145,3 +145,24 @@ console.log("anon inserts screening:", await as("anon", null, ins(null, "evil@x.
   console.log("guest check purchase stored:", (await db.query("select kind, user_id from plan_purchases where reference='CK-test1'")).rows[0]);
   console.log("anon sees purchases:", (await as("anon", null, "select id from plan_purchases")).length);
 }
+{
+  // SQL 17: member IDs and biological age results.
+  await db.exec("update profiles set member_code = null"); // the trigger keeps existing ones
+  const ba = fs.readFileSync(new URL("../migrations/20261130000000_bio_age.sql", import.meta.url), "utf8");
+  await db.exec(ba); await db.exec(ba);
+  const codes = (await db.query("select id, member_code from profiles order by id")).rows;
+  console.log("member codes:", codes.map((c) => /^PV-[2-9A-HJKMNP-Z]{6}$/.test(c.member_code)).join(","), "unique:", new Set(codes.map((c) => c.member_code)).size === codes.length);
+  const before = codes[0].member_code;
+  console.log("u1 changes own member code:", JSON.stringify(await as("authenticated", u1, `update profiles set member_code='PV-AAAAAA', full_name='Ada' where id='${u1}' returning member_code`)));
+  await db.exec(`update profiles set member_code='PV-AAAAAA' where id='${u1}'`);
+  console.log("u1 member code unchanged:", (await db.query(`select member_code from profiles where id='${u1}'`)).rows[0].member_code === before);
+  const u3 = "33333333-3333-3333-3333-333333333333";
+  await db.exec(`insert into auth.users values ('${u3}','c@x.com')`);
+  console.log("new user gets a code:", /^PV-/.test((await db.query(`select member_code from profiles where id='${u3}'`)).rows[0].member_code));
+  await db.exec(`insert into bio_age_results (user_id, member_code, sample_date, age_years, markers, pheno_age, entered_by) values ('${u1}', '${before}', '2026-11-20', 34, '{}', 29.5, 'admin@x.com'), ('${u3}', 'PV-X', '2026-11-20', 50, '{}', 52, 'admin@x.com')`);
+  console.log("u1 sees bio age rows:", (await as("authenticated", u1, "select user_id from bio_age_results")).length);
+  console.log("u1 adds own bio age:", JSON.stringify(await as("authenticated", u1, `insert into bio_age_results (user_id, member_code, sample_date, age_years, markers, pheno_age, entered_by) values ('${u1}', 'x', '2026-11-21', 34, '{}', 10, 'me')`)));
+  console.log("u1 edits own bio age:", JSON.stringify(await as("authenticated", u1, "update bio_age_results set pheno_age = 10 returning id")));
+  console.log("anon sees bio age:", (await as("anon", null, "select id from bio_age_results")).length);
+  console.log("bio age package:", JSON.stringify((await db.query("select code, featured, fasting from home_tests where code = 'biological-age'")).rows));
+}

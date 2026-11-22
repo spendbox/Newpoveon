@@ -101,6 +101,8 @@ export default async function TermsPage() {
               <li><strong>Prescription medicines</strong> are only supplied with a valid prescription, from one of our doctors or your own.</li>
               <li>Medicines are sourced from licensed suppliers. You can check any medicine&apos;s registration on the NAFDAC website.</li>
               <li>The partner lab or pharmacy is responsible for the test or medicine it provides.</li>
+              <li><strong>Biological Age Check:</strong> our team enters your lab results into Poveon, which works out your biological age using a published formula (Levine&apos;s PhenoAge, 2018) and shows it on your dashboard. It is an <strong>estimate, not a diagnosis</strong>. It was developed using data from adults in the United States, and a recent illness can raise it for a while.</li>
+              <li>Every account has a <strong>Poveon ID</strong> (like PV-7K3M9Q). Please share it when you message us, so we can match your request and results to your account.</li>
             </ul>
           ),
         },

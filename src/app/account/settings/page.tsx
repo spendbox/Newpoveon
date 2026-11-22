@@ -8,16 +8,20 @@ import { LoginForm } from "@/app/login/login-form";
 import { DeleteAccount } from "../account-actions";
 import { getAccount } from "../data";
 import { PageHead } from "../panels";
+import { MemberId } from "@/components/member-id";
+import { myMemberCode } from "@/lib/bioage/server";
 
 export const metadata: Metadata = { title: "Settings", robots: { index: false } };
 
 export default async function SettingsPage() {
   if (!supabaseConfigured()) redirect("/account");
   const { user } = await getAccount();
+  const code = await myMemberCode(user.id);
   return (
     <>
       <PageHead eyebrow="Account" title="Settings" />
       <div className="flex flex-col gap-4">
+        {code && <MemberId code={code} />}
         <section className="rounded-[var(--radius-xl)] border border-line bg-surface p-5">
           <h2 className="text-lg font-semibold">Your login</h2>
           <p className="mt-1 text-[15px] text-muted">You log in with <b className="text-ink">{user.email}</b> and your password.</p>

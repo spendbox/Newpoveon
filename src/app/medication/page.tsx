@@ -4,12 +4,17 @@ import { Icon } from "@/components/icons";
 import { ButtonLink } from "@/components/ui";
 import { NafdacDemo } from "@/components/nafdac-demo";
 import { WhatsAppCatalog } from "@/components/whatsapp-catalog";
+import { currentMemberCode } from "@/lib/bioage/server";
 
 export const metadata: Metadata = { title: "Medication delivery" };
 
-export default function MedicationPage() {
+export const dynamic = "force-dynamic";
+
+export default async function MedicationPage() {
+  const memberCode = await currentMemberCode();
   return (
     <WhatsAppCatalog
+      memberCode={memberCode}
       eyebrow="Medication delivery"
       title="Any medicine, delivered. Even the hard-to-find ones."
       intro="From your regular blood pressure tablets to rare and imported medicines, our pharmacy partners can source it and deliver it to your door. Just ask on WhatsApp."
