@@ -4,6 +4,7 @@ import { savePlanPerks, saveConsultType } from "../../actions";
 import { loadPlanSettings } from "@/lib/plan/settings";
 import { discountLabel, memberPrice } from "@/lib/plan/perks";
 import { aBtn, aInput, Badge, Card, H1 } from "../../ui";
+import { SubmitButton } from "@/components/buttons";
 
 type T = { id?: string; code: string; name: string; description: string | null; grp: string; doctor_type: string; duration_min: number; price_naira: number | null; urgent_check: boolean; credit_to_plan: boolean; active: boolean; sort: number };
 
@@ -24,7 +25,7 @@ function Form({ t }: { t?: T }) {
         <label className="flex items-center gap-1.5"><input type="checkbox" name="urgent_check" defaultChecked={t?.urgent_check ?? true} /> Ask about danger signs first</label>
         <label className="flex items-center gap-1.5"><input type="checkbox" name="credit_to_plan" defaultChecked={t?.credit_to_plan ?? false} /> Credit fee towards a care plan</label>
       </div>
-      <div className="md:text-right"><button className={aBtn}>{t ? "Save" : "Add"}</button></div>
+      <div className="md:text-right"><SubmitButton className={aBtn}>{t ? "Save" : "Add"}</SubmitButton></div>
     </form>
   );
 }
@@ -50,7 +51,7 @@ export default async function ConsultsPage() {
             </div>
           </fieldset>
           <label className="text-sm font-semibold">Discount value<input name="plan_discount_value" inputMode="numeric" defaultValue={perks.discount.value} className={aInput} /></label>
-          <button className={aBtn}>Save</button>
+          <SubmitButton className={aBtn}>Save</SubmitButton>
         </form>
         <p className="mt-3 text-sm text-muted">
           Now: <b>{discountLabel(perks.discount) || "no discount"}</b>

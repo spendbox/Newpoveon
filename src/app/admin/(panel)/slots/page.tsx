@@ -4,6 +4,7 @@ import { supabaseAdmin } from "@/lib/supabase/server";
 import { addException, addRule, deleteException, deleteRule, saveBookingSettings } from "../../actions";
 import { aBtn, aBtnQuiet, aInput, Badge, Card, H1 } from "../../ui";
 import { clockTime } from "@/lib/time";
+import { SubmitButton } from "@/components/buttons";
 
 const DAYS = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
 const ORDER = [1, 2, 3, 4, 5, 6, 0];
@@ -39,7 +40,7 @@ export default async function AvailabilityPage() {
                       <input type="hidden" name="id" value={r.id} />
                       <span className="tabular">{t5(r.start_time)}–{t5(r.end_time)}</span>
                       {r.capacity > 1 && <Badge>{r.capacity} at a time</Badge>}
-                      <button className="ml-1 text-xs text-act-text hover:underline" aria-label={`Remove ${DAYS[d]} ${t5(r.start_time)} to ${t5(r.end_time)}`}>Remove</button>
+                      <SubmitButton className="ml-1 text-xs text-act-text hover:underline" aria-label={`Remove ${DAYS[d]} ${t5(r.start_time)} to ${t5(r.end_time)}`}>Remove</SubmitButton>
                     </form>
                   ))}
                 </div>
@@ -57,7 +58,7 @@ export default async function AvailabilityPage() {
               <label className="text-sm font-semibold">From<input type="time" name="start_time" required defaultValue="09:00" className={aInput} /></label>
               <label className="text-sm font-semibold">To<input type="time" name="end_time" required defaultValue="13:00" className={aInput} /></label>
               <label className="text-sm font-semibold">People per time<input type="number" name="capacity" min={1} max={50} defaultValue={1} className={aInput} title="1 for one doctor. More when several doctors cover these hours." /></label>
-              <button className={aBtn}>Add to selected days</button>
+              <SubmitButton className={aBtn}>Add to selected days</SubmitButton>
             </div>
           </form>
         </Card>
@@ -70,7 +71,7 @@ export default async function AvailabilityPage() {
               <label className="text-sm font-semibold">Minimum notice (hours)<input type="number" name="min_notice_hours" min={0} max={168} defaultValue={settings.minNoticeHours} className={aInput} /></label>
               <label className="text-sm font-semibold">Book up to (days ahead)<input type="number" name="horizon_days" min={1} max={120} defaultValue={settings.horizonDays} className={aInput} /></label>
               <label className="text-sm font-semibold">Hold unpaid time (min)<input type="number" name="hold_minutes" min={5} max={120} defaultValue={settings.holdMinutes} className={aInput} /></label>
-              <div className="col-span-2"><button className={aBtn}>Save rules</button></div>
+              <div className="col-span-2"><SubmitButton className={aBtn}>Save rules</SubmitButton></div>
             </form>
             <p className="mt-3 text-xs text-subtle">{open.slots.length} open times in the next {settings.horizonDays} days.</p>
           </Card>
@@ -82,7 +83,7 @@ export default async function AvailabilityPage() {
               {(exceptions.data ?? []).map((e) => (
                 <li key={e.id} className="flex items-center justify-between gap-2">
                   <span>{e.on_date} · {e.kind === "closed" ? "Closed" : `Extra ${t5(e.start_time)}–${t5(e.end_time)}`}{e.note ? ` · ${e.note}` : ""}</span>
-                  <form action={deleteException}><input type="hidden" name="id" value={e.id} /><button className="text-xs text-act-text hover:underline">Remove</button></form>
+                  <form action={deleteException}><input type="hidden" name="id" value={e.id} /><SubmitButton className="text-xs text-act-text hover:underline">Remove</SubmitButton></form>
                 </li>
               ))}
             </ul>
@@ -92,7 +93,7 @@ export default async function AvailabilityPage() {
               <label className="text-sm font-semibold">From (extra)<input type="time" name="start_time" className={aInput} /></label>
               <label className="text-sm font-semibold">To (extra)<input type="time" name="end_time" className={aInput} /></label>
               <label className="col-span-2 text-sm font-semibold">Note<input name="note" placeholder="e.g. Public holiday" className={aInput} /></label>
-              <div className="col-span-2"><button className={aBtnQuiet}>Add</button></div>
+              <div className="col-span-2"><SubmitButton className={aBtnQuiet}>Add</SubmitButton></div>
             </form>
           </Card>
 

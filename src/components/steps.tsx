@@ -90,7 +90,7 @@ export function Steps({
   const buttons = (
     <div className="flex gap-3">
       {(idx > 0 || (full && onExit)) && <Button variant="secondary" onClick={back} className="w-28" icon="arrowLeft">Back</Button>}
-      <Button type="submit" disabled={!step.valid || busy} iconRight={last ? undefined : "arrowRight"} className="flex-1">
+      <Button type="submit" loading={busy} disabled={!step.valid} iconRight={last ? undefined : "arrowRight"} className="flex-1">
         {busy ? "Please wait…" : last ? submitLabel : "Continue"}
       </Button>
     </div>

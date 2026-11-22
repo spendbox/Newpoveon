@@ -1,40 +1,13 @@
 import Link from "next/link";
-import type { ComponentProps, ReactNode } from "react";
+import type { ReactNode } from "react";
 import { Icon, type IconName } from "./icons";
 import { PoveonMark } from "./poveon-mark";
 import { site } from "@/config/site";
 import type { ResultCard as ResultCardData, Status } from "@/lib/scoring/results";
 import { displayValue, STATUS_LABEL } from "@/lib/scoring/results";
 
-const base = "inline-flex items-center justify-center gap-2 whitespace-nowrap font-semibold transition-[background,box-shadow,transform,border-color] duration-150 disabled:cursor-not-allowed disabled:opacity-40";
-const primary = `${base} min-h-[54px] rounded-[var(--radius-md)] bg-primary px-6 text-[17px] text-white shadow-[var(--shadow-sm)] hover:bg-primary-hover hover:shadow-[var(--shadow-md)] active:translate-y-px`;
-const secondary = `${base} min-h-[50px] rounded-[var(--radius-md)] border border-line-strong bg-surface px-5 text-[16px] text-ink hover:border-ink/40 hover:bg-surface-2`;
-const quiet = `${base} min-h-[44px] rounded-[var(--radius-sm)] bg-surface-2 px-4 text-[15px] text-ink hover:bg-line`;
+export { Button, ButtonLink, SubmitButton, Spinner } from "./buttons";
 
-type Variant = "primary" | "secondary" | "quiet";
-const cls = (v: Variant) => (v === "primary" ? primary : v === "secondary" ? secondary : quiet);
-
-export function Button({ variant = "primary", icon, iconRight, children, className = "", ...rest }: { variant?: Variant; icon?: IconName; iconRight?: IconName } & ComponentProps<"button">) {
-  return (
-    <button type="button" className={`${cls(variant)} ${className}`} {...rest}>
-      {icon && <Icon name={icon} size={20} strokeWidth={2} />}
-      {children}
-      {iconRight && <Icon name={iconRight} size={20} strokeWidth={2} />}
-    </button>
-  );
-}
-
-export function ButtonLink({ variant = "primary", icon, iconRight, children, className = "", ...rest }: { variant?: Variant; icon?: IconName; iconRight?: IconName } & ComponentProps<typeof Link>) {
-  return (
-    <Link className={`${cls(variant)} ${className}`} {...rest}>
-      {icon && <Icon name={icon} size={20} strokeWidth={2} />}
-      {children}
-      {iconRight && <Icon name={iconRight} size={20} strokeWidth={2} />}
-    </Link>
-  );
-}
-
-/** Poveon mark + product name. `animate` (home page nav only) plays the first-visit intro. */
 export function Logo({ animate = false }: { animate?: boolean }) {
   return (
     <Link href="/" className="inline-flex items-center gap-2" aria-label={`${site.appName} home`}>

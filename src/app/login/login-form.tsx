@@ -57,7 +57,7 @@ export function LoginForm({ next, changeEmail }: { next: string; changeEmail?: s
       {step === "email" && changeEmail && (
         <div className="flex flex-col gap-3">
           {error && <Notice tone="warn">{error}</Notice>}
-          <Button type="button" variant="secondary" disabled={busy} onClick={() => start(undefined, true)} icon="shield">{busy ? "Sending…" : "Email me a code"}</Button>
+          <Button type="button" variant="secondary" loading={busy} onClick={() => start(undefined, true)} icon="shield">{busy ? "Sending…" : "Email me a code"}</Button>
         </div>
       )}
       {step === "email" && !changeEmail && (
@@ -66,7 +66,7 @@ export function LoginForm({ next, changeEmail }: { next: string; changeEmail?: s
             <input id="l-email" type="email" autoComplete="email" required className={inputCls} value={email} onChange={(e) => setEmail(e.target.value)} />
           </Field>
           {error && <Notice tone="warn">{error}</Notice>}
-          <Button type="submit" disabled={busy || !/\S+@\S+\.\S+/.test(email)} iconRight="arrowRight">{busy ? "Checking…" : "Continue"}</Button>
+          <Button type="submit" loading={busy} disabled={!/\S+@\S+\.\S+/.test(email)} iconRight="arrowRight">{busy ? "Checking…" : "Continue"}</Button>
         </form>
       )}
 
@@ -77,7 +77,7 @@ export function LoginForm({ next, changeEmail }: { next: string; changeEmail?: s
             <PasswordInput id="l-pass" autoComplete="current-password" required autoFocus className={inputCls} value={password} onChange={(e) => setPassword(e.target.value)} />
           </Field>
           {error && <Notice tone="warn">{error}</Notice>}
-          <Button type="submit" disabled={busy || !password} iconRight="arrowRight">{busy ? "Logging in…" : "Log in"}</Button>
+          <Button type="submit" loading={busy} disabled={!password} iconRight="arrowRight">{busy ? "Logging in…" : "Log in"}</Button>
           <button type="button" onClick={() => start(undefined, true)} disabled={busy} className="self-start text-sm font-medium text-primary hover:underline">Forgot your password?</button>
         </form>
       )}
@@ -92,7 +92,7 @@ export function LoginForm({ next, changeEmail }: { next: string; changeEmail?: s
             <PasswordInput id="l-new" autoComplete="new-password" required className={inputCls} value={newPass} onChange={(e) => setNewPass(e.target.value)} />
           </Field>
           {error && <Notice tone="warn">{error}</Notice>}
-          <Button type="submit" disabled={busy || code.length < 6 || newPass.length < MIN} iconRight="arrowRight">{busy ? "Saving…" : forgot ? "Save new password" : "Create my account"}</Button>
+          <Button type="submit" loading={busy} disabled={code.length < 6 || newPass.length < MIN} iconRight="arrowRight">{busy ? "Saving…" : forgot ? "Save new password" : "Create my account"}</Button>
           <div className="flex flex-wrap gap-4 text-sm">
             <button type="button" onClick={() => start(undefined, forgot)} disabled={busy} className="font-medium text-primary hover:underline">Send a new code</button>
             {!changeEmail && <button type="button" onClick={back} className="text-muted hover:underline">Use a different email</button>}

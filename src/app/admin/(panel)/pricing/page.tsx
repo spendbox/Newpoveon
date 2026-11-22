@@ -3,6 +3,7 @@ import { COMPONENT_CATEGORIES, loadCatalogue, loadFx, naira } from "@/lib/care-p
 import { marginFromMarkup } from "@/lib/pricing";
 import { saveCareOption, saveComponent, savePricingSettings } from "../../actions";
 import { aBtn, aInput, Badge, Card, H1 } from "../../ui";
+import { SubmitButton } from "@/components/buttons";
 
 export default async function PricingPage() {
   const { settings, components, options, plans } = await loadCatalogue();
@@ -27,7 +28,7 @@ export default async function PricingPage() {
           <label className="text-sm font-semibold">₦ per €1<input name="fx_eur" inputMode="decimal" defaultValue={rate("EUR")} className={aInput} /></label>
           <label className="text-sm font-semibold">₦ per CA$1<input name="fx_cad" inputMode="decimal" defaultValue={rate("CAD")} className={aInput} /></label>
           <p className="text-xs text-muted md:pb-2">Update these weekly. Prices are charged in naira; the foreign amount is shown as a guide.</p>
-          <div className="md:col-span-5"><button className={aBtn}>Save rules</button></div>
+          <div className="md:col-span-5"><SubmitButton className={aBtn}>Save rules</SubmitButton></div>
         </form>
       </Card>
 
@@ -52,7 +53,7 @@ export default async function PricingPage() {
               <label className="text-sm font-semibold">Cost to us (₦)<input name="cost_naira" inputMode="numeric" defaultValue={c.cost_naira ?? ""} placeholder="not set" className={`${aInput} ${c.cost_naira == null ? "border-check-text" : ""}`} /></label>
               <div className="flex items-center gap-3">
                 <label className="flex items-center gap-1 text-sm font-semibold"><input type="checkbox" name="active" defaultChecked={c.active} /> On</label>
-                <button className={aBtn}>Save</button>
+                <SubmitButton className={aBtn}>Save</SubmitButton>
               </div>
               <p className="text-xs text-subtle md:col-span-5">Used in {usedIn} plan{usedIn === 1 ? "" : "s"}{c.notes ? ` · ${c.notes}` : ""}</p>
             </form>
@@ -67,7 +68,7 @@ export default async function PricingPage() {
             <label className="text-sm font-semibold">Unit<input name="unit" defaultValue="each" className={aInput} /></label>
             <label className="text-sm font-semibold">Cost (₦)<input name="cost_naira" inputMode="numeric" className={aInput} /></label>
             <input type="hidden" name="active" value="on" />
-            <button className={aBtn}>Add</button>
+            <SubmitButton className={aBtn}>Add</SubmitButton>
           </form>
         </Card>
       </div>
@@ -85,7 +86,7 @@ export default async function PricingPage() {
             </label>
             <label className="text-sm font-semibold">Multiplier<input name="multiplier" inputMode="decimal" defaultValue={o?.multiplier ?? 1} className={aInput} /></label>
             <label className="text-sm font-semibold">Add (₦/yr)<input name="add_naira" inputMode="numeric" defaultValue={o?.add_naira ?? 0} className={aInput} /></label>
-            <div className="flex items-center gap-3"><label className="flex items-center gap-1 text-sm font-semibold"><input type="checkbox" name="active" defaultChecked={o?.active ?? true} /> On</label><button className={aBtn}>{o ? "Save" : "Add"}</button></div>
+            <div className="flex items-center gap-3"><label className="flex items-center gap-1 text-sm font-semibold"><input type="checkbox" name="active" defaultChecked={o?.active ?? true} /> On</label><SubmitButton className={aBtn}>{o ? "Save" : "Add"}</SubmitButton></div>
           </form>
         ))}
       </div>

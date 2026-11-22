@@ -6,6 +6,7 @@ import { supabaseAdmin } from "@/lib/supabase/server";
 import { saveBookingNotes, setBookingStatus } from "../../actions";
 import { aBtn, aBtnQuiet, aInput, Badge, Card, H1, Tabs } from "../../ui";
 import { AudioPlayer } from "@/components/audio-player";
+import { SubmitButton } from "@/components/buttons";
 
 const VIEWS = { upcoming: "Paid · upcoming", done: "Done", unpaid: "Unpaid", all: "All" } as const;
 
@@ -95,9 +96,9 @@ export default async function BookingsPage({ searchParams }: PageProps<"/admin/b
                 <textarea id={`n-${b.id}`} name="notes" defaultValue={b.admin_notes ?? ""} rows={2} className={`${aInput} py-2`} placeholder="Notes for the team" />
                 <label className="flex items-center gap-2 text-sm font-medium"><input type="checkbox" name="needs_reschedule" defaultChecked={b.needs_reschedule} /> Needs a new time</label>
                 <div className="flex flex-wrap gap-2">
-                  <button className={aBtnQuiet}>Save notes</button>
-                  {b.status === "paid" && <button formAction={setBookingStatus} name="status" value="completed" className={aBtn}>Mark done</button>}
-                  {b.status !== "cancelled" && b.status !== "completed" && <button formAction={setBookingStatus} name="status" value="cancelled" className={aBtnQuiet}>Cancel</button>}
+                  <SubmitButton className={aBtnQuiet}>Save notes</SubmitButton>
+                  {b.status === "paid" && <SubmitButton formAction={setBookingStatus} name="status" value="completed" className={aBtn}>Mark done</SubmitButton>}
+                  {b.status !== "cancelled" && b.status !== "completed" && <SubmitButton formAction={setBookingStatus} name="status" value="cancelled" className={aBtnQuiet}>Cancel</SubmitButton>}
                 </div>
               </form>
             </Card>

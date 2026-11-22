@@ -4,6 +4,7 @@ import { LAB_CATEGORIES } from "@/lib/home-tests";
 import { supabaseAdmin } from "@/lib/supabase/server";
 import { saveTest } from "../../actions";
 import { aBtn, aInput, Badge, Card, H1 } from "../../ui";
+import { SubmitButton } from "@/components/buttons";
 
 type T = HomeTest & { active: boolean; sort: number };
 
@@ -40,7 +41,7 @@ function TestForm({ t }: { t?: T }) {
         <label className="flex items-center gap-1.5"><input type="checkbox" name="featured" defaultChecked={t?.featured} /> Mark as popular</label>
         <label className="flex items-center gap-1.5">Order<input name="sort" type="number" defaultValue={t?.sort ?? 100} className={`${aInput} w-20`} /></label>
       </div>
-      <div className="md:col-span-2 md:text-right"><button className={aBtn}>{t ? "Save" : "Add package or test"}</button></div>
+      <div className="md:col-span-2 md:text-right"><SubmitButton className={aBtn}>{t ? "Save" : "Add package or test"}</SubmitButton></div>
     </form>
   );
 }
