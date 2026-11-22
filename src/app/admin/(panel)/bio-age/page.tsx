@@ -9,6 +9,7 @@ import { supabaseAdmin } from "@/lib/supabase/server";
 import { aBtnQuiet, aInput, Badge, Card, H1 } from "../../ui";
 import { BioAgeForm } from "./bio-age-form";
 import { deleteBioAge } from "./actions";
+import { LabRequest } from "./lab-request";
 
 type Member = { id: string; email: string; full_name: string | null; phone: string | null; member_code: string; latest_answers: Record<string, unknown> | null };
 
@@ -51,6 +52,8 @@ export default async function BioAgePage({ searchParams }: PageProps<"/admin/bio
       {sp.saved && <p className="mb-4 rounded-lg bg-good-bg px-4 py-2 text-sm font-medium text-good-text">Saved{sp.saved === "emailed" ? " and emailed" : ". Not emailed"}. It&apos;s on their dashboard now.</p>}
       {sp.deleted && <p className="mb-4 rounded-lg bg-good-bg px-4 py-2 text-sm font-medium text-good-text">Result deleted.</p>}
       {typeof sp.error === "string" && <p className="mb-4 rounded-lg bg-act-bg px-4 py-2 text-sm font-medium text-act-text">{sp.error}</p>}
+
+      <LabRequest memberCode={member?.member_code ?? null} />
 
       <form className="mb-5 flex gap-2" role="search">
         <input name="q" defaultValue={q} placeholder="Member ID (PV-…), email, name or phone" className={aInput} aria-label="Find a member" autoFocus={!q} />

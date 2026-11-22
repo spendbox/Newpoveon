@@ -119,3 +119,18 @@ export function differenceText(diff: number): string {
   if (y === 0) return "about the same as your age";
   return `${y} year${y === 1 ? "" : "s"} ${diff < 0 ? "younger" : "older"} than your age`;
 }
+
+/** The request to send to the partner lab, ready to paste into WhatsApp or email. */
+export function labRequestText(memberCode?: string | null): string {
+  return [
+    "Biological Age Check: tests needed",
+    ...(memberCode ? [`Poveon ID: ${memberCode}`] : []),
+    "",
+    ...BIO_AGE_TESTS.map((t, i) => `${i + 1}. ${t}`),
+    "",
+    "Please make sure the report shows: albumin, alkaline phosphatase, creatinine, fasting glucose, hs-CRP, white cell count, lymphocytes (%), MCV and RDW (RDW-CV, %).",
+    "",
+    "Patient preparation:",
+    ...BIO_AGE_PREP.map((t) => `- ${t}`),
+  ].join("\n");
+}

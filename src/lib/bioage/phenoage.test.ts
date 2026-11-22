@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { checkValues, differenceText, exactAge, phenoAge, toBase, type Values } from "./phenoage";
+import { checkValues, differenceText, exactAge, labRequestText, phenoAge, toBase, type Values } from "./phenoage";
 
 const healthy: Values = { albumin: 45, creatinine: 80, glucose: 5.0, crp: 1.0, lymph: 35, mcv: 88, rdw: 12.8, alp: 70, wbc: 6.0 };
 const lessHealthy: Values = { albumin: 40, creatinine: 80, glucose: 6.5, crp: 6.0, lymph: 25, mcv: 92, rdw: 14.5, alp: 90, wbc: 8.0 };
@@ -61,5 +61,14 @@ describe("units and checks", () => {
     expect(differenceText(-3.2)).toBe("3 years younger than your age");
     expect(differenceText(1.4)).toBe("1 year older than your age");
     expect(differenceText(0.3)).toBe("about the same as your age");
+  });
+});
+
+describe("lab request text", () => {
+  it("lists every test and adds the member ID when given", () => {
+    const t = labRequestText("PV-7K3M9Q");
+    expect(t).toContain("Poveon ID: PV-7K3M9Q");
+    expect(t).toContain("5. hs-CRP");
+    expect(labRequestText()).not.toContain("Poveon ID");
   });
 });
