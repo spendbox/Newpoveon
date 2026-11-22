@@ -18,7 +18,7 @@ export const site = {
     phoneIntl: "+2349167015451",
     dpo: "Wilson",
     /** Date the current privacy notice and terms took effect. */
-    effective: "21 November 2026",
+    effective: "22 November 2026",
   },
   tagline: "Friendly health screening for Nigerians",
 

@@ -1,6 +1,7 @@
 import type { ReactNode } from "react";
 import type { CatalogGroup } from "@/config/catalog";
 import { whatsappLink } from "@/lib/whatsapp";
+import { withMemberId } from "@/lib/bioage/member";
 import { Icon, type IconName } from "./icons";
 import { Logo } from "./ui";
 
@@ -23,12 +24,14 @@ export function WhatsAppButton({ message, children, size = "lg", className = "" 
 
 /** Lab tests and Medication pages: what we can arrange, then one tap to WhatsApp. No forms, no prices. */
 export function WhatsAppCatalog({
-  eyebrow, title, intro, icon, groups, kind, highlight, children, steps, heroExtra,
+  eyebrow, title, intro, icon, groups, kind, highlight, children, steps, heroExtra, memberCode,
 }: {
   eyebrow: string; title: string; intro: string; icon: IconName; groups: CatalogGroup[]; kind: "lab test" | "medicine";
   highlight?: string | null; children?: ReactNode; steps: string[]; heroExtra?: ReactNode;
+  /** Logged-in people's messages carry their member ID, so the team can find the account. */
+  memberCode?: string | null;
 }) {
-  const general = highlight ? `Hello, I'd like to ask about a ${kind}: ${highlight}.` : `Hello, I'd like to ask about a ${kind}.`;
+  const general = withMemberId(highlight ? `Hello, I'd like to ask about a ${kind}: ${highlight}.` : `Hello, I'd like to ask about a ${kind}.`, memberCode);
   return (
     <main className="mx-auto w-full max-w-5xl px-5 pt-6 pb-16">
       <Logo />
@@ -68,7 +71,7 @@ export function WhatsAppCatalog({
             <ul className="mt-3 grid gap-1.5 text-[15px]">
               {g.items.map((x) => <li key={x} className="flex gap-2"><Icon name="check" size={16} strokeWidth={2.4} className="mt-1 shrink-0 text-primary" />{x}</li>)}
             </ul>
-            <WhatsAppButton size="sm" message={`Hello, I'd like to ask about a ${kind} (${g.title}).`} className="mt-5 self-start">Ask about this</WhatsAppButton>
+            <WhatsAppButton size="sm" message={withMemberId(`Hello, I'd like to ask about a ${kind} (${g.title}).`, memberCode)} className="mt-5 self-start">Ask about this</WhatsAppButton>
           </article>
         ))}
       </div>
