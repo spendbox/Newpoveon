@@ -136,3 +136,12 @@ console.log("anon inserts screening:", await as("anon", null, ins(null, "evil@x.
   await db.exec(px); await db.exec(px);
   console.log("consult fees:", JSON.stringify((await db.query("select distinct price_naira from consult_types where price_naira is not null")).rows));
 }
+{
+  const pc = fs.readFileSync(new URL("../migrations/20261129000000_paid_check.sql", import.meta.url), "utf8");
+  await db.exec(pc); await db.exec(pc);
+  console.log("existing checks stay unlocked:", (await db.query("select count(*)::int n from screenings where paid = false")).rows[0].n === 0);
+  const sid = (await db.query("insert into screenings (email,answers,results,results_version,consent_at,consent_text,owner_token_hash,paid) values ('guest2@x.com','{}','{}',1,now(),'x','h',false) returning id")).rows[0].id;
+  await db.query(`insert into plan_purchases (kind, screening_id, email, reference, amount_kobo) values ('check', '${sid}', 'guest2@x.com', 'CK-test1', 150000)`);
+  console.log("guest check purchase stored:", (await db.query("select kind, user_id from plan_purchases where reference='CK-test1'")).rows[0]);
+  console.log("anon sees purchases:", (await as("anon", null, "select id from plan_purchases")).length);
+}

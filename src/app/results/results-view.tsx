@@ -11,15 +11,22 @@ import { SupportScreen } from "@/components/support-screen";
 import { BodyMap } from "@/components/body-map";
 import { WellbeingHero } from "@/components/score-widgets";
 import { ShareSection } from "./share-section";
+import { Paywall } from "./paywall";
+import type { Discount } from "@/lib/plan/perks";
 import { Steps } from "@/components/steps";
 import { isComplete } from "@/lib/questions";
 import { computeResults, displayValue, type Results } from "@/lib/scoring/results";
 import { loadPrefill, loadProgress, loadSaved, saveSaved, type Progress, type SavedScreening } from "@/lib/storage";
 
-export function ResultsView() {
+export type Offer = { price: number; months: number; perk: string; discount: Discount | null; consult: number | null };
+
+export function ResultsView({ offer }: { offer: Offer }) {
   const [progress, setProgress] = useState<Progress | null | undefined>(undefined);
   const [saved, setSaved] = useState<SavedScreening | null>(null);
-  const [unlocked, setUnlocked] = useState(false);
+  const [emailed, setEmailed] = useState(false);
+  /** No database or payments in this copy of the site: show results without saving or paying. */
+  const [offline, setOffline] = useState(false);
+  const [confirming, setConfirming] = useState(false);
 
   useEffect(() => {
     const p = loadProgress();
@@ -27,8 +34,24 @@ export function ResultsView() {
     /* eslint-disable react-hooks/set-state-in-effect -- reading browser storage after mount */
     setProgress(p);
     setSaved(s);
-    if (p && s && s.savedAt >= p.startedAt) setUnlocked(true);
+    const current = !!(p && s && s.savedAt >= p.startedAt);
+    if (current) setEmailed(true);
     /* eslint-enable react-hooks/set-state-in-effect */
+    if (!current || s!.paid) return;
+    // Back from Paystack (?reference=…), or check whether it's already been paid (e.g. the webhook got there first).
+    const ref = new URLSearchParams(location.search).get("reference");
+    setConfirming(true);
+    fetch("/api/check/confirm", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify(ref ? { reference: ref } : { screeningId: s!.screeningId, ownerToken: s!.ownerToken }) })
+      .then((r) => r.json()).catch(() => ({}))
+      .then((d: { paid?: boolean; screeningId?: string | null; accountCreated?: boolean }) => {
+        if (d.paid && (!d.screeningId || d.screeningId === s!.screeningId)) {
+          const next = { ...s!, paid: true, accountNew: !!d.accountCreated || s!.accountNew };
+          saveSaved(next);
+          setSaved(next);
+        }
+        if (ref) history.replaceState(null, "", "/results");
+        setConfirming(false);
+      });
   }, []);
 
   const results = useMemo(() => (progress && isComplete(progress.answers) ? computeResults(progress.answers) : null), [progress]);
@@ -45,7 +68,7 @@ export function ResultsView() {
     );
   }
 
-  if (!unlocked) {
+  if (!emailed && !offline) {
     return (
       <EmailGate
         progress={progress}
@@ -53,14 +76,17 @@ export function ResultsView() {
           if (s) {
             saveSaved(s);
             setSaved(s);
-          }
-          setUnlocked(true);
+            setEmailed(true);
+          } else setOffline(true);
           window.scrollTo({ top: 0 });
         }}
       />
     );
   }
-  return <Reveal results={results} saved={saved} />;
+  if (!offline && saved && !saved.paid) {
+    return <Paywall results={results} answers={progress.answers} saved={saved} offer={offer} confirming={confirming} onOffline={() => setOffline(true)} />;
+  }
+  return <Reveal results={results} saved={offline ? null : saved} offer={offer} />;
 }
 
 /* ------------------------------------------------------------------ Email + consent */
@@ -110,7 +136,7 @@ function EmailGate({ progress, onDone }: { progress: Progress; onDone: (s: Saved
         className="mt-5"
         busy={busy}
         error={error}
-        submitLabel="Show my results"
+        submitLabel="Continue"
         onSubmit={submit}
         steps={[
           {
@@ -142,7 +168,7 @@ function EmailGate({ progress, onDone }: { progress: Progress; onDone: (s: Saved
 
 /* ------------------------------------------------------------------ The reveal */
 
-function Reveal({ results, saved }: { results: Results; saved: SavedScreening | null }) {
+function Reveal({ results, saved, offer }: { results: Results; saved: SavedScreening | null; offer: Offer }) {
   const reduce = useReducedMotion();
   const [support, setSupport] = useState(results.selfHarmFlag);
   const heart = results.heart;
@@ -171,6 +197,14 @@ function Reveal({ results, saved }: { results: Results; saved: SavedScreening | 
         <span className="font-display text-xl font-semibold">Your results</span>
         <span className="w-[68px]" />
       </div>
+
+      {saved?.paid && (
+        <section className="mt-4 flex flex-col gap-3 rounded-[var(--radius-xl)] border border-primary/30 bg-primary-soft p-5" aria-label="Your plan">
+          <p className="flex items-center gap-2 font-semibold"><Icon name="target" size={20} strokeWidth={2} className="text-primary" /> Your {offer.months}-month plan is ready</p>
+          <p className="text-[15px] text-ink/80">We&apos;ve made a plan from these results{offer.perk ? `, and you get ${offer.perk} every doctor consultation while it's active` : ""}. {saved.accountNew ? `We've created your account for ${saved.email}; log in with a code sent to that email to open it.` : "Open it to see this week's steps."}</p>
+          <ButtonLink href="/account/plan" icon="target">Open my plan</ButtonLink>
+        </section>
+      )}
 
       {/* Headline: wellbeing (WHO-5), valid at every age */}
       {results.wellbeing && <div className="mt-4"><WellbeingHero w={results.wellbeing} /></div>}
@@ -335,8 +369,8 @@ function Reveal({ results, saved }: { results: Results; saved: SavedScreening | 
 
       <section className="mt-8 rounded-[var(--radius-xl)] bg-primary-soft p-5">
         <h2 className="text-2xl font-semibold">Keep track over time</h2>
-        <p className="mt-1 text-[15px] text-muted">Create a free account to save your profile, update your answers and see how your scores change.</p>
-        <ButtonLink href="/account" variant="secondary" icon="user" className="mt-4 w-full">Save to my account</ButtonLink>
+        <p className="mt-1 text-[15px] text-muted">Your results are saved to your account. Check again in {offer.months} months to see how your scores change.</p>
+        <ButtonLink href="/account" variant="secondary" icon="user" className="mt-4 w-full">Go to my dashboard</ButtonLink>
       </section>
 
       <p className="mt-8 text-center text-xs font-medium text-subtle">

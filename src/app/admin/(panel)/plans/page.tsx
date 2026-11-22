@@ -2,6 +2,7 @@ export const dynamic = "force-dynamic";
 import { loadCatalogue, naira, TIERS } from "@/lib/care-plans";
 import { saveCareGoal, saveCarePlan, savePlanItem } from "../../actions";
 import { aBtn, aBtnQuiet, aInput, Badge, Card, H1 } from "../../ui";
+import { SubmitButton } from "@/components/buttons";
 
 export default async function PlansPage() {
   const { goals, plans, components, settings } = await loadCatalogue();
@@ -26,7 +27,7 @@ export default async function PlansPage() {
                     <input type="hidden" name="id" value={g.id} /><input type="hidden" name="code" value={g.code} /><input type="hidden" name="sort" value={g.sort} />
                     <label className="text-sm font-semibold">Goal name<input name="name" defaultValue={g.name} className={aInput} /></label>
                     <label className="text-sm font-semibold">Area<input name="area" defaultValue={g.area} className={aInput} /></label>
-                    <div className="flex items-center gap-3"><label className="flex items-center gap-1 text-sm font-semibold"><input type="checkbox" name="active" defaultChecked={g.active} /> Offer this goal</label><button className={aBtnQuiet}>Save goal</button></div>
+                    <div className="flex items-center gap-3"><label className="flex items-center gap-1 text-sm font-semibold"><input type="checkbox" name="active" defaultChecked={g.active} /> Offer this goal</label><SubmitButton className={aBtnQuiet}>Save goal</SubmitButton></div>
                   </form>
 
                   <div className="flex flex-col gap-4">
@@ -53,7 +54,7 @@ export default async function PlansPage() {
                           <label className="text-sm font-semibold">For<select name="audience" defaultValue={(p as { audience?: string }).audience ?? "self"} className={aInput}><option value="self">The member</option><option value="family">A parent (family pays)</option><option value="both">Both</option></select></label>
                           <label className="text-sm font-semibold">Fixed price (₦/yr)<input name="price_override_naira" inputMode="numeric" defaultValue={p.price_override_naira ?? ""} placeholder="automatic" className={aInput} /></label>
                           <label className="text-sm font-semibold">Markup for this plan<input name="markup_override" inputMode="decimal" defaultValue={p.markup_override ?? ""} placeholder={`${settings.defaultMarkup}× (default)`} className={aInput} /></label>
-                          <div className="flex items-center gap-3"><label className="flex items-center gap-1 text-sm font-semibold"><input type="checkbox" name="active" defaultChecked={p.active} /> Show</label><button className={aBtn}>Save plan</button></div>
+                          <div className="flex items-center gap-3"><label className="flex items-center gap-1 text-sm font-semibold"><input type="checkbox" name="active" defaultChecked={p.active} /> Show</label><SubmitButton className={aBtn}>Save plan</SubmitButton></div>
                           <label className="text-sm font-semibold md:col-span-7">Summary<input name="summary" defaultValue={p.summary ?? ""} className={aInput} /></label>
                         </form>
 
@@ -73,7 +74,7 @@ export default async function PlansPage() {
                                         <input type="hidden" name="plan_id" value={p.id} /><input type="hidden" name="component_id" value={i.component_id} />
                                         <input name="quantity" inputMode="decimal" defaultValue={Number(i.quantity)} aria-label={`Quantity of ${c?.name}`} className={`${aInput} w-20`} />
                                         <span className="w-28 text-muted">{c?.cost_naira != null ? naira(c.cost_naira * Number(i.quantity)) : "—"}</span>
-                                        <button className={aBtnQuiet}>Update</button>
+                                        <SubmitButton className={aBtnQuiet}>Update</SubmitButton>
                                         <span className="text-xs text-subtle">0 removes it</span>
                                       </form>
                                     </td>
@@ -86,7 +87,7 @@ export default async function PlansPage() {
                             <input type="hidden" name="plan_id" value={p.id} />
                             <label className="text-sm font-semibold">Add a block<select name="component_id" className={aInput}>{components.filter((c) => c.active && !items.some((i) => i.component_id === c.id)).map((c) => <option key={c.id} value={c.id}>{c.name}</option>)}</select></label>
                             <label className="text-sm font-semibold">Qty / year<input name="quantity" inputMode="decimal" defaultValue="1" className={`${aInput} w-24`} /></label>
-                            <button className={aBtnQuiet}>Add</button>
+                            <SubmitButton className={aBtnQuiet}>Add</SubmitButton>
                           </form>
                         </details>
                       </Card>
@@ -98,7 +99,7 @@ export default async function PlansPage() {
                         <label className="text-sm font-semibold">Name<input name="name" required placeholder={`${g.name} · Concierge`} className={aInput} /></label>
                         <label className="text-sm font-semibold">Tier<select name="tier" className={aInput}>{TIERS.map((t) => <option key={t}>{t}</option>)}</select></label>
                         <label className="text-sm font-semibold">Fixed price (₦/yr)<input name="price_override_naira" inputMode="numeric" placeholder="automatic" className={aInput} /></label>
-                        <button className={aBtn}>Add plan</button>
+                        <SubmitButton className={aBtn}>Add plan</SubmitButton>
                       </form>
                     </Card>
                   </div>
@@ -113,7 +114,7 @@ export default async function PlansPage() {
             <label className="text-sm font-semibold">Code<input name="code" required placeholder="e.g. menopause" className={aInput} /></label>
             <label className="text-sm font-semibold">Goal, as people say it<input name="name" required className={aInput} /></label>
             <label className="text-sm font-semibold">Area<input name="area" defaultValue="Prevention" className={aInput} /></label>
-            <button className={aBtn}>Add goal</button>
+            <SubmitButton className={aBtn}>Add goal</SubmitButton>
           </form>
         </Card>
       </div>

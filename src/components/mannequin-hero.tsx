@@ -29,15 +29,15 @@ export function MannequinHero({ compact = false }: { compact?: boolean }) {
             <span className="absolute h-3.5 w-3.5 -translate-x-1/2 -translate-y-1/2 rounded-full border-[3px] border-surface bg-coral pulse-dot shadow-[var(--shadow-sm)]" style={{ left: `${p.left}%`, top: `${p.top}%` }} />
             <span
               className="hc-chip absolute h-px bg-ink/25"
-              style={{ top: `${p.top}%`, ...(c.side === "left" ? { right: `${100 - p.left + 2}%`, width: compact ? "26%" : "30%" } : { left: `${p.left + 2}%`, width: compact ? "26%" : "30%" }), ["--d" as string]: `${c.d}s` }}
+              style={{ top: `${p.top}%`, ...(c.side === "left" ? { right: `${100 - p.left + 2}%`, width: compact ? "18%" : "30%" } : { left: `${p.left + 2}%`, width: compact ? "18%" : "30%" }), ["--d" as string]: `${c.d}s` }}
             />
             <div
               className={`hc-chip absolute w-max -translate-y-1/2 whitespace-nowrap rounded-[14px] border border-line bg-surface/95 shadow-[var(--shadow-md)] backdrop-blur ${compact ? "px-2.5 py-1.5" : "px-3 py-2"}`}
-              style={{ top: `${p.top}%`, ...(c.side === "left" ? { right: `${100 - p.left + (compact ? 26 : 30)}%` } : { left: `${p.left + (compact ? 26 : 30)}%` }), ["--d" as string]: `${c.d}s` }}
+              style={{ top: `${p.top}%`, ...(c.side === "left" ? { right: `${100 - p.left + (compact ? 18 : 30)}%` } : { left: `${p.left + (compact ? 18 : 30)}%` }), ["--d" as string]: `${c.d}s` }}
             >
               <div className={`font-medium text-muted ${compact ? "text-[10px]" : "text-[11px]"}`}>{c.label}</div>
               <div className={`font-display font-bold tabular ${compact ? "text-[15px]" : "text-lg"}`}>
-                {c.value}{c.note && <span className="ml-1 font-body text-[11px] font-semibold text-primary">{c.note}</span>}
+                {c.value}{c.note && <span className={`ml-1 font-body text-[11px] font-semibold text-primary ${compact ? "hidden min-[360px]:inline" : ""}`}>{c.note}</span>}
               </div>
             </div>
           </div>

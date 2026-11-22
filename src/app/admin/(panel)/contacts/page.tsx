@@ -2,6 +2,7 @@ export const dynamic = "force-dynamic";
 import { supabaseAdmin } from "@/lib/supabase/server";
 import { saveContact } from "../../actions";
 import { aBtn, aBtnQuiet, aInput, Badge, Card, H1 } from "../../ui";
+import { SubmitButton } from "@/components/buttons";
 
 type C = { id?: string; label: string; phone: string | null; description: string | null; active: boolean; sort: number; is_placeholder?: boolean };
 
@@ -15,8 +16,8 @@ function ContactForm({ c }: { c?: C }) {
       <label className="text-sm font-medium">Order<input name="sort" type="number" defaultValue={c?.sort ?? 100} className={aInput} /></label>
       <label className="flex items-center gap-1 text-sm font-medium"><input type="checkbox" name="active" defaultChecked={c?.active ?? true} /> Show to users</label>
       <div className="flex gap-2">
-        <button className={aBtn}>{c ? "Save" : "Add"}</button>
-        {c?.id && <button name="delete" value="1" className={aBtnQuiet}>Remove</button>}
+        <SubmitButton className={aBtn}>{c ? "Save" : "Add"}</SubmitButton>
+        {c?.id && <SubmitButton name="delete" value="1" className={aBtnQuiet}>Remove</SubmitButton>}
       </div>
     </form>
   );

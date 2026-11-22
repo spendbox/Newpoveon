@@ -47,6 +47,10 @@ export interface SavedScreening {
   phone?: string;
   name?: string;
   savedAt: string;
+  /** The check has been paid for (results unlocked). */
+  paid?: boolean;
+  /** An account was created for this email when they paid. */
+  accountNew?: boolean;
 }
 export const loadSaved = () => safeGet<SavedScreening>(SAVED_KEY);
 export const saveSaved = (s: SavedScreening) => safeSet(SAVED_KEY, s);

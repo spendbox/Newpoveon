@@ -78,7 +78,7 @@ function HelpLabel() {
 export function FloatingDoctor() {
   const path = usePathname();
   // On question screens the doctor link sits in the top bar instead, so it never covers "Continue".
-  if (path.startsWith("/doctor") || path.startsWith("/admin") || path.startsWith("/check") || path.startsWith("/account")) return null;
+  if (path.startsWith("/doctor") || path.startsWith("/admin") || path.startsWith("/check") || path.startsWith("/account") || path.startsWith("/results")) return null;
   return (
     <Link
       href="/doctor"

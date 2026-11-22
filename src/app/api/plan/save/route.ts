@@ -2,7 +2,7 @@ import { handleError, json, readJson } from "@/lib/http";
 import { cleanGoals } from "@/lib/plan/validate";
 import { currentUser, supabaseAdmin, supabaseConfigured } from "@/lib/supabase/server";
 
-/** Create or update the signed-in person's plan goals. Payment is separate (see /api/plan/checkout). */
+/** Create or update the signed-in person's plan goals. The plan itself comes with a paid health check. */
 export async function POST(req: Request) {
   try {
     if (!supabaseConfigured()) return json({ error: "Plans aren't switched on yet." }, 503);

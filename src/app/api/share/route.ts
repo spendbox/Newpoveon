@@ -26,6 +26,8 @@ export async function POST(req: Request) {
     const s = await canManageScreening(String(body.screeningId ?? ""), req.headers.get("x-owner-token"));
     if (!s) return json({ error: "Not found" }, 404);
     if (body.enabled === true) {
+      const { data: paid } = await supabaseAdmin().from("screenings").select("paid").eq("id", s.id).single();
+      if (paid && paid.paid === false) return json({ error: "Unlock your results first to share them." }, 402);
       const token = randomToken(24);
       await supabaseAdmin().from("screenings").update({ share_token: token, share_enabled: true }).eq("id", s.id);
       return json({ url: shareUrl(token) });

@@ -4,6 +4,7 @@ import { savePlanPerks, saveConsultType } from "../../actions";
 import { loadPlanSettings } from "@/lib/plan/settings";
 import { discountLabel, memberPrice } from "@/lib/plan/perks";
 import { aBtn, aInput, Badge, Card, H1 } from "../../ui";
+import { SubmitButton } from "@/components/buttons";
 
 type T = { id?: string; code: string; name: string; description: string | null; grp: string; doctor_type: string; duration_min: number; price_naira: number | null; urgent_check: boolean; credit_to_plan: boolean; active: boolean; sort: number };
 
@@ -24,7 +25,7 @@ function Form({ t }: { t?: T }) {
         <label className="flex items-center gap-1.5"><input type="checkbox" name="urgent_check" defaultChecked={t?.urgent_check ?? true} /> Ask about danger signs first</label>
         <label className="flex items-center gap-1.5"><input type="checkbox" name="credit_to_plan" defaultChecked={t?.credit_to_plan ?? false} /> Credit fee towards a care plan</label>
       </div>
-      <div className="md:text-right"><button className={aBtn}>{t ? "Save" : "Add"}</button></div>
+      <div className="md:text-right"><SubmitButton className={aBtn}>{t ? "Save" : "Add"}</SubmitButton></div>
     </form>
   );
 }
@@ -37,10 +38,11 @@ export default async function ConsultsPage() {
   return (
     <>
       <Card className="mb-6">
-        <h2 className="text-lg font-semibold">Health plan</h2>
-        <p className="mt-1 text-sm text-muted">The yearly plan price, and the discount members get on every consult while their plan is active. A discounted consult never costs less than ₦100.</p>
-        <form action={savePlanPerks} className="mt-3 grid gap-3 md:grid-cols-[1fr_1.4fr_1fr_auto] md:items-end">
-          <label className="text-sm font-semibold">Plan price per year (₦)<input name="plan_price_naira" inputMode="numeric" required defaultValue={perks.price} className={aInput} /></label>
+        <h2 className="text-lg font-semibold">Health check and plan</h2>
+        <p className="mt-1 text-sm text-muted">What one health check costs (answering is free; paying unlocks the results), how long the personal plan that comes with it lasts, and the discount on consults while a plan is active. A discounted consult never costs less than ₦100.</p>
+        <form action={savePlanPerks} className="mt-3 grid gap-3 md:grid-cols-[1fr_0.8fr_1.4fr_1fr_auto] md:items-end">
+          <label className="text-sm font-semibold">Health check price (₦)<input name="plan_price_naira" inputMode="numeric" required defaultValue={perks.price} className={aInput} /></label>
+          <label className="text-sm font-semibold">Plan length (months)<input name="plan_months" type="number" min={1} max={24} required defaultValue={perks.months} className={aInput} /></label>
           <fieldset className="text-sm font-semibold">
             <legend className="mb-1">Member discount on consults</legend>
             <div className="flex flex-wrap gap-3 font-medium">
@@ -50,7 +52,7 @@ export default async function ConsultsPage() {
             </div>
           </fieldset>
           <label className="text-sm font-semibold">Discount value<input name="plan_discount_value" inputMode="numeric" defaultValue={perks.discount.value} className={aInput} /></label>
-          <button className={aBtn}>Save</button>
+          <SubmitButton className={aBtn}>Save</SubmitButton>
         </form>
         <p className="mt-3 text-sm text-muted">
           Now: <b>{discountLabel(perks.discount) || "no discount"}</b>

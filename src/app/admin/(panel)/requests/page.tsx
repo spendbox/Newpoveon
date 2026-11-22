@@ -4,6 +4,7 @@ import { supabaseAdmin } from "@/lib/supabase/server";
 import { setRequestStatus } from "../../actions";
 import { aBtn, aBtnQuiet, aInput, Badge, Card, H1, Tabs } from "../../ui";
 import { clockTime } from "@/lib/time";
+import { SubmitButton } from "@/components/buttons";
 
 export default async function RequestsPage({ searchParams }: PageProps<"/admin/requests">) {
   const sp = await searchParams;
@@ -62,10 +63,10 @@ export default async function RequestsPage({ searchParams }: PageProps<"/admin/r
               <input type="hidden" name="id" value={r.id} />
               <textarea name="notes" defaultValue={r.admin_notes ?? ""} rows={2} className={`${aInput} py-2`} placeholder="Notes" aria-label="Notes" />
               <div className="flex flex-wrap gap-2">
-                {r.status === "new" && <button name="status" value="in_progress" className={aBtnQuiet}>Mark in progress</button>}
-                {r.status !== "handled" && <button name="status" value="handled" className={aBtn}>Mark handled</button>}
-                {r.status !== "cancelled" && r.status !== "handled" && <button name="status" value="cancelled" className={aBtnQuiet}>Cancel</button>}
-                {(r.status === "handled" || r.status === "cancelled") && <button name="status" value="new" className={aBtnQuiet}>Re-open</button>}
+                {r.status === "new" && <SubmitButton name="status" value="in_progress" className={aBtnQuiet}>Mark in progress</SubmitButton>}
+                {r.status !== "handled" && <SubmitButton name="status" value="handled" className={aBtn}>Mark handled</SubmitButton>}
+                {r.status !== "cancelled" && r.status !== "handled" && <SubmitButton name="status" value="cancelled" className={aBtnQuiet}>Cancel</SubmitButton>}
+                {(r.status === "handled" || r.status === "cancelled") && <SubmitButton name="status" value="new" className={aBtnQuiet}>Re-open</SubmitButton>}
               </div>
             </form>
           </Card>

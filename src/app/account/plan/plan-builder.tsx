@@ -53,12 +53,8 @@ export function PlanBuilder({ hints, existing, active, price, expired, perkLabel
     const save = await fetch("/api/plan/save", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ goals }) }).catch(() => null);
     const sd = save ? await save.json().catch(() => ({})) : {};
     if (!save?.ok) { setBusy(false); setError(sd.error ?? "We couldn't save your plan. Please try again."); return; }
-    if (active) { router.push("/account/plan"); router.refresh(); return; }
-    const pay = await fetch("/api/plan/checkout", { method: "POST" }).catch(() => null);
-    const pd = pay ? await pay.json().catch(() => ({})) : {};
-    if (pay?.ok && pd.authorizationUrl) { window.location.assign(pd.authorizationUrl); return; }
-    setBusy(false);
-    setError(pd.error ?? "We couldn't start the payment. Please try again.");
+    router.push("/account/plan");
+    router.refresh();
   }
 
   const steps: Step[] = [

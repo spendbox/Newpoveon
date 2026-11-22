@@ -4,6 +4,7 @@ import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
 import { Icon, type IconName } from "@/components/icons";
 import { PoveonMark } from "@/components/poveon-mark";
+import { SubmitButton } from "@/components/buttons";
 
 export type NavGroup = { title: string; items: [href: string, label: string, icon: IconName][] };
 
@@ -50,9 +51,9 @@ export function SideNav({ email, appName, badge, home, groups, logoutAction, log
     <div className="border-t border-line pt-4">
       <p className="truncate px-3 text-xs text-subtle">{email}</p>
       <form action={logoutAction} method="post" className="mt-2">
-        <button className="flex min-h-[44px] w-full items-center gap-3 rounded-lg px-3 text-[15px] font-semibold text-ink/80 hover:bg-ground">
+        <SubmitButton className="!justify-start flex min-h-[44px] w-full gap-3 rounded-lg px-3 text-[15px] font-semibold text-ink/80 hover:bg-ground">
           <Icon name="arrowLeft" size={18} strokeWidth={2} /> {logoutLabel}
-        </button>
+        </SubmitButton>
       </form>
     </div>
   );

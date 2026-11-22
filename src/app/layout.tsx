@@ -5,11 +5,12 @@ import "@fontsource-variable/inter/wght.css";
 import "./globals.css";
 import { site } from "@/config/site";
 import { FloatingDoctor } from "@/components/client";
+import { NavProgress } from "@/components/nav-progress";
 
 export const metadata: Metadata = {
   metadataBase: new URL(site.siteUrl),
-  title: { default: `${site.appName}: free health check in 10 minutes`, template: `%s · ${site.appName}` },
-  description: "Answer a few friendly questions and find out your heart age, diabetes risk, sleep, mood and more. Free, private, and a doctor is a tap away.",
+  title: { default: `${site.appName}: your health check in 10 minutes`, template: `%s · ${site.appName}` },
+  description: "Answer a few friendly questions and find out your heart age, diabetes risk, sleep, mood and more. Private, with a personal plan, and a doctor is a tap away.",
 };
 
 export const viewport: Viewport = { themeColor: "#F6F8F7", width: "device-width", initialScale: 1 };
@@ -26,6 +27,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
         />
       </head>
       <body className="flex min-h-full flex-col">
+        <NavProgress />
         <a href="#main" className="sr-only focus:not-sr-only focus:fixed focus:top-2 focus:left-2 focus:z-50 focus:rounded-lg focus:bg-surface focus:px-4 focus:py-2">
           Skip to content
         </a>

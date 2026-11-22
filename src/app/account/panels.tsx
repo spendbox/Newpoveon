@@ -36,7 +36,7 @@ export function NoChecksYet() {
     <section className="grid items-center gap-6 rounded-[var(--radius-xl)] border border-line bg-surface p-6 md:grid-cols-[1fr_200px] md:p-10">
       <div>
         <h2 className="text-3xl font-semibold">Let&apos;s get your first scores</h2>
-        <p className="mt-2 text-[17px] text-muted">Take the free 10-minute check. Your wellbeing score, heart age, diabetes risk and more will live here, so you can watch them improve.</p>
+        <p className="mt-2 text-[17px] text-muted">Take the 10-minute check. Your wellbeing score, heart age, diabetes risk and more will live here, so you can watch them improve.</p>
         <ButtonLink href="/check" className="mt-6" iconRight="arrowRight">Start my check</ButtonLink>
       </div>
       <div className="mx-auto w-[180px]"><Mannequin crop="upper" className="h-auto w-full" /></div>

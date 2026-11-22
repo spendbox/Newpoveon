@@ -2,15 +2,19 @@ import "server-only";
 import type { SupabaseClient } from "@supabase/supabase-js";
 
 /**
- * Save a screening. If the database hasn't had SQL 8 yet (no wellbeing_score column),
- * save without that column instead of failing: the score is still inside "results".
+ * Save a screening, tolerating columns that later SQL scripts add.
  */
 export async function insertScreening(sb: SupabaseClient, row: Record<string, unknown>) {
-  const first = await sb.from("screenings").insert(row).select("id").single();
-  if (first.error && /wellbeing_score/.test(first.error.message ?? "")) {
-    const { wellbeing_score: _skip, ...rest } = row;
-    void _skip;
-    return sb.from("screenings").insert(rest).select("id").single();
+  let attempt = { ...row };
+  let res = await sb.from("screenings").insert(attempt).select("id").single();
+  // Columns added by later SQL scripts: if the database hasn't had them yet, save without them.
+  for (const col of ["wellbeing_score", "paid"]) {
+    if (res.error && new RegExp(col).test(res.error.message ?? "")) {
+      const { [col]: _skip, ...rest } = attempt;
+      void _skip;
+      attempt = rest;
+      res = await sb.from("screenings").insert(attempt).select("id").single();
+    }
   }
-  return first;
+  return res;
 }

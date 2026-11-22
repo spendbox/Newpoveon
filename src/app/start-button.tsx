@@ -3,7 +3,7 @@ import { useEffect, useState } from "react";
 import { ButtonLink } from "@/components/ui";
 import { loadProgress } from "@/lib/storage";
 
-/** "Start my free check", or "Carry on" if there's saved progress in this browser. */
+/** "Start my check", or "Carry on" if there's saved progress in this browser. */
 export function StartButton({ compact = false }: { compact?: boolean }) {
   const [resume, setResume] = useState<"none" | "progress" | "finished">("none");
   useEffect(() => {
@@ -15,7 +15,7 @@ export function StartButton({ compact = false }: { compact?: boolean }) {
   return (
     <div className={`flex gap-3 ${compact ? "flex-col" : "flex-col sm:flex-row"}`}>
       <ButtonLink href="/check" iconRight="arrowRight" className="flex-1">
-        {resume === "progress" ? "Carry on" : "Start my free check"}
+        {resume === "progress" ? "Carry on" : "Start my check"}
       </ButtonLink>
       {resume === "finished" && !compact && (
         <ButtonLink href="/results" variant="secondary" className="flex-1">My last results</ButtonLink>

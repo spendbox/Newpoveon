@@ -33,7 +33,8 @@ export default async function LearnPage({ params }: PageProps<"/learn/[slug]">) 
     const user = await currentUser();
     if (user) {
       const sb = await supabaseUser();
-      const { data } = await sb.from("screenings").select("results").order("created_at", { ascending: false }).limit(1).maybeSingle();
+      const first = await sb.from("screenings").select("results").eq("paid", true).order("created_at", { ascending: false }).limit(1).maybeSingle();
+      const data = first.error ? (await sb.from("screenings").select("results").order("created_at", { ascending: false }).limit(1).maybeSingle()).data : first.data;
       saved = ((data?.results as Results | undefined)?.cards ?? []).find((c) => c.id === t.slug) ?? null;
     }
   }

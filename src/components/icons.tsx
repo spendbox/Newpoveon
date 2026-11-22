@@ -58,6 +58,7 @@ const P: Record<string, React.ReactNode> = {
   eye: <><path d="M3 20s6-11 17-11 17 11 17 11-6 11-17 11S3 20 3 20z" /><circle cx="20" cy="20" r="5" /></>,
   eyeOff: <><path d="M3 20s6-11 17-11c3.2 0 5.9.9 8.1 2.3M37 20s-6 11-17 11c-3.2 0-5.9-.9-8.1-2.3" /><path d="M16.5 23.5a5 5 0 0 1 7-7M6 34L34 6" /></>,
   mic: <><rect x="14" y="5" width="12" height="20" rx="6" /><path d="M9 19a11 11 0 0 0 22 0M20 30v5M14 35h12" /></>,
+  lock: <><rect x="8" y="18" width="24" height="17" rx="4" /><path d="M13 18v-5a7 7 0 0 1 14 0v5M20 25v4" /></>,
   sparkle: <path d="M20 5l3.5 11.5L35 20l-11.5 3.5L20 35l-3.5-11.5L5 20l11.5-3.5z" />,
 };
 

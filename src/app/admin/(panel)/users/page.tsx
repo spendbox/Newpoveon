@@ -5,6 +5,7 @@ import { Icon } from "@/components/icons";
 import { supabaseAdmin } from "@/lib/supabase/server";
 import { deleteUser } from "../../actions";
 import { aBtnQuiet, aInput, Badge, Card, H1 } from "../../ui";
+import { SubmitButton } from "@/components/buttons";
 
 const PER_PAGE = 25;
 type Profile = { id: string; email: string; full_name: string | null; phone: string | null; role: string; created_at: string };
@@ -64,7 +65,7 @@ export default async function UsersPage({ searchParams }: PageProps<"/admin/user
 
       <form className="mb-4 flex gap-2" role="search">
         <input name="q" defaultValue={q} placeholder="Search by email, name or phone" className={aInput} aria-label="Search users" />
-        <button className={aBtnQuiet}>Search</button>
+        <SubmitButton className={aBtnQuiet}>Search</SubmitButton>
         {q && <Link href="/admin/users" className={`${aBtnQuiet} inline-flex items-center`}>Clear</Link>}
       </form>
 
@@ -111,7 +112,7 @@ export default async function UsersPage({ searchParams }: PageProps<"/admin/user
                       <p className="mt-0.5 text-xs text-act-text/80">Removes their account and saved checks. Paid booking records are kept for accounting, without the account link. This can&apos;t be undone.</p>
                       <div className="mt-2 flex flex-col gap-2 sm:flex-row">
                         <input name="confirm" placeholder={`Type ${u.email} to confirm`} className={aInput} aria-label="Type the email to confirm" autoComplete="off" />
-                        <button className="min-h-[40px] shrink-0 rounded-lg bg-act-text px-4 text-sm font-semibold whitespace-nowrap text-white hover:opacity-90">Delete user</button>
+                        <SubmitButton className="min-h-[40px] shrink-0 rounded-lg bg-act-text px-4 text-sm font-semibold whitespace-nowrap text-white hover:opacity-90">Delete user</SubmitButton>
                       </div>
                     </form>
                   </div>
