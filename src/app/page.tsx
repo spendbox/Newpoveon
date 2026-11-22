@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { TrustedTools } from "@/components/trusted-tools";
 import { features } from "@/config/site";
 import { Icon, type IconName } from "@/components/icons";
 import { Logo, Overline } from "@/components/ui";
@@ -77,6 +78,8 @@ export default async function HomePage() {
       <p className="mt-5 flex items-center justify-center gap-2 text-center text-[12px] text-subtle md:hidden">
         <Icon name="shield" size={14} strokeWidth={2} /> Built on WHO screening tools. Private. Not a diagnosis.
       </p>
+
+      <TrustedTools />
 
       {/* ---------------- Explore the body ---------------- */}
       <section className="py-12 md:py-16" aria-labelledby="explore">
