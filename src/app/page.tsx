@@ -40,8 +40,8 @@ export default async function HomePage() {
         <div>
           <div className="mb-4 md:hidden"><MannequinHero compact /></div>
           <RotatingHeadline className="text-[40px] leading-[1.04] font-bold md:text-[64px]" />
-          <p className="mt-4 max-w-md text-[17px] leading-relaxed text-muted md:text-lg">
-            <span className="md:hidden">Your wellbeing score, heart age and more in 10 minutes. {price}, with a {months}-month plan included.</span>
+          <p className="mt-4 max-w-md text-[17px] leading-relaxed text-balance text-muted md:text-lg">
+            <span className="md:hidden"><span className="whitespace-nowrap">Your wellbeing score, heart age</span><br /><span className="whitespace-nowrap">and more, in 10 minutes.</span></span>
             <span className="hidden md:inline">Answer a few quick questions and find out your wellbeing score, heart age, diabetes risk and more. Answer for free, then unlock your results and a {months}-month personal plan for {price}.</span>
           </p>
           <div className="mt-7 max-w-sm">

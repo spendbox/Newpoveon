@@ -132,7 +132,7 @@ export function Paywall({ results, answers, saved, offer, confirming, onOffline 
         <div className="bg-primary px-5 py-2.5 text-center text-[13px] font-semibold text-white">One payment · {offer.months} months of support · nothing renews automatically</div>
         <div className="p-5 text-center">
           <p id="pw-price" className="font-display text-[44px] leading-none font-bold">{ngn(offer.price)}</p>
-          <p className="mt-1.5 text-[15px] text-muted">That&apos;s less than <b className="text-ink">{ngn(perDay)} a day</b>{offer.consult ? <> · a single doctor visit is {ngn(offer.consult)}</> : null}</p>
+          <p className="mt-1.5 text-[15px] text-muted">That&apos;s less than <b className="text-ink">{ngn(perDay)} a day</b></p>
           {error && <div className="mt-4 text-left"><Notice tone="warn">{error}</Notice></div>}
           <div className="mt-5">{cta}</div>
           <div className="mt-4 grid grid-cols-3 gap-2 text-[12px] font-medium text-muted">
