@@ -19,13 +19,15 @@ export const AREAS: Area[] = ["move", "sleep", "weight", "eat", "calm"];
 
 export interface MoveSettings { cue: string; activity: string; startLevel: number }
 export interface SleepSettings { wake: string; startLevel: number } // wake "06:30"
-export interface WeightSettings { startKg: number; targetKg: number; weighDay: number } // 0 = Sunday
+export interface WeightSettings { startKg: number; targetKg: number; weighDay: number; moveStart?: number } // weighDay 0 = Sunday
 export interface EatSettings { swaps: string[] } // in the order they'll be added
 export interface CalmSettings { practice: string; cue: string }
 export type Settings = MoveSettings | SleepSettings | WeightSettings | EatSettings | CalmSettings;
 
 export interface Goal { area: Area; settings: Settings }
 export interface Log { day: string; done: boolean; value?: number | null } // day "YYYY-MM-DD"
+/** Other goals in the same plan: the weight programme leaves movement or swaps to them if they exist. */
+export interface PlanContext { hasMove?: boolean; hasEat?: boolean }
 
 /* ------------------------------------------------------------------ Ladders */
 
@@ -56,6 +58,15 @@ export const EAT_SWAPS: Record<string, { title: string; why: string }> = {
   "late-meal": { title: "Last big meal at least 3 hours before bed", why: "Better sleep and steadier sugar overnight." },
 };
 export const EAT_DAYS = 5;
+
+/**
+ * Weight programme (modelled on the Diabetes Prevention Program lifestyle intervention: eating changes,
+ * 150 minutes of activity a week and weekly self-weighing). Levels grow the plate habit and movement;
+ * if the scale stalls for 2 weeks while someone is keeping up, one more change ("lever") is added.
+ */
+export const WEIGHT_DAYS = 5;
+export const WEIGHT_MAX_LEVEL = 6;
+export const WEIGHT_LEVERS = ["sugary-drinks", "late-meal", "snack", "fried"] as const;
 
 /** Calm: a short daily practice (associated with better wellbeing in WHO guidance on mental health and stress). */
 export const CALM_PRACTICES: Record<string, string> = {
@@ -104,6 +115,14 @@ export function startLevel(goal: Goal): number {
   return 0;
 }
 
+/** What the weight programme asks for at a given level. */
+export function weightPlan(w: WeightSettings, level: number, levers: number, ctx: PlanContext = {}) {
+  const meals = level >= 2 ? 2 : 1;
+  const rung = MOVE_LADDER[Math.min(6, (w.moveStart ?? 0) + level)];
+  const extra = ctx.hasEat ? [] : WEIGHT_LEVERS.slice(0, levers).map((k) => EAT_SWAPS[k].title);
+  return { meals, minutes: ctx.hasMove ? null : rung.minutes, extra };
+}
+
 /** Bedtime for a wake time, aiming for 7.5 hours in bed. "06:30" → "11pm". */
 export function bedtimeFor(wake: string): string {
   const [h, m] = wake.split(":").map(Number);
@@ -118,7 +137,7 @@ export function clock(mins: number): string {
 }
 export const wakeLabel = (wake: string) => { const [h, m] = wake.split(":").map(Number); return clock(h * 60 + m); };
 
-export function targetFor(goal: Goal, level: number, week: number): WeekTarget {
+export function targetFor(goal: Goal, level: number, week: number, ctx: PlanContext = {}, levers = 0): WeekTarget {
   const s = goal.settings;
   switch (goal.area) {
     case "move": {
@@ -136,11 +155,15 @@ export function targetFor(goal: Goal, level: number, week: number): WeekTarget {
     }
     case "weight": {
       const w = s as WeightSettings;
-      const expected = expectedWeight(w, week);
-      return { days: 1, headline: `Weigh in on ${DAY_NAMES[w.weighDay]}. On track: about ${expected} kg`, steps: [
-        `Weigh yourself once a week on ${DAY_NAMES[w.weighDay]} morning, before eating, and log it here.`,
-        `Aim to lose about 0.5 kg a week, towards ${w.targetKg} kg. Slow and steady keeps it off.`,
-      ] };
+      const p = weightPlan(w, Math.min(WEIGHT_MAX_LEVEL, level), levers, ctx);
+      const steps = [
+        `${p.meals === 1 ? "At one meal a day" : "At lunch and dinner"}: half your plate vegetables or vegetable soup, a quarter protein (fish, beans, eggs or chicken), a quarter swallow, rice or yam.`,
+      ];
+      if (p.minutes) steps.push(`Move for ${p.minutes} minutes: a brisk walk, dancing, or anything that makes you breathe faster but still able to talk.`);
+      for (const x of p.extra) steps.push(x + ".");
+      steps.push(`Weigh yourself on ${DAY_NAMES[w.weighDay]} morning, before eating, and log it here.`);
+      const parts = [`${p.meals === 1 ? "1 plate" : "2 plates"} a day`, ...(p.minutes ? [`${p.minutes} min moving`] : [])];
+      return { days: WEIGHT_DAYS, headline: `${parts.join(" + ")}, ${WEIGHT_DAYS} days · weigh in ${DAY_NAMES[w.weighDay]}`, steps };
     }
     case "eat": {
       const e = s as EatSettings;
@@ -177,35 +200,46 @@ export interface Progress {
   /** Weeks in a row (before this one) at 80% or better. */
   streak: number;
   /** Weight only: latest logged weight and whether it's on track. */
-  weight?: { latest: number | null; expected: number; onTrack: boolean | null; points: { day: string; kg: number }[] };
+  weight?: { latest: number | null; expected: number; onTrack: boolean | null; points: { day: string; kg: number }[]; lost: number | null; levers: number };
 }
 
 const UP = 0.8, HOLD = 0.5;
 
-export function progress(goal: Goal, logs: Log[], planStart: string, today: string): Progress {
+export function progress(goal: Goal, logs: Log[], planStart: string, today: string, ctx: PlanContext = {}): Progress {
   const start = mondayOf(planStart);
   const thisMonday = mondayOf(today);
   const weeks = Math.max(1, Math.floor((toDate(thisMonday).getTime() - toDate(start).getTime()) / (7 * DAY)) + 1);
   const doneDays = new Set(logs.filter((l) => l.done).map((l) => l.day));
   let level = startLevel(goal);
   const history: WeekReview[] = [];
-  const maxLevel = clampLevel(goal.area, 99);
+  const maxLevel = goal.area === "weight" ? WEIGHT_MAX_LEVEL : clampLevel(goal.area, 99);
+  const weighIns = logs.filter((l) => l.value != null && Number(l.value) > 0).sort((a, b) => a.day.localeCompare(b.day));
+  /** Latest weigh-in on or before a day. */
+  const weightBy = (day: string) => [...weighIns].reverse().find((l) => l.day <= day)?.value ?? null;
+  let levers = 0, lastLeverWeek = 0;
 
   for (let w = 1; w < weeks; w++) {
     const ws = addDays(start, (w - 1) * 7);
-    const needed = targetFor(goal, level, w - 1).days;
+    const needed = targetFor(goal, level, w - 1, ctx, levers).days;
     let done = 0;
     for (let d = 0; d < 7; d++) if (doneDays.has(addDays(ws, d))) done++;
     const adherence = Math.min(1, done / needed);
     const before = level;
-    if (goal.area !== "weight" && goal.area !== "calm") {
+    if (goal.area !== "calm") {
       if (adherence >= UP) level = Math.min(maxLevel, level + (goal.area === "eat" ? (w % 2 === 0 ? 1 : 0) : 1));
       else if (adherence < HOLD) level = Math.max(0, level - 1);
+    }
+    // Weight: keeping up for 2 weeks but the scale hasn't moved (less than 0.3 kg)? Add one more change.
+    if (goal.area === "weight" && w >= 2 && w - lastLeverWeek >= 2 && levers < WEIGHT_LEVERS.length) {
+      const prev = history.at(-1);
+      const end = addDays(ws, 6), twoBack = addDays(ws, -8);
+      const now = weightBy(end), before = weightBy(twoBack) ?? (goal.settings as WeightSettings).startKg;
+      if (prev && prev.adherence >= UP && adherence >= UP && now != null && Number(before) - Number(now) < 0.3) { levers++; lastLeverWeek = w; }
     }
     history.push({ week: w, start: ws, done, needed, adherence, level: before, change: level > before ? "up" : level < before ? "down" : "same" });
   }
 
-  const target = targetFor(goal, level, weeks - 1);
+  const target = targetFor(goal, level, weeks - 1, ctx, levers);
   const days: Record<string, boolean> = {};
   let done = 0;
   for (let d = 0; d < 7; d++) {
@@ -222,7 +256,7 @@ export function progress(goal: Goal, logs: Log[], planStart: string, today: stri
     const points = logs.filter((l) => l.value != null && l.value > 0).sort((a, b) => a.day.localeCompare(b.day)).map((l) => ({ day: l.day, kg: Number(l.value) }));
     const latest = points.at(-1)?.kg ?? null;
     const expected = expectedWeight(w, weeks - 1);
-    out.weight = { latest, expected, onTrack: latest == null ? null : latest <= expected + 0.5, points };
+    out.weight = { latest, expected, onTrack: latest == null ? null : latest <= expected + 0.5, points, lost: latest == null ? null : Math.round((w.startKg - latest) * 10) / 10, levers };
   }
   return out;
 }

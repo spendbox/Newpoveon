@@ -19,7 +19,6 @@ function reviewLine(g: GoalView): string | null {
   const last = g.progress.history.at(-1);
   if (!last) return null;
   const did = `Last week: ${last.done} of ${last.needed}.`;
-  if (g.area === "weight") return null;
   if (last.change === "up") return `${did} Great work, so this week is a small step up.`;
   if (last.change === "down") return `${did} This week is a little easier, so you can get back on track.`;
   return last.adherence >= 0.8 ? `${did} Well done. Same again this week while the habit settles.` : `${did} Same target this week. You've got this.`;
@@ -104,32 +103,11 @@ export function PlanHome({ goals, today, paidUntil, reminders, startsOn, recheck
             </ul>
             {review && <p className="mt-3 rounded-[var(--radius-md)] bg-surface-2 px-3 py-2 text-sm text-muted">{review}</p>}
 
-            {g.area === "weight" ? (
-              <div className="mt-4">
-                <form className="flex gap-2" onSubmit={(e) => { e.preventDefault(); const v = Number(kg); if (v >= 30 && v <= 250) { log(g.id, today, true, v); setKg(""); } }}>
-                  <input inputMode="decimal" aria-label="Your weight in kg" placeholder={`Today's weight (kg)`} value={kg} onChange={(e) => setKg(e.target.value.replace(/[^\d.]/g, ""))}
-                    className="min-h-[48px] w-full rounded-[var(--radius-md)] border border-line-strong bg-surface px-4 text-base focus:border-primary focus:outline-none" />
-                  <button className="min-h-[48px] shrink-0 rounded-[var(--radius-md)] bg-primary px-5 font-semibold whitespace-nowrap text-white disabled:opacity-40" disabled={!kg || pending !== null}>Log weight</button>
-                </form>
-                <p className="mt-1.5 text-xs text-subtle">Best on {DAY_NAMES[(g.settings as WeightSettings).weighDay]} mornings, before eating.</p>
-                {p.weight && (
-                  <div className="mt-3">
-                    <p className="text-sm">
-                      {p.weight.latest != null ? <>Latest: <b>{p.weight.latest} kg</b> · on-track line: {p.weight.expected} kg · goal {(g.settings as WeightSettings).targetKg} kg. {p.weight.onTrack ? <span className="font-semibold text-good-text">On track.</span> : <span className="font-semibold text-check-text">A little behind. Keep going.</span>}</> : "Log your first weigh-in to see your progress."}
-                    </p>
-                    {p.weight.points.length >= 2 && (
-                      <div className="mt-2"><TrendLine label="Weight over time" unit=" kg" points={p.weight.points.map((x) => ({ date: short.format(d(x.day)), value: x.kg }))}
-                        min={Math.floor(Math.min(...p.weight.points.map((x) => x.kg), (g.settings as WeightSettings).targetKg) - 1)} max={Math.ceil(Math.max(...p.weight.points.map((x) => x.kg)) + 1)} /></div>
-                    )}
-                  </div>
-                )}
-              </div>
-            ) : (
               <>
                 <button type="button" disabled={pending !== null} onClick={() => log(g.id, today, !doneToday)} aria-pressed={!!doneToday}
                   className={`mt-4 flex min-h-[52px] w-full items-center justify-center gap-2 rounded-[var(--radius-md)] text-[16px] font-semibold whitespace-nowrap transition-colors disabled:opacity-60 ${doneToday ? "bg-good-bg text-good-text" : "bg-primary text-white hover:bg-primary-hover"}`}>
                   {pending === `${g.id}:${today}` ? <span className="h-4 w-4 animate-spin rounded-full border-2 border-current border-t-transparent" aria-hidden="true" /> : <Icon name="check" size={18} strokeWidth={2.6} />}
-                  {doneToday ? "Done today. Tap to undo" : g.area === "sleep" ? "I kept to it last night" : "Done today"}
+                  {doneToday ? "Done today. Tap to undo" : g.area === "sleep" ? "I kept to it last night" : g.area === "weight" ? "I followed today's plan" : "Done today"}
                 </button>
                 <div className="mt-3 grid grid-cols-7 gap-1.5" role="group" aria-label="This week">
                   {days.map((day) => {
@@ -144,6 +122,29 @@ export function PlanHome({ goals, today, paidUntil, reminders, startsOn, recheck
                   })}
                 </div>
               </>
+            {g.area === "weight" && (
+              <div className="mt-4">
+                <form className="flex gap-2" onSubmit={(e) => { e.preventDefault(); const v = Number(kg); if (v >= 30 && v <= 250) { log(g.id, today, true, v); setKg(""); } }}>
+                  <input inputMode="decimal" aria-label="Your weight in kg" placeholder={`Today's weight (kg)`} value={kg} onChange={(e) => setKg(e.target.value.replace(/[^\d.]/g, ""))}
+                    className="min-h-[48px] w-full rounded-[var(--radius-md)] border border-line-strong bg-surface px-4 text-base focus:border-primary focus:outline-none" />
+                  <button className="min-h-[48px] shrink-0 rounded-[var(--radius-md)] bg-primary px-5 font-semibold whitespace-nowrap text-white disabled:opacity-40" disabled={!kg || pending !== null}>Log weight</button>
+                </form>
+                <p className="mt-1.5 text-xs text-subtle">Best on {DAY_NAMES[(g.settings as WeightSettings).weighDay]} mornings, before eating.</p>
+                {p.weight && p.weight.levers > 0 && (
+                  <p className="mt-3 rounded-[var(--radius-md)] bg-sun-soft px-3 py-2 text-sm text-check-text">Your weight held steady for 2 weeks while you kept up, so we&apos;ve added {p.weight.levers === 1 ? "one more change" : `${p.weight.levers} extra changes`} to your plan. That&apos;s normal: bodies adjust, and a small extra step gets things moving again.</p>
+                )}
+                {p.weight && (
+                  <div className="mt-3">
+                    <p className="text-sm">
+                      {p.weight.latest != null ? <>Latest: <b>{p.weight.latest} kg</b>{p.weight.lost != null && p.weight.lost > 0 ? <> · <b className="text-good-text">down {p.weight.lost} kg</b></> : null} · on-track line {p.weight.expected} kg · goal {(g.settings as WeightSettings).targetKg} kg. {p.weight.onTrack ? <span className="font-semibold text-good-text">On track.</span> : <span className="font-semibold text-check-text">A little behind. Keep going.</span>}</> : "Log your first weigh-in to see your progress."}
+                    </p>
+                    {p.weight.points.length >= 2 && (
+                      <div className="mt-2"><TrendLine label="Weight over time" unit=" kg" points={p.weight.points.map((x) => ({ date: short.format(d(x.day)), value: x.kg }))}
+                        min={Math.floor(Math.min(...p.weight.points.map((x) => x.kg), (g.settings as WeightSettings).targetKg) - 1)} max={Math.ceil(Math.max(...p.weight.points.map((x) => x.kg)) + 1)} /></div>
+                    )}
+                  </div>
+                )}
+              </div>
             )}
           </section>
         );

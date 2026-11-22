@@ -26,10 +26,10 @@ export function cleanGoals(input: unknown): Goal[] | null {
         break;
       }
       case "weight": {
-        const kg = Number(settings.startKg), weighDay = int(settings.weighDay, 0, 6);
-        if (!Number.isFinite(kg) || kg < 30 || kg > 250 || weighDay === null) return null;
+        const kg = Number(settings.startKg), weighDay = int(settings.weighDay, 0, 6), moveStart = settings.moveStart === undefined ? 0 : int(settings.moveStart, 0, 6);
+        if (!Number.isFinite(kg) || kg < 30 || kg > 250 || weighDay === null || moveStart === null) return null;
         const startKg = Math.round(kg * 10) / 10;
-        out.push({ area, settings: { startKg, targetKg: weightTarget(startKg), weighDay } });
+        out.push({ area, settings: { startKg, targetKg: weightTarget(startKg), weighDay, moveStart } });
         break;
       }
       case "eat": {

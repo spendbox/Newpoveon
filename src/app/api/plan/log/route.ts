@@ -22,15 +22,21 @@ export async function POST(req: Request) {
     const inWindow = day <= today && (day >= mondayOf(today) || day === yesterday);
     if (!inWindow || (plan!.starts_on && day < plan!.starts_on)) return json({ error: "You can only tick off this week, or yesterday." }, 400);
 
-    if (goal.area === "weight") {
+    if (goal.area === "weight" && value !== undefined && value !== null) {
+      // A weigh-in: keep whatever the day's tick already says.
       const kg = Number(value);
       if (!Number.isFinite(kg) || kg < 30 || kg > 250) return json({ error: "Please enter your weight in kg." }, 400);
-      const { error } = await sb.from("plan_logs").upsert({ goal_id: goal.id, user_id: user.id, day, done: true, value: Math.round(kg * 10) / 10 }, { onConflict: "goal_id,day" });
+      const { data: cur } = await sb.from("plan_logs").select("done").eq("goal_id", goal.id).eq("day", day).maybeSingle();
+      const { error } = await sb.from("plan_logs").upsert({ goal_id: goal.id, user_id: user.id, day, done: cur?.done ?? false, value: Math.round(kg * 10) / 10 }, { onConflict: "goal_id,day" });
       if (error) throw error;
     } else if (done === false) {
-      await sb.from("plan_logs").delete().eq("goal_id", goal.id).eq("day", day);
+      // Untick: keep a weigh-in logged that day, otherwise remove the row.
+      const { data: cur } = await sb.from("plan_logs").select("value").eq("goal_id", goal.id).eq("day", day).maybeSingle();
+      if (cur?.value != null) await sb.from("plan_logs").update({ done: false }).eq("goal_id", goal.id).eq("day", day);
+      else await sb.from("plan_logs").delete().eq("goal_id", goal.id).eq("day", day);
     } else {
-      const { error } = await sb.from("plan_logs").upsert({ goal_id: goal.id, user_id: user.id, day, done: true }, { onConflict: "goal_id,day" });
+      const { data: cur } = await sb.from("plan_logs").select("value").eq("goal_id", goal.id).eq("day", day).maybeSingle();
+      const { error } = await sb.from("plan_logs").upsert({ goal_id: goal.id, user_id: user.id, day, done: true, value: cur?.value ?? null }, { onConflict: "goal_id,day" });
       if (error) throw error;
     }
     return json({ ok: true });
