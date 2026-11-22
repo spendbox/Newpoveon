@@ -202,3 +202,13 @@ h1, h2, h3, .font-display {
 @keyframes pw-wiggle { 0%,80%,100% { transform: rotate(0) } 85% { transform: rotate(-10deg) } 90% { transform: rotate(10deg) } 95% { transform: rotate(-5deg) } }
 @keyframes pw-spin { to { transform: rotate(360deg) } }
 @keyframes pw-shimmer { from { background-position: 200% 0 } to { background-position: -200% 0 } }
+
+/* Trusted tools strip on the home page: a slow, endless scroll that pauses on touch or hover. */
+.tt-track { animation: tt-scroll 45s linear infinite; }
+.tt-viewport:hover .tt-track, .tt-viewport:active .tt-track { animation-play-state: paused; }
+@keyframes tt-scroll { to { transform: translateX(calc(-50% - 6px)); } }
+@media (prefers-reduced-motion: reduce) {
+  .tt-track { animation: none; }
+  .tt-copy { display: none; }
+  .tt-viewport { overflow-x: auto; }
+}
