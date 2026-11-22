@@ -4,7 +4,6 @@ import { Icon, type IconName } from "@/components/icons";
 import { Logo, Overline } from "@/components/ui";
 import { StartButton } from "./start-button";
 import { AccountLink } from "@/components/account-link";
-import { RotatingHeadline } from "@/components/rotating-headline";
 import { loadPlanSettings } from "@/lib/plan/settings";
 import { MannequinHero } from "@/components/mannequin-hero";
 import { BodyMap } from "@/components/body-map";
@@ -39,7 +38,10 @@ export default async function HomePage() {
       <section className="grid items-center gap-4 pt-6 pb-8 md:grid-cols-[1.05fr_1fr] md:gap-10 md:pt-10 md:pb-20">
         <div>
           <div className="mb-4 md:hidden"><MannequinHero compact /></div>
-          <RotatingHeadline className="text-[40px] leading-[1.04] font-bold md:text-[64px]" />
+          <h1 className="text-[40px] leading-[1.04] font-bold md:text-[64px]">
+            <span className="block whitespace-nowrap">How old is</span>
+            <span className="block whitespace-nowrap">your <span className="text-primary">heart</span>?</span>
+          </h1>
           <p className="mt-4 max-w-md text-[17px] leading-relaxed text-balance text-muted md:text-lg">
             <span className="md:hidden"><span className="whitespace-nowrap">Your wellbeing score, heart age</span><br /><span className="whitespace-nowrap">and more, in 10 minutes.</span></span>
             <span className="hidden md:inline">Answer a few quick questions and find out your wellbeing score, heart age, diabetes risk and more. Answer for free, then unlock your results and a {months}-month personal plan for {price}.</span>
