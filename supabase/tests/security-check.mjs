@@ -131,3 +131,8 @@ console.log("anon inserts screening:", await as("anon", null, ins(null, "evil@x.
   console.log("plan perks:", JSON.stringify((await db.query("select plan_price_naira, plan_discount_type, plan_discount_value from booking_settings")).rows));
   try { await db.exec("update booking_settings set plan_discount_type='percent', plan_discount_value=150"); console.log("150% allowed?!"); } catch { console.log("150% discount refused: ok"); }
 }
+{
+  const px = fs.readFileSync(new URL("../migrations/20261128000000_consult_price_7500.sql", import.meta.url), "utf8");
+  await db.exec(px); await db.exec(px);
+  console.log("consult fees:", JSON.stringify((await db.query("select distinct price_naira from consult_types where price_naira is not null")).rows));
+}
