@@ -1,11 +1,14 @@
 "use client";
 import { useEffect, useState } from "react";
 
-/** Three questions people actually wonder about, each tied to a score we give. */
-const LINES: { lead: string; hi: string; tail?: string }[] = [
-  { lead: "How old is your ", hi: "heart", tail: "?" },
-  { lead: "How are you, ", hi: "really", tail: "?" },
-  { lead: "How well do you ", hi: "sleep", tail: "?" },
+/**
+ * Three questions with the same shape, so every one breaks in the same place on every screen:
+ * "How old is / your heart?", each tied to a score we give (heart age, wellbeing, sleep).
+ */
+const LINES: { top: string; hi: string }[] = [
+  { top: "How old is", hi: "heart" },
+  { top: "How happy is", hi: "mind" },
+  { top: "How rested is", hi: "body" },
 ];
 
 /**
@@ -21,10 +24,11 @@ export function RotatingHeadline({ className = "" }: { className?: string }) {
   }, []);
   return (
     <h1 className={className}>
-      <span className="sr-only">How old is your heart, how are you really, and how well do you sleep? Find out in 10 minutes.</span>
-      <span aria-hidden="true" className="relative block min-h-[2.1em] overflow-hidden">
+      <span className="sr-only">How old is your heart, how happy is your mind, and how rested is your body? Find out in 10 minutes.</span>
+      <span aria-hidden="true" className="relative block h-[2.1em] overflow-hidden">
         <span key={i} className="rh-line block">
-          {LINES[i].lead}<span className="text-primary">{LINES[i].hi}</span>{LINES[i].tail}
+          <span className="block whitespace-nowrap">{LINES[i].top}</span>
+          <span className="block whitespace-nowrap">your <span className="text-primary">{LINES[i].hi}</span>?</span>
         </span>
       </span>
     </h1>
