@@ -35,7 +35,7 @@ export default async function TermsPage() {
           id: "check", title: "The health check gives estimates, not a diagnosis",
           body: (
             <>
-              <p>The free health check uses published, validated screening tools to estimate things like your heart age, diabetes risk, sleep, mood and wellbeing. The results depend on the answers you give, are <strong>estimates only</strong>, and are <strong>not a diagnosis</strong> or a substitute for seeing a doctor.</p>
+              <p>The health check uses published, validated screening tools to estimate things like your heart age, diabetes risk, sleep, mood and wellbeing. The results depend on the answers you give, are <strong>estimates only</strong>, and are <strong>not a diagnosis</strong> or a substitute for seeing a doctor.</p>
               <p>Our health guides are general information, not personal medical advice. Always talk to a doctor before making changes to medicines or treatment.</p>
             </>
           ),
@@ -80,10 +80,12 @@ export default async function TermsPage() {
           ),
         },
         {
-          id: "plan", title: "Personal plans",
+          id: "plan", title: "The health check and your plan",
           body: (
             <ul>
-              <li>A personal plan costs <strong>₦{plan.price.toLocaleString("en-NG")} for 12 months</strong>, paid once through Paystack. It does <strong>not</strong> renew automatically; we&apos;ll remind you before it ends.</li>
+              <li>Answering the health check is free. Seeing your full results costs <strong>₦{plan.price.toLocaleString("en-NG")} per check</strong>, paid once through Paystack. It includes a <strong>personal plan for {plan.months} months</strong>, made from your results. If anything urgent shows up, such as very high blood pressure or thoughts of harming yourself, we always show it, whether or not you pay.</li>
+              <li>Each new paid check renews your plan for another {plan.months} months. Nothing renews automatically; we&apos;ll remind you before your plan ends.</li>
+              <li>When you pay, we create a Poveon account for your email if you don&apos;t have one, so your results and plan are kept safe. You log in with a code sent to that email.</li>
               <li>Your plan gives general lifestyle guidance based on published guidelines. It is not medical treatment. If you have a heart condition, diabetes, are pregnant, or get chest pain, dizziness or unusual breathlessness when active, talk to a doctor before starting or stepping up.</li>
               <li>You can ask for a <strong>full refund within 7 days</strong> of paying by emailing {mail}.</li>
               {perk && <li>While your plan is active, you get <strong>{perk}</strong> every doctor consultation, applied automatically when you book while logged in. We may change this perk for future bookings; it never changes a consult you have already paid for.</li>}

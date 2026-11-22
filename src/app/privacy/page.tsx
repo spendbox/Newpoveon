@@ -21,7 +21,7 @@ export default function PrivacyPage() {
           id: "who", title: "Who we are",
           body: (
             <>
-              <p>{L.name} is a company registered in Nigeria ({L.rc}), with its office in {L.address}. Poveon offers a free online health check, doctor consults, and help arranging lab tests and medicines.</p>
+              <p>{L.name} is a company registered in Nigeria ({L.rc}), with its office in {L.address}. Poveon offers an online health check, doctor consults, and help arranging lab tests and medicines.</p>
               <p>Our Data Protection Officer is <strong>{L.dpo}</strong>. You can reach them at {mail} or on <a href={`tel:${L.phoneIntl}`}>{L.phone}</a>.</p>
             </>
           ),
@@ -34,7 +34,7 @@ export default function PrivacyPage() {
               <ul>
                 <li><strong>Health check answers</strong>, such as your date of birth, sex, height, weight, waist, blood pressure, smoking, activity, sleep, alcohol, mood, worry and wellbeing, and the results we calculate from them.</li>
                 <li><strong>Contact details</strong>: your email address, and your phone or WhatsApp number if you give it.</li>
-                <li><strong>Account details</strong>: your email and a password (stored only in scrambled, &ldquo;hashed&rdquo; form by our database provider; we can never see it).</li>
+                <li><strong>Account details</strong>: your email (we create an account for it when you pay for a check, so your results and plan are kept) and a password (stored only in scrambled, &ldquo;hashed&rdquo; form by our database provider; we can never see it).</li>
                 <li><strong>Doctor consult details</strong>: your name, phone, email, the time you choose, your voice note, any written note, and any photos or documents you attach (for example lab results or a prescription).</li>
                 <li><strong>Your plan</strong>, if you have one: the areas you chose, your settings (such as your wake-up time or starting weight), the days you tick off and the weights you log.</li>
                 <li><strong>Messages</strong> you send us by email or WhatsApp, for example to request a lab test or medicine.</li>

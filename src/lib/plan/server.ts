@@ -148,11 +148,11 @@ ${button(planUrl(), "Tick off today")}`);
 /** 14 days before a plan year ends (plans don't renew automatically). */
 export function renewalEmail(paidUntil: string, name?: string | null) {
   const when = new Intl.DateTimeFormat("en-NG", { day: "numeric", month: "long", year: "numeric", timeZone: "UTC" }).format(new Date(`${paidUntil}T12:00:00Z`));
-  const html = layout("Your plan year ends soon", `<p>${hi(name)}</p>
-<p>Your Poveon plan runs until <b>${when}</b>. It doesn't renew automatically, so nothing will be charged.</p>
-<p>If you'd like to keep going, you can renew for another year from your plan page. Your history and progress carry on.</p>
-${button(`${planUrl()}?edit=1`, "Renew my plan")}`);
-  return { subject: "Your Poveon plan year ends in 2 weeks", html, text: `Your plan runs until ${when}. Renew at ${planUrl()}?edit=1` };
+  const html = layout("Your plan ends soon", `<p>${hi(name)}</p>
+<p>Your Poveon plan runs until <b>${when}</b>. Nothing renews automatically, so nothing will be charged.</p>
+<p>It's a good time for a new check: see how your scores have moved, and your plan carries on with your history and progress.</p>
+${button(`${site.siteUrl}/account/retake`, "Take a new check")}`);
+  return { subject: "Your Poveon plan ends in 2 weeks", html, text: `Your plan runs until ${when}. Take a new check: ${site.siteUrl}/account/retake` };
 }
 
 /** Plans whose year has run out become "expired" (the person keeps their history). */

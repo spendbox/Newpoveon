@@ -9,8 +9,8 @@ import { NavProgress } from "@/components/nav-progress";
 
 export const metadata: Metadata = {
   metadataBase: new URL(site.siteUrl),
-  title: { default: `${site.appName}: free health check in 10 minutes`, template: `%s · ${site.appName}` },
-  description: "Answer a few friendly questions and find out your heart age, diabetes risk, sleep, mood and more. Free, private, and a doctor is a tap away.",
+  title: { default: `${site.appName}: your health check in 10 minutes`, template: `%s · ${site.appName}` },
+  description: "Answer a few friendly questions and find out your heart age, diabetes risk, sleep, mood and more. Private, with a personal plan, and a doctor is a tap away.",
 };
 
 export const viewport: Viewport = { themeColor: "#F6F8F7", width: "device-width", initialScale: 1 };

@@ -38,10 +38,11 @@ export default async function ConsultsPage() {
   return (
     <>
       <Card className="mb-6">
-        <h2 className="text-lg font-semibold">Health plan</h2>
-        <p className="mt-1 text-sm text-muted">The yearly plan price, and the discount members get on every consult while their plan is active. A discounted consult never costs less than ₦100.</p>
-        <form action={savePlanPerks} className="mt-3 grid gap-3 md:grid-cols-[1fr_1.4fr_1fr_auto] md:items-end">
-          <label className="text-sm font-semibold">Plan price per year (₦)<input name="plan_price_naira" inputMode="numeric" required defaultValue={perks.price} className={aInput} /></label>
+        <h2 className="text-lg font-semibold">Health check and plan</h2>
+        <p className="mt-1 text-sm text-muted">What one health check costs (answering is free; paying unlocks the results), how long the personal plan that comes with it lasts, and the discount on consults while a plan is active. A discounted consult never costs less than ₦100.</p>
+        <form action={savePlanPerks} className="mt-3 grid gap-3 md:grid-cols-[1fr_0.8fr_1.4fr_1fr_auto] md:items-end">
+          <label className="text-sm font-semibold">Health check price (₦)<input name="plan_price_naira" inputMode="numeric" required defaultValue={perks.price} className={aInput} /></label>
+          <label className="text-sm font-semibold">Plan length (months)<input name="plan_months" type="number" min={1} max={24} required defaultValue={perks.months} className={aInput} /></label>
           <fieldset className="text-sm font-semibold">
             <legend className="mb-1">Member discount on consults</legend>
             <div className="flex flex-wrap gap-3 font-medium">

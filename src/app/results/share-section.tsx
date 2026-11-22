@@ -49,7 +49,7 @@ export function ShareSection({ results, saved }: { results: Results; saved: Save
     const file = new File([blob], `${site.appName.toLowerCase()}-card.png`, { type: "image/png" });
     if (navigator.canShare?.({ files: [file] })) {
       try {
-        await navigator.share({ files: [file], text: `Check your heart age free at ${site.siteUrl}` });
+        await navigator.share({ files: [file], text: `Check your heart age at ${site.siteUrl}` });
         return;
       } catch {
         /* user cancelled */
@@ -77,7 +77,7 @@ export function ShareSection({ results, saved }: { results: Results; saved: Save
     setMsg(enabled ? "Your share link is on. Anyone with the link can see your summary." : "Your share link is off. The old link no longer works.");
   }
 
-  const waText = link ? `I just did my free ${site.appName} health check. Here's my summary: ${link}` : `I just did a free ${site.appName} health check in 10 minutes. Check your heart age: ${site.siteUrl}`;
+  const waText = link ? `I just did my ${site.appName} health check. Here's my summary: ${link}` : `I just did a ${site.appName} health check in 10 minutes. Check your heart age: ${site.siteUrl}`;
 
   return (
     <section className="mt-8 rounded-[var(--radius-xl)] border border-line bg-surface p-5" aria-labelledby="share">

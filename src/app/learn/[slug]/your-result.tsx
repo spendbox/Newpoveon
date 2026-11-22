@@ -25,7 +25,7 @@ export function YourResult({ slug, saved }: { slug: ResultCard["id"]; saved?: Re
     return (
       <div className="rounded-[var(--radius-xl)] border border-dashed border-line-strong bg-surface p-5">
         <p className="font-semibold">See your own result</p>
-        <p className="mt-1 text-[15px] text-muted">Take the free 10-minute check and your result for this will show here.</p>
+        <p className="mt-1 text-[15px] text-muted">Take the 10-minute check and your result for this will show here.</p>
         <Link href="/check" className="mt-3 inline-flex items-center gap-1 text-sm font-semibold text-primary hover:underline">Start my check →</Link>
       </div>
     );

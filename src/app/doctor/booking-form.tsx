@@ -378,9 +378,9 @@ export function BookingForm({ types, preselect, defaultReason, perk = null }: { 
             <span className="text-sm">Share my Poveon results with the doctor.<span className="block text-xs text-subtle">{saved ? "Your latest saved results will be attached." : "If you've saved results with us, they'll be attached."}</span></span>
           </label>
           {perk && !perk.isMember && fee != null && memberPrice(fee, perk.discount) < fee && (
-            <a href="/account/plan" className="flex items-start gap-3 rounded-[var(--radius-lg)] border border-primary/30 bg-primary-soft p-4">
+            <a href="/check" className="flex items-start gap-3 rounded-[var(--radius-lg)] border border-primary/30 bg-primary-soft p-4">
               <Icon name="target" size={20} strokeWidth={2} className="mt-0.5 shrink-0 text-primary" />
-              <span className="text-sm"><b className="text-ink">Activate the yearly health plan ({ngn(perk.planPrice)}) and get {perk.label} all consultations.</b> <span className="text-muted">Get the plan first, then come back to book.</span></span>
+              <span className="text-sm"><b className="text-ink">Take the health check ({ngn(perk.planPrice)}) and get a personal plan plus {perk.label} all consultations.</b> <span className="text-muted">Do the check first, then come back to book.</span></span>
             </a>
           )}
           <p className="flex items-center gap-1.5 text-xs text-subtle"><Icon name="shield" size={14} /> Secure payment by Paystack. Card, bank transfer or USSD.</p>

@@ -2,7 +2,8 @@ export const dynamic = "force-dynamic";
 import type { Metadata } from "next";
 import { redirect } from "next/navigation";
 import { site } from "@/config/site";
-import { Notice } from "@/components/ui";
+import { Icon } from "@/components/icons";
+import { ButtonLink, Notice } from "@/components/ui";
 import type { Answers } from "@/lib/questions";
 import { lagosDay } from "@/lib/plan/engine";
 import { confirmPlanPayment, isActive, loadPlan, planHints } from "@/lib/plan/server";
@@ -51,15 +52,35 @@ export default async function PlanPage({ searchParams }: PageProps<"/account/pla
     );
   }
 
+  if (active && loaded) {
+    return (
+      <>
+        <PageHead eyebrow="My plan" title="Change my plan" sub="Change what you're working on or how. Your progress so far is kept." />
+        <div className="max-w-2xl">
+          <PlanBuilder hints={hints} existing={loaded.goals.map((g) => ({ area: g.area, settings: g.settings }))} active expired={false} price={settings.price} perkLabel={perkLabel} />
+        </div>
+      </>
+    );
+  }
+
+  // No active plan: it comes with a paid health check.
+  const ended = loaded?.plan.status === "expired" || (loaded?.plan.status === "active" && !active);
+  const ngn = `₦${settings.price.toLocaleString("en-NG")}`;
   return (
     <>
-      <PageHead eyebrow="My plan" title={active ? "Change my plan" : "Build your plan"}
-        sub={active ? "Change what you're working on or how. Your progress so far is kept." : `A personal plan for the things that matter most for your scores, with a daily check-off and a weekly review. ${new Intl.NumberFormat("en-NG", { style: "currency", currency: "NGN", maximumFractionDigits: 0 }).format(settings.price)} for a whole year${perkLabel ? `, plus ${perkLabel} every doctor consultation` : ""}.`} />
+      <PageHead eyebrow="My plan" title={ended ? "Your plan has ended" : "Get your personal plan"} />
       {payFailed && <div className="mb-4"><Notice tone="warn">We couldn&apos;t confirm your payment. If you were charged, it will show here within a few minutes, or contact us at {site.legal.email}.</Notice></div>}
-      {!latest && <div className="mb-4"><Notice>Tip: take the free check first, so we can recommend the right areas and starting points for you.</Notice></div>}
-      <div className="max-w-2xl">
-        <PlanBuilder hints={hints} existing={(loaded?.goals ?? []).map((g) => ({ area: g.area, settings: g.settings }))} active={active} expired={loaded?.plan.status === "expired"} price={settings.price} perkLabel={perkLabel} />
-      </div>
+      <section className="max-w-2xl rounded-[var(--radius-xl)] border border-line bg-surface p-6">
+        <p className="text-[17px] text-ink/85">
+          {ended ? `Take a new check to see how your scores have moved and renew your plan for another ${settings.months} months. Your history is kept.` : `Your plan comes with your health check. For ${ngn} you get your full results and a personal plan for ${settings.months} months, made from them.`}
+        </p>
+        <ul className="mt-4 flex flex-col gap-2 text-[15px]">
+          {["Move more, sleep better, lose weight, eat better or feel calmer: up to 3 at a time", "A daily check-off and a weekly review that adjusts your targets", "Sunday summaries and a midweek nudge by email", ...(perkLabel ? [`${perkLabel} every doctor consultation while your plan is active`] : [])].map((x) => (
+            <li key={x} className="flex gap-2"><Icon name="check" size={18} strokeWidth={2.6} className="mt-0.5 shrink-0 text-primary" />{x}</li>
+          ))}
+        </ul>
+        <ButtonLink href={latest ? "/account/retake" : "/check"} className="mt-6" iconRight="arrowRight">{ended ? "Take a new check" : "Take the check"} · {ngn}</ButtonLink>
+      </section>
     </>
   );
 }

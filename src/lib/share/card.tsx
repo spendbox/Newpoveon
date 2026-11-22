@@ -34,7 +34,7 @@ export async function shareCard({ age, heartAge, format = "story" }: { age: numb
   const H = story ? 1920 : 630;
   const s = story ? 1 : 0.5;
   const ha = heartAge ? `${heartAge.kind === "below" ? "<" : heartAge.kind === "above" ? ">" : ""}${heartAge.value}` : null;
-  const headline = ha ? `My heart age is ${ha.replace("<", "under ").replace(">", "over ")}.` : `I just did my free ${site.appName} health check.`;
+  const headline = ha ? `My heart age is ${ha.replace("<", "under ").replace(">", "over ")}.` : `I just did my ${site.appName} health check.`;
   const sub = ha ? `I'm ${age}.` : "Heart age, diabetes risk, sleep and more.";
   return new ImageResponse(
     (

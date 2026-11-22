@@ -1,5 +1,4 @@
 import { CONSENT_TEXT } from "@/lib/consent";
-import { emailConfigured, resultsEmail, sendEmail } from "@/lib/email";
 import { cleanText, handleError, isEmail, isPhone, json, readJson } from "@/lib/http";
 import { isComplete, sanitizeAnswers } from "@/lib/questions";
 import { computeResults, RESULTS_VERSION } from "@/lib/scoring/results";
@@ -8,7 +7,7 @@ import { insertScreening } from "@/lib/screening-insert";
 import { randomToken, sha256 } from "@/lib/tokens";
 
 /**
- * Save a finished screening against an email (no account needed) and email a copy.
+ * Save a finished screening against an email (no account needed). It stays locked until paid for.
  * The server recomputes every score from the answers; it never trusts scores sent by the browser.
  */
 export async function POST(req: Request) {
@@ -41,18 +40,15 @@ export async function POST(req: Request) {
         consent_at: new Date().toISOString(),
         consent_text: CONSENT_TEXT,
         owner_token_hash: sha256(ownerToken),
+        // Unlocked when the check is paid for (see /api/check/checkout); the results email goes then too.
+        paid: false,
       });
     if (error) throw error;
     if (user && user.email?.toLowerCase() === email) {
       await sb.from("profiles").update({ latest_answers: answers, phone: phone ?? undefined, updated_at: new Date().toISOString() }).eq("id", user.id);
     }
 
-    let emailed = false;
-    if (emailConfigured()) {
-      const m = resultsEmail(results);
-      emailed = await sendEmail(email, m.subject, m.html, m.text);
-    }
-    return json({ screeningId: data.id, ownerToken, emailed });
+    return json({ screeningId: data.id, ownerToken });
   } catch (e) {
     return handleError(e);
   }

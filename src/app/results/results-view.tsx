@@ -16,10 +16,15 @@ import { isComplete } from "@/lib/questions";
 import { computeResults, displayValue, type Results } from "@/lib/scoring/results";
 import { loadPrefill, loadProgress, loadSaved, saveSaved, type Progress, type SavedScreening } from "@/lib/storage";
 
-export function ResultsView() {
+export type Offer = { price: number; months: number; perk: string };
+
+export function ResultsView({ offer }: { offer: Offer }) {
   const [progress, setProgress] = useState<Progress | null | undefined>(undefined);
   const [saved, setSaved] = useState<SavedScreening | null>(null);
-  const [unlocked, setUnlocked] = useState(false);
+  const [emailed, setEmailed] = useState(false);
+  /** No database or payments in this copy of the site: show results without saving or paying. */
+  const [offline, setOffline] = useState(false);
+  const [confirming, setConfirming] = useState(false);
 
   useEffect(() => {
     const p = loadProgress();
@@ -27,8 +32,24 @@ export function ResultsView() {
     /* eslint-disable react-hooks/set-state-in-effect -- reading browser storage after mount */
     setProgress(p);
     setSaved(s);
-    if (p && s && s.savedAt >= p.startedAt) setUnlocked(true);
+    const current = !!(p && s && s.savedAt >= p.startedAt);
+    if (current) setEmailed(true);
     /* eslint-enable react-hooks/set-state-in-effect */
+    if (!current || s!.paid) return;
+    // Back from Paystack (?reference=…), or check whether it's already been paid (e.g. the webhook got there first).
+    const ref = new URLSearchParams(location.search).get("reference");
+    setConfirming(true);
+    fetch("/api/check/confirm", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify(ref ? { reference: ref } : { screeningId: s!.screeningId, ownerToken: s!.ownerToken }) })
+      .then((r) => r.json()).catch(() => ({}))
+      .then((d: { paid?: boolean; screeningId?: string | null; accountCreated?: boolean }) => {
+        if (d.paid && (!d.screeningId || d.screeningId === s!.screeningId)) {
+          const next = { ...s!, paid: true, accountNew: !!d.accountCreated || s!.accountNew };
+          saveSaved(next);
+          setSaved(next);
+        }
+        if (ref) history.replaceState(null, "", "/results");
+        setConfirming(false);
+      });
   }, []);
 
   const results = useMemo(() => (progress && isComplete(progress.answers) ? computeResults(progress.answers) : null), [progress]);
@@ -45,7 +66,7 @@ export function ResultsView() {
     );
   }
 
-  if (!unlocked) {
+  if (!emailed && !offline) {
     return (
       <EmailGate
         progress={progress}
@@ -53,14 +74,82 @@ export function ResultsView() {
           if (s) {
             saveSaved(s);
             setSaved(s);
-          }
-          setUnlocked(true);
+            setEmailed(true);
+          } else setOffline(true);
           window.scrollTo({ top: 0 });
         }}
       />
     );
   }
-  return <Reveal results={results} saved={saved} />;
+  if (!offline && saved && !saved.paid) {
+    return <Paywall results={results} saved={saved} offer={offer} confirming={confirming} onOffline={() => setOffline(true)} />;
+  }
+  return <Reveal results={results} saved={offline ? null : saved} offer={offer} />;
+}
+
+/* ------------------------------------------------------------------ Pay to unlock */
+
+/**
+ * Before paying: how many results look good and how many need a look, which areas were checked,
+ * and anything urgent (always shown free). Paying unlocks the details and creates the plan.
+ */
+function Paywall({ results, saved, offer, confirming, onOffline }: { results: Results; saved: SavedScreening; offer: Offer; confirming: boolean; onOffline: () => void }) {
+  const [support, setSupport] = useState(results.selfHarmFlag);
+  const [busy, setBusy] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const counts = { good: 0, look: 0 };
+  results.cards.forEach((c) => (c.status === "good" ? counts.good++ : counts.look++));
+  const urgent = results.cards.filter((c) => c.id === "bp" && c.status === "act" && /180\/110/.test(c.summary));
+  const ngn = (n: number) => `₦${n.toLocaleString("en-NG")}`;
+
+  async function pay() {
+    setBusy(true);
+    setError(null);
+    const r = await fetch("/api/check/checkout", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ screeningId: saved.screeningId, ownerToken: saved.ownerToken }) }).catch(() => null);
+    const d = r ? await r.json().catch(() => ({})) : {};
+    if (r?.ok && d.authorizationUrl) { window.location.assign(d.authorizationUrl); return; }
+    if (r?.ok && d.paid) { const next = { ...saved, paid: true }; saveSaved(next); window.location.reload(); return; }
+    if (r?.status === 503) { onOffline(); return; }
+    setBusy(false);
+    setError(d.error ?? "We couldn't start the payment. Please try again.");
+  }
+
+  return (
+    <div className="mx-auto w-full max-w-[460px] px-5 pt-6 pb-10">
+      {support && <SupportScreen onClose={() => setSupport(false)} />}
+      <section className="relative overflow-hidden rounded-[var(--radius-xl)] bg-ink p-6 text-center text-white shadow-[var(--shadow-lg)]">
+        <p className="text-[13px] font-semibold tracking-[0.08em] text-white/65 uppercase">Your results are ready</p>
+        <p className="mt-3 font-display text-[40px] leading-[1.05] font-semibold">{counts.good} looking good</p>
+        {counts.look > 0 && <p className="font-display text-[28px] font-semibold text-sun">{counts.look} to look at</p>}
+        <ul className="mt-5 flex flex-wrap justify-center gap-2">
+          {results.cards.map((c) => (
+            <li key={c.id} className="inline-flex items-center gap-1.5 rounded-full bg-white/10 px-3 py-1.5 text-sm font-medium"><Icon name="shield" size={14} strokeWidth={2} />{c.topic}</li>
+          ))}
+        </ul>
+      </section>
+
+      {urgent.map((c) => (
+        <div key={c.id} className="mt-4"><Notice tone="warn"><b>Please act on this now:</b> {c.summary}</Notice></div>
+      ))}
+
+      <section className="mt-5 rounded-[var(--radius-xl)] border border-line bg-surface p-5">
+        <h1 className="text-2xl font-semibold">Unlock your full results</h1>
+        <ul className="mt-3 flex flex-col gap-2 text-[15px]">
+          {[
+            "Every score in full: wellbeing, heart age, diabetes risk, blood pressure, sleep, mood and more",
+            "What each result means for you, and how to improve it",
+            `Your personal plan for ${offer.months} months, made from these results, with a daily check-off and weekly review`,
+            ...(offer.perk ? [`${offer.perk} every doctor consultation while your plan is active`] : []),
+            "Your results emailed to you and saved to your dashboard",
+          ].map((x) => <li key={x} className="flex gap-2"><Icon name="check" size={18} strokeWidth={2.6} className="mt-0.5 shrink-0 text-primary" />{x}</li>)}
+        </ul>
+        {error && <div className="mt-4"><Notice tone="warn">{error}</Notice></div>}
+        <Button className="mt-5 w-full" loading={busy || confirming} onClick={pay} iconRight="arrowRight">{confirming ? "Checking your payment…" : `Unlock for ${ngn(offer.price)}`}</Button>
+        <p className="mt-2 flex items-center justify-center gap-1.5 text-xs text-subtle"><Icon name="shield" size={14} /> Secure payment by Paystack · full refund within 7 days</p>
+      </section>
+      <p className="mt-4 text-center text-xs text-subtle">Every result is an estimate, not a diagnosis. If you feel unwell, talk to a doctor. In an emergency call 112.</p>
+    </div>
+  );
 }
 
 /* ------------------------------------------------------------------ Email + consent */
@@ -110,7 +199,7 @@ function EmailGate({ progress, onDone }: { progress: Progress; onDone: (s: Saved
         className="mt-5"
         busy={busy}
         error={error}
-        submitLabel="Show my results"
+        submitLabel="Continue"
         onSubmit={submit}
         steps={[
           {
@@ -142,7 +231,7 @@ function EmailGate({ progress, onDone }: { progress: Progress; onDone: (s: Saved
 
 /* ------------------------------------------------------------------ The reveal */
 
-function Reveal({ results, saved }: { results: Results; saved: SavedScreening | null }) {
+function Reveal({ results, saved, offer }: { results: Results; saved: SavedScreening | null; offer: Offer }) {
   const reduce = useReducedMotion();
   const [support, setSupport] = useState(results.selfHarmFlag);
   const heart = results.heart;
@@ -171,6 +260,14 @@ function Reveal({ results, saved }: { results: Results; saved: SavedScreening | 
         <span className="font-display text-xl font-semibold">Your results</span>
         <span className="w-[68px]" />
       </div>
+
+      {saved?.paid && (
+        <section className="mt-4 flex flex-col gap-3 rounded-[var(--radius-xl)] border border-primary/30 bg-primary-soft p-5" aria-label="Your plan">
+          <p className="flex items-center gap-2 font-semibold"><Icon name="target" size={20} strokeWidth={2} className="text-primary" /> Your {offer.months}-month plan is ready</p>
+          <p className="text-[15px] text-ink/80">We&apos;ve made a plan from these results{offer.perk ? `, and you get ${offer.perk} every doctor consultation while it's active` : ""}. {saved.accountNew ? `We've created your account for ${saved.email}; log in with a code sent to that email to open it.` : "Open it to see this week's steps."}</p>
+          <ButtonLink href="/account/plan" icon="target">Open my plan</ButtonLink>
+        </section>
+      )}
 
       {/* Headline: wellbeing (WHO-5), valid at every age */}
       {results.wellbeing && <div className="mt-4"><WellbeingHero w={results.wellbeing} /></div>}
@@ -335,8 +432,8 @@ function Reveal({ results, saved }: { results: Results; saved: SavedScreening | 
 
       <section className="mt-8 rounded-[var(--radius-xl)] bg-primary-soft p-5">
         <h2 className="text-2xl font-semibold">Keep track over time</h2>
-        <p className="mt-1 text-[15px] text-muted">Create a free account to save your profile, update your answers and see how your scores change.</p>
-        <ButtonLink href="/account" variant="secondary" icon="user" className="mt-4 w-full">Save to my account</ButtonLink>
+        <p className="mt-1 text-[15px] text-muted">Your results are saved to your account. Check again in {offer.months} months to see how your scores change.</p>
+        <ButtonLink href="/account" variant="secondary" icon="user" className="mt-4 w-full">Go to my dashboard</ButtonLink>
       </section>
 
       <p className="mt-8 text-center text-xs font-medium text-subtle">

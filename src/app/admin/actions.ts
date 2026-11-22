@@ -314,9 +314,13 @@ export async function savePlanPerks(f: FormData) {
   if (!Number.isFinite(value) || value < 0) value = 0;
   if (type === "percent") value = Math.min(100, value);
   value = Math.min(1_000_000, value);
-  const { error } = await supabaseAdmin().from("booking_settings").upsert({ id: 1, plan_price_naira: price, plan_discount_type: type, plan_discount_value: value, updated_at: new Date().toISOString() });
-  if (error) throw new Error("Couldn't save. Has SQL 14 been run?");
+  const months = Math.round(Number(f.get("plan_months") || 3));
+  if (!Number.isFinite(months) || months < 1 || months > 24) throw new Error("The plan length must be between 1 and 24 months.");
+  const { error } = await supabaseAdmin().from("booking_settings").upsert({ id: 1, plan_price_naira: price, plan_months: months, plan_discount_type: type, plan_discount_value: value, updated_at: new Date().toISOString() });
+  if (error) throw new Error("Couldn't save. Have SQL 14 and SQL 16 been run?");
   revalidatePath("/admin/consults");
   revalidatePath("/doctor");
   revalidatePath("/account/plan");
+  revalidatePath("/");
+  revalidatePath("/results");
 }
