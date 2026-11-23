@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { LAB_GROUPS, TEST_NAMES } from "@/config/catalog";
-import { Icon } from "@/components/icons";
+import { Icon, type IconName } from "@/components/icons";
 import { WhatsAppButton, WhatsAppCatalog } from "@/components/whatsapp-catalog";
 import { BioAgeStudy } from "@/components/bio-age-study";
 import { BIO_AGE_PREP, BIO_AGE_TESTS } from "@/lib/bioage/phenoage";
@@ -43,6 +43,21 @@ function BioAgePackage({ memberCode, price }: { memberCode: string | null; price
         <p className="mt-1 max-w-2xl text-[16px] text-ink/75">How old is your body, really? Nine routine blood results, turned into one number, with what&apos;s adding years and what&apos;s taking them off.</p>
         <p className="mt-4 flex flex-wrap items-baseline gap-x-2"><span className="font-display text-[32px] leading-none font-bold">₦{price.toLocaleString("en-NG")}</span><span className="text-[14px] text-ink/70">all nine results and your biological age · pay when we confirm on WhatsApp</span></p>
       </div>
+      <ol className="grid gap-3 border-b border-line px-5 py-5 md:grid-cols-3 md:px-8">
+        {[
+          ["whatsapp", "Book on WhatsApp", "Pick a day and time that suits you."],
+          ["home", "We come to your home", "A trained health worker takes a small blood sample."],
+          ["clipboard", "Get your result", "In 2 to 3 days, on your dashboard and by email."],
+        ].map(([icon, title, text], i) => (
+          <li key={title} className="flex gap-3">
+            <span className="relative flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-primary-soft text-primary">
+              <Icon name={icon as IconName} size={18} strokeWidth={2.2} />
+              <span className="absolute -top-1 -right-1 flex h-5 w-5 items-center justify-center rounded-full bg-primary text-[11px] font-bold text-white">{i + 1}</span>
+            </span>
+            <span><span className="block font-semibold">{title}</span><span className="block text-[14px] text-muted">{text}</span></span>
+          </li>
+        ))}
+      </ol>
       <div className="grid gap-6 px-5 py-5 md:grid-cols-2 md:px-8 md:py-7">
         <div>
           <p className="text-[13px] font-semibold tracking-[0.06em] text-primary uppercase">What&apos;s tested</p>
@@ -55,7 +70,7 @@ function BioAgePackage({ memberCode, price }: { memberCode: string | null; price
           <ul className="mt-2 flex flex-col gap-1.5 text-[15px]">
             {BIO_AGE_PREP.map((t) => <li key={t} className="flex gap-2"><Icon name="clock" size={16} strokeWidth={2.2} className="mt-1 shrink-0 text-primary" />{t}</li>)}
           </ul>
-          <p className="mt-4 text-[14px] text-muted">Your result appears on your dashboard and we email it to you. Re-test every 6 to 12 months to watch it change.</p>
+          <p className="mt-4 text-[14px] text-muted">Re-test every 6 to 12 months to watch it change.</p>
         </div>
       </div>
       <div className="flex flex-col gap-3 border-t border-line px-5 py-4 md:flex-row md:items-center md:justify-between md:px-8">
