@@ -51,7 +51,7 @@ export default function PrivacyPage() {
           body: (
             <>
               <p>While you answer the health check, your answers are saved only on your own device so you don&apos;t lose your place. <strong>Nothing is sent to us until you enter your email and tick the consent box</strong> to see your results.</p>
-              <p>We use a small number of essential cookies and browser storage: to keep you logged in, to keep your place in the check, and to remember settings like whether you have seen the logo animation. You can clear these at any time in your browser settings.</p>
+              <p>We use a small number of essential cookies and browser storage: to keep you logged in, to keep your place in the check, to remember your email (and phone and name, if you gave them) so you don&apos;t have to type them again, and to remember settings like whether you have seen the logo animation. On the login page, &ldquo;Use a different email&rdquo; forgets your email on that device. You can clear these at any time in your browser settings.</p>
             </>
           ),
         },

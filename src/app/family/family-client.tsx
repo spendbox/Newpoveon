@@ -1,5 +1,6 @@
 "use client";
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { loadMe, rememberMe } from "@/lib/storage";
 import { AnswerTile } from "@/components/client";
 import { Icon } from "@/components/icons";
 import { Field, inputCls, Notice } from "@/components/ui";
@@ -66,12 +67,18 @@ export function FamilyForm({ plans }: { plans: string[] }) {
   const [busy, setBusy] = useState(false);
   const [done, setDone] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  useEffect(() => {
+    const me = loadMe();
+    /* eslint-disable-next-line react-hooks/set-state-in-effect -- prefill from this browser */
+    if (me) setV((x) => ({ ...x, email: x.email || me.email, phone: x.phone || me.phone || "", name: x.name || me.name || "" }));
+  }, []);
   const set = (k: keyof typeof v) => (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => setV({ ...v, [k]: e.target.value });
   const them = v.relationship === "Both my parents" ? "your parents" : v.parentName.trim() || (v.relationship === "My mother" ? "your mum" : v.relationship === "My father" ? "your dad" : "them");
 
   async function submit() {
     setBusy(true);
     setError(null);
+    rememberMe({ email: v.email, phone: v.phone, name: v.name });
     const r = await fetch("/api/requests", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ kind: "family_care", ...v, concerns, consent }) }).catch(() => null);
     const d = r ? await r.json().catch(() => ({})) : {};
     setBusy(false);

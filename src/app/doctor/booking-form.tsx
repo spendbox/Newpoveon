@@ -7,7 +7,7 @@ import { AttachmentsInput } from "@/components/attachments-input";
 import { Button, Field, inputCls, Notice } from "@/components/ui";
 import { Steps, type Step } from "@/components/steps";
 import { VoiceNote } from "@/components/voice-note";
-import { loadSaved } from "@/lib/storage";
+import { loadMe, loadSaved, rememberMe } from "@/lib/storage";
 import { clockTime } from "@/lib/time";
 import { memberPrice, type Discount } from "@/lib/plan/perks";
 import { whatsappLink } from "@/lib/whatsapp";
@@ -106,9 +106,15 @@ export function BookingForm({ types, preselect, defaultReason, perk = null }: { 
     const s = loadSaved();
     /* eslint-disable react-hooks/set-state-in-effect -- prefill from this browser */
     setSaved(s);
+    const me = loadMe();
     if (s) {
       setEmail(s.email);
       if (s.phone) setPhone(s.phone);
+    }
+    if (me && (!s || s.email.toLowerCase() === me.email)) {
+      if (!s) setEmail(me.email);
+      if (me.phone && !s?.phone) setPhone(me.phone);
+      if (me.name) setName(me.name);
     }
     const tz = Intl.DateTimeFormat().resolvedOptions().timeZone;
     if (tz && tz !== TZ && new Date().toLocaleString("en-GB", { timeZone: tz }) !== new Date().toLocaleString("en-GB", { timeZone: TZ })) setMyTz(tz);
@@ -144,6 +150,7 @@ export function BookingForm({ types, preselect, defaultReason, perk = null }: { 
     setBusy(true);
     setError(null);
     const data = { consultTypeId: type.id, startsAt: callMe ? null : startsAt, name, phone, email, reason, shareResults: share, screeningId: saved?.screeningId, ownerToken: saved?.ownerToken };
+    rememberMe({ email, phone, name });
     const form = new FormData();
     form.set("data", JSON.stringify(data));
     if (voice) form.set("voice", voice, `voice.${voice.type.includes("mp4") ? "m4a" : voice.type.includes("ogg") ? "ogg" : "webm"}`);

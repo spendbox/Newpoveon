@@ -49,12 +49,12 @@ export default async function HomePage() {
         <div>
           <div className="mb-4 md:hidden"><MannequinHero compact /></div>
           <h1 className="text-[40px] leading-[1.04] font-bold md:text-[64px]">
-            <span className="block whitespace-nowrap">How old is</span>
-            <span className="block whitespace-nowrap">your <span className="text-primary">heart</span>?</span>
+            <span className="block whitespace-nowrap">How <span className="text-primary">healthy</span></span>
+            <span className="block whitespace-nowrap">are you?</span>
           </h1>
           <p className="mt-4 max-w-md text-[17px] leading-relaxed text-balance text-muted md:text-lg">
-            <span className="md:hidden"><span className="whitespace-nowrap">Your wellbeing score, heart age</span><br /><span className="whitespace-nowrap">and more, in 10 minutes.</span></span>
-            <span className="hidden md:inline">Answer a few quick questions and find out your wellbeing score, heart age, diabetes risk and more.</span>
+            <span className="md:hidden"><span className="whitespace-nowrap">How old is your heart?</span><br /><span className="whitespace-nowrap">What&apos;s your wellbeing score?</span><br /><span className="whitespace-nowrap">And much more, in 10 minutes.</span></span>
+            <span className="hidden md:inline">How old is your heart? What&apos;s your wellbeing score? Find out in 10 minutes, along with your diabetes risk, blood pressure and much more.</span>
           </p>
           <div className="mt-7 max-w-sm">
             <StartButton />

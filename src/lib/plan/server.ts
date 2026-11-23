@@ -85,10 +85,14 @@ function goalList(goals: GoalView[], which: "now" | "next" = "now") {
   }).join("");
 }
 
-export function welcomeEmail(goals: GoalView[], name?: string | null) {
+export function welcomeEmail(goals: GoalView[], name?: string | null, opts: { email?: string; newAccount?: boolean } = {}) {
+  const login = opts.newAccount && opts.email
+    ? `<p style="background:#E3F2EC;border-radius:12px;padding:12px 14px">We've made a Poveon account for <b>${esc(opts.email)}</b>. To log in, tap the button below and enter this email. We'll send you a code, then you choose a password.</p>`
+    : "";
   const html = layout("Your plan starts now", `<p>${hi(name)}</p>
 <p>Your personal plan is ready. Here's week 1:</p><ul style="padding-left:18px">${goalList(goals)}</ul>
 <p>Tick things off in the app each day. Every Sunday we'll send your week's summary and adjust next week: a step up when it's going well, a step back if life got busy.</p>
+${login}
 ${button(planUrl(), "Open my plan")}`);
   return { subject: "Your Poveon plan starts now", html, text: `Your personal plan is ready. Open it: ${planUrl()}` };
 }
