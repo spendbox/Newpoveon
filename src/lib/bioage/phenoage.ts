@@ -1,3 +1,5 @@
+import { EGFR_WORDS, egfrCkdEpi2021, egfrStage, type EgfrStage } from "@/lib/scoring/tools";
+
 /**
  * Biological age from routine blood tests: Levine's "PhenoAge".
  * Levine ME, et al. An epigenetic biomarker of aging for lifespan and healthspan. Aging 2018;10:573–591.
@@ -133,4 +135,17 @@ export function labRequestText(memberCode?: string | null): string {
     "Patient preparation:",
     ...BIO_AGE_PREP.map((t) => `- ${t}`),
   ].join("\n");
+}
+
+/** Kidney function (eGFR, CKD-EPI 2021) from the creatinine in the same blood test. Creatinine in µmol/L. */
+export function kidneyFunction(creatinineUmol: number, age: number, sex: "female" | "male") {
+  const egfr = Math.round(egfrCkdEpi2021(creatinineUmol / 88.4, age, sex));
+  const stage: EgfrStage = egfrStage(egfr);
+  return { egfr, stage, ...EGFR_WORDS[stage] };
+}
+
+/** Kidney function for a saved result, when its sex was recorded (results saved before eGFR have none). */
+export function kidneyForResult(r: { markers: Values; age_years: number; entered: { sex?: "female" | "male" } | null }) {
+  const sex = r.entered?.sex;
+  return sex && Number.isFinite(r.markers.creatinine) ? kidneyFunction(r.markers.creatinine, r.age_years, sex) : null;
 }

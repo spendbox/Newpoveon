@@ -7,7 +7,7 @@ import { type Answers, type BpValue, ageOf, num, str } from "@/lib/questions";
 import { heartAge, isExtrapolated, whoCvdRisk, whoRiskBand, WHO_MAX_AGE, type HeartAge, type Sex } from "./who-cvd";
 import {
   auditC, bmi as calcBmi, bmiClass, bpClass, FINDRISC_BAND_RISK, findrisc, gad2Positive, gad7, meetsSleepGuideline,
-  meetsWhoActivity, phq2Positive, phq9, stopBang, waistToHeight, whtrClass, who5, type Who5Band,
+  meetsWhoActivity, phq2Positive, phq9, scored, stopBang, waistToHeight, whtrClass, who5, type Who5Band,
 } from "./tools";
 
 export const RESULTS_VERSION = 1;
@@ -21,7 +21,7 @@ export type NextStep =
   | { kind: "retest"; label: string; months: number };
 
 export interface ResultCard {
-  id: "wellbeing" | "heart" | "bp" | "diabetes" | "body" | "sleep" | "mood" | "anxiety" | "alcohol" | "smoking" | "activity";
+  id: "wellbeing" | "heart" | "bp" | "diabetes" | "kidney" | "body" | "sleep" | "mood" | "anxiety" | "alcohol" | "smoking" | "activity";
   topic: string;
   status: Status;
   /** Short headline value, e.g. "Low" or "BMI 27.1". */
@@ -199,6 +199,45 @@ export function computeResults(a: Answers): Results {
       basis: "Estimate based on FINDRISC.",
       next: status === "good" ? retest(12) : test("blood-sugar", "Order a sugar test"),
     });
+  }
+
+  /* ---------- Kidneys (SCORED) ---------- */
+  // Only for checks that asked the kidney questions (older saved checks simply have no kidney card).
+  if (Array.isArray(a.kidney_conditions)) {
+    const told = new Set(a.kidney_conditions as string[]);
+    const hypertension = a.told_high_bp === "yes" || a.bp_meds === "yes";
+    const familyKidney = a.family_kidney === "yes";
+    const s = scored({
+      age, sex, anaemia: told.has("anaemia"), hypertension, diabetes: hasDiabetes, cvd: hasCvd,
+      heartFailure: told.has("heart_failure"), pvd: told.has("pvd"), proteinuria: told.has("protein"),
+    });
+    const checkTest = test("kidney-check", "Get a kidney check");
+    if (told.has("ckd")) {
+      cards.push({
+        id: "kidney", topic: "Kidneys", status: "check", value: "Kidney disease", sensitive: true,
+        summary: "You already know you have kidney disease. Regular blood and urine tests, and keeping blood pressure and sugar in range, protect your kidneys.",
+        basis: "SCORED is for people who don't know they have kidney disease, so we didn't score it.", next: doctor("Talk to a doctor"),
+      });
+    } else if (s.high) {
+      cards.push({
+        id: "kidney", topic: "Kidney risk", status: "check", value: "Higher risk", sensitive: true,
+        summary: `Your score is ${s.score} out of 12. About 1 in 5 people with a score of 4 or more have kidney disease without knowing it. A simple blood and urine test will tell you.${familyKidney ? " Kidney failure in your family is another reason to check." : ""}`,
+        basis: "Estimate based on SCORED.", next: checkTest,
+      });
+    } else if (hasDiabetes || hypertension || familyKidney) {
+      const why = [hasDiabetes && "diabetes", hypertension && "high blood pressure", familyKidney && "kidney failure in your family"].filter(Boolean) as string[];
+      cards.push({
+        id: "kidney", topic: "Kidney risk", status: "check", value: "Worth a yearly test", sensitive: true,
+        summary: `Your score is ${s.score} out of 12, but ${why.join(" and ")} can quietly damage the kidneys. Doctors advise a kidney blood and urine test every year.`,
+        basis: "Estimate based on SCORED, with KDIGO testing advice.", next: checkTest,
+      });
+    } else {
+      cards.push({
+        id: "kidney", topic: "Kidney risk", status: "good", value: "Low", sensitive: true,
+        summary: `Your score is ${s.score} out of 12. Hidden kidney disease is unlikely. Keeping blood pressure and sugar healthy keeps it that way.`,
+        basis: "Estimate based on SCORED.", next: retest(12),
+      });
+    }
   }
 
   /* ---------- Body (BMI + waist-to-height) ---------- */

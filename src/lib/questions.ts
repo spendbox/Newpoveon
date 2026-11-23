@@ -16,6 +16,7 @@ export type Topic =
   | "Your body"
   | "Your heart"
   | "Blood sugar"
+  | "Kidneys"
   | "Moving"
   | "Sleep"
   | "Alcohol"
@@ -224,6 +225,24 @@ export const QUESTIONS: Question[] = [
       { value: "yes", label: "Every day", icon: "veg" },
       { value: "no", label: "Not every day", icon: "calendar" },
     ],
+  },
+
+  /* ---------------- Kidneys (SCORED) ---------------- */
+  {
+    id: "kidney_conditions", topic: "Kidneys", kind: "multi", title: "Has a doctor ever told you that you have any of these?",
+    help: "Tap all that apply. These help us check your kidneys.", illustration: "heartHistory", noneValue: "none",
+    options: [
+      { value: "anaemia", label: "Anaemia (low blood)", icon: "drop" },
+      { value: "protein", label: "Protein in your urine", icon: "flask" },
+      { value: "heart_failure", label: "Heart failure", icon: "heart" },
+      { value: "pvd", label: "Poor circulation in your legs", icon: "walk" },
+      { value: "ckd", label: "Kidney disease", icon: "shield" },
+      { value: "none", label: "None of these", icon: "question" },
+    ],
+  },
+  {
+    id: "family_kidney", topic: "Kidneys", kind: "choice", title: "Has anyone in your close family had kidney failure or needed dialysis?",
+    help: "A parent, brother, sister or child.", illustration: "family", options: yesNoUnsure,
   },
 
   /* ---------------- Moving ---------------- */

@@ -2,8 +2,8 @@ export const dynamic = "force-dynamic";
 import Link from "next/link";
 import { site } from "@/config/site";
 import { SubmitButton } from "@/components/buttons";
-import { MARKER_BY_KEY, MARKERS, type MarkerKey } from "@/lib/bioage/phenoage";
-import { bioAgePrice, bioAgesFor, dobForMember, normaliseMemberCode, type BioAgeRow } from "@/lib/bioage/server";
+import { kidneyForResult, MARKER_BY_KEY, MARKERS, type MarkerKey } from "@/lib/bioage/phenoage";
+import { bioAgePrice, bioAgesFor, memberFacts, normaliseMemberCode, type BioAgeRow } from "@/lib/bioage/server";
 import { lagosDay } from "@/lib/plan/engine";
 import { supabaseAdmin } from "@/lib/supabase/server";
 import { aBtn, aBtnQuiet, aInput, Badge, Card, H1 } from "../../ui";
@@ -37,7 +37,7 @@ export default async function BioAgePage({ searchParams }: PageProps<"/admin/bio
     members = (res.data ?? []) as Member[];
   }
   const member = members.length === 1 ? members[0] : null;
-  const [history, dobGuess] = member ? await Promise.all([bioAgesFor(member.id), dobForMember(member.id, member.email, member.latest_answers)]) : [[], null];
+  const [history, facts] = member ? await Promise.all([bioAgesFor(member.id), memberFacts(member.id, member.email, member.latest_answers)]) : [[], null];
 
   const price = await bioAgePrice();
   const { data: recentRaw, error: recentErr } = await sb.from("bio_age_results")
@@ -107,7 +107,7 @@ export default async function BioAgePage({ searchParams }: PageProps<"/admin/bio
 
           <Card>
             <h2 className="mb-4 text-lg font-semibold">Add a result</h2>
-            <BioAgeForm userId={member.id} dobGuess={dobGuess} today={lagosDay()} />
+            <BioAgeForm userId={member.id} dobGuess={facts?.dob ?? null} defaultSex={facts?.sex ?? null} today={lagosDay()} />
           </Card>
 
           {history.length > 0 && (
@@ -135,6 +135,7 @@ export default async function BioAgePage({ searchParams }: PageProps<"/admin/bio
                             ))}
                           </tbody>
                         </table>
+                        {kidneyForResult(h) && <p className="mt-2 text-sm">Kidney function (eGFR): <b>{kidneyForResult(h)!.egfr}</b> · {kidneyForResult(h)!.label} ({kidneyForResult(h)!.stage})</p>}
                         <p className="mt-2 text-xs text-muted">Entered by {h.entered_by} on {dayFmt.format(new Date(h.created_at))}{h.lab_name ? ` · ${h.lab_name}` : ""}{h.lab_ref ? ` · ref ${h.lab_ref}` : ""}</p>
                         {h.notes && <p className="mt-1 text-xs text-muted">Note: {h.notes}</p>}
                         <form action={deleteBioAge} className="mt-3 flex flex-col gap-2 rounded-lg bg-act-bg p-3 sm:flex-row">

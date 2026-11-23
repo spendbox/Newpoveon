@@ -1,7 +1,7 @@
 "use client";
 import { useMemo, useState } from "react";
 import { SubmitButton } from "@/components/buttons";
-import { checkValues, differenceText, exactAge, MARKER_BY_KEY, MARKERS, phenoAge, toBase, type MarkerKey, type Values } from "@/lib/bioage/phenoage";
+import { checkValues, differenceText, exactAge, kidneyFunction, MARKER_BY_KEY, MARKERS, phenoAge, toBase, type MarkerKey, type Values } from "@/lib/bioage/phenoage";
 import type { DobGuess } from "@/lib/bioage/dob";
 import { saveBioAge } from "./actions";
 import { aBtn, aInput } from "../../ui";
@@ -11,8 +11,9 @@ type Typed = Record<MarkerKey, { value: string; unit: string }>;
 /** Type the nine results as they appear on the lab report, pick each unit, and see the age as you go. */
 const shortDay = (iso: string) => new Intl.DateTimeFormat("en-NG", { day: "numeric", month: "short", year: "numeric", timeZone: "Africa/Lagos" }).format(new Date(iso));
 
-export function BioAgeForm({ userId, dobGuess, today }: { userId: string; dobGuess: DobGuess | null; today: string }) {
+export function BioAgeForm({ userId, dobGuess, defaultSex, today }: { userId: string; dobGuess: DobGuess | null; defaultSex: "female" | "male" | null; today: string }) {
   const [dob, setDob] = useState(dobGuess?.dob ?? "");
+  const [sex, setSex] = useState<"" | "female" | "male">(defaultSex ?? "");
   const [sample, setSample] = useState(today);
   const [typed, setTyped] = useState<Typed>(() => Object.fromEntries(MARKERS.map((m) => [m.key, { value: "", unit: m.units[0].label }])) as Typed);
 
@@ -28,6 +29,8 @@ export function BioAgeForm({ userId, dobGuess, today }: { userId: string; dobGue
     return { problems, age, result: phenoAge(age, values) };
   }, [typed, dob, sample]);
 
+  const creat = typed.creatinine.value === "" ? NaN : toBase("creatinine", Number(typed.creatinine.value.replace(",", ".")), typed.creatinine.unit);
+  const kidney = preview.age !== null && sex && Number.isFinite(creat) && creat >= 20 ? kidneyFunction(creat, preview.age, sex) : null;
   const bad = new Map(preview.problems.filter((p) => typed[p.key].value !== "").map((p) => [p.key, p.problem]));
   const set = (k: MarkerKey, patch: Partial<Typed[MarkerKey]>) => setTyped((t) => ({ ...t, [k]: { ...t[k], ...patch } }));
 
@@ -48,6 +51,15 @@ export function BioAgeForm({ userId, dobGuess, today }: { userId: string; dobGue
             <span className="mt-1 block rounded-md bg-check-bg px-2 py-1 text-xs font-medium text-check-text">Estimated from the age they gave on {shortDay(dobGuess.from)}. Confirm it with them or the lab form: a year out changes the result.</span>
           )}
         </label>
+        <label className="text-sm font-semibold">Sex
+          <select name="sex" value={sex} onChange={(e) => setSex(e.target.value as "" | "female" | "male")} className={`${aInput} mt-1`} required>
+            <option value="">Choose</option>
+            <option value="female">Female</option>
+            <option value="male">Male</option>
+          </select>
+          <span className="mt-1 block text-xs font-normal text-muted">{defaultSex ? "From their health check." : "Not in their health checks."} Needed for kidney function (eGFR).</span>
+        </label>
+        <span className="hidden sm:block" />
         <label className="text-sm font-semibold">Lab name
           <input name="lab_name" className={`${aInput} mt-1`} placeholder="e.g. Synlab Yaba" maxLength={120} />
         </label>
@@ -90,6 +102,7 @@ export function BioAgeForm({ userId, dobGuess, today }: { userId: string; dobGue
             <p className="text-sm text-white/70">Biological age (preview)</p>
             <p className="font-display text-4xl font-bold">{preview.result.phenoAge.toFixed(1)}</p>
             <p className="text-sm text-white/80">Real age {preview.age!.toFixed(1)} · {differenceText(preview.result.difference)}</p>
+            {kidney && <p className="mt-2 text-sm text-white/80">Kidney function (eGFR): <b>{kidney.egfr}</b> · {kidney.label} ({kidney.stage})</p>}
             <p className="mt-2 text-xs text-white/60">Biggest effects: {preview.result.drivers.slice(0, 3).map((d) => `${MARKER_BY_KEY[d.key].name} ${d.years > 0 ? "+" : "−"}${Math.abs(d.years).toFixed(1)}y`).join(" · ")}</p>
           </>
         ) : (

@@ -14,7 +14,7 @@ export const LAB_GROUPS: CatalogGroup[] = [
   { key: "men", icon: "male", title: "Men's health", text: "Checks most men skip.", items: ["Prostate (PSA)", "Testosterone", "Semen analysis"] },
   { key: "sexual", icon: "shield", title: "Sexual health", text: "Private and judgement-free.", items: ["HIV test", "Hepatitis B and C", "Syphilis (VDRL)", "Full STI screen"] },
   { key: "premarital", icon: "dna", title: "Pre-marital and pregnancy", text: "Plan ahead with confidence.", items: ["Genotype", "Blood group", "Pregnancy test", "Antenatal panel"] },
-  { key: "organs", icon: "flask", title: "Kidney, liver and thyroid", text: "How your organs are working.", items: ["Kidney function (E/U/Cr)", "Liver function (LFT)", "Thyroid (TSH, T3, T4)"] },
+  { key: "organs", icon: "flask", title: "Kidney, liver and thyroid", text: "How your organs are working.", items: ["Kidney function (E/U/Cr)", "Urine albumin (ACR, early kidney damage)", "Liver function (LFT)", "Thyroid (TSH, T3, T4)"] },
   { key: "everyday", icon: "sun", title: "Everyday tests", text: "The common ones.", items: ["Full blood count", "Malaria", "Typhoid", "Urine test", "Vitamin D and B12"] },
 ];
 
@@ -37,4 +37,5 @@ export const TEST_NAMES: Record<string, string> = {
   "cervical-screening": "Cervical screening",
   "hepatitis-b": "Hepatitis B test",
   genotype: "Genotype test",
+  "kidney-check": "Kidney check (creatinine blood test and urine albumin)",
 };

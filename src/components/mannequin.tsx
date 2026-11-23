@@ -113,6 +113,10 @@ export function Mannequin({ highlight, crop = "full", className = "", animate = 
           <path d="M150 128v14M150 142l-8 10M150 142l8 10" stroke="var(--color-lavender)" strokeWidth="1.6" strokeLinecap="round" opacity=".45" />
         </g>
         <g opacity={op("liver")}><path d="M118 214c8-8 34-10 44-4 1 10-8 20-26 22-12 1-20-8-18-18z" fill="var(--color-coral)" opacity=".18" /></g>
+        <g opacity={op("kidneys")}>
+          <path d="M128 238c-7 0-10 7-9 14s5 12 10 11c4-1 4-6 2-9-2-3-1-6 1-8 2-3 0-8-4-8z" fill="var(--color-coral)" opacity=".28" />
+          <path d="M172 238c7 0 10 7 9 14s-5 12-10 11c-4-1-4-6-2-9 2-3 1-6-1-8-2-3 0-8 4-8z" fill="var(--color-coral)" opacity=".28" />
+        </g>
         <g opacity={op("sugar")}><ellipse cx="163" cy="236" rx="17" ry="6" transform="rotate(-14 163 236)" fill="var(--color-sun)" opacity=".5" /></g>
         <g opacity={op("waist")}><path d="M116 266c22 7 46 7 68 0" stroke="var(--color-sun)" strokeWidth="3.5" strokeDasharray="1.5 5" strokeLinecap="round" fill="none" /></g>
         <g opacity={op("legs")}><ellipse cx="172" cy="436" rx="11" ry="15" fill="var(--color-primary)" opacity={highlight === "legs" ? 0.16 : 0} /></g>

@@ -16,3 +16,10 @@ export function dobFromAnswers(answers: unknown, savedAt: string): DobGuess | nu
   const est = new Date(saved.getTime() - (age + 0.5) * 365.2425 * 864e5);
   return { dob: est.toISOString().slice(0, 10), source: "estimated", from: savedAt };
 }
+
+/** The sex recorded in a health check, if any (needed for kidney function, eGFR). */
+export function sexFromAnswers(answers: unknown): "female" | "male" | null {
+  if (!answers || typeof answers !== "object") return null;
+  const v = (answers as Record<string, unknown>).sex;
+  return v === "female" || v === "male" ? v : null;
+}

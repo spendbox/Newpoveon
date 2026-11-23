@@ -15,6 +15,7 @@ const FINDINGS: { icon: IconName; title: string; text: string; tint: string }[] 
   { icon: "sun", title: "Wellbeing score", text: "How you've really been feeling, out of 100.", tint: "bg-sun-soft text-check-text" },
   { icon: "heart", title: "Heart age", text: "And your 10-year risk of heart attack or stroke.", tint: "bg-coral-soft text-act-text" },
   { icon: "drop", title: "Diabetes risk", text: "Whether a sugar test is a good idea.", tint: "bg-lavender-soft text-lavender" },
+  { icon: "shield", title: "Kidney risk", text: "Whether you might have hidden kidney disease.", tint: "bg-coral-soft text-act-text" },
   { icon: "moon", title: "Sleep", text: "Hours, snoring and signs of sleep apnoea.", tint: "bg-lavender-soft text-night" },
   { icon: "mind", title: "Mood and stress", text: "A gentle check on low mood and worry.", tint: "bg-lavender-soft text-lavender" },
   { icon: "scale", title: "Body and blood pressure", text: "BMI, waist and blood pressure, in plain words.", tint: "bg-primary-soft text-primary" },
@@ -105,7 +106,7 @@ export default async function HomePage() {
       {/* ---------------- What you'll find out ---------------- */}
       <section className="py-12" aria-labelledby="find-out">
         <Overline>What you&apos;ll find out</Overline>
-        <h2 id="find-out" className="mt-2 max-w-xl text-3xl font-bold md:text-[40px] md:leading-tight">Seven things worth knowing about your health</h2>
+        <h2 id="find-out" className="mt-2 max-w-xl text-3xl font-bold md:text-[40px] md:leading-tight">Eight things worth knowing about your health</h2>
         <div className="mt-8 grid gap-x-8 gap-y-6 sm:grid-cols-2 lg:grid-cols-3">
           {FINDINGS.map((f) => (
             <div key={f.title} className="flex gap-4">

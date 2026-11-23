@@ -229,10 +229,10 @@ describe("computeResults", () => {
     const s = shareSummary(computeResults(healthy));
     expect(JSON.stringify(s)).not.toMatch(/Mood|Worry|Alcohol|PHQ|GAD|AUDIT/);
   });
-  it("opens gated sections only when needed (30–40 questions for most people, incl. 5 WHO-5)", () => {
-    expect(visibleQuestions(healthy).length).toBe(30);
+  it("opens gated sections only when needed (32–51 questions, incl. 5 WHO-5 and 2 kidney)", () => {
+    expect(visibleQuestions(healthy).length).toBe(32);
     const busy = { ...healthy, snore: "yes", drinks: "yes", phq1: "2", phq2: "2", gad1: "2", gad2: "2", sex: "female" };
-    expect(visibleQuestions(busy).length).toBe(31 + 3 + 3 + 7 + 5);
+    expect(visibleQuestions(busy).length).toBe(33 + 3 + 3 + 7 + 5);
   });
   it("server sanitiser drops invalid and hidden answers", () => {
     const s = sanitizeAnswers({ ...healthy, age: 500, tired: "yes", evil: "<script>" });

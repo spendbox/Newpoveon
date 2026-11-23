@@ -97,6 +97,26 @@ const TOOLS: Tool[] = [
     links: [{ href: "/learn/sleep", label: "Sleep" }],
   },
   {
+    mark: "SCORED", full: "Screening for Occult Renal Disease", use: "Kidney risk", tint: "text-[#A23B2A]",
+    what: "A short set of questions, made in the USA in 2007, that shows whether someone might already have kidney disease without knowing it.",
+    how: [
+      "Points for age, being female, anaemia, high blood pressure, diabetes, heart attack or stroke, heart failure, poor circulation in the legs and protein in the urine.",
+      "A score of 4 or more out of 12 means you should have a kidney blood and urine test. About 1 in 5 people with that score have kidney disease.",
+    ],
+    source: "Bang H, et al. Arch Intern Med 2007;167:374–381.",
+    links: [{ href: "/learn/kidney", label: "Kidney risk" }],
+  },
+  {
+    mark: "CKD-EPI", full: "Kidney function equation, 2021", use: "Kidney function (eGFR)", tint: "text-[#7A2E5C]",
+    what: "The formula doctors worldwide use to work out how well your kidneys filter blood (eGFR) from a creatinine blood test.",
+    how: [
+      "When your Biological Age Check results come in, we use your creatinine, age and sex to work out your eGFR.",
+      "90 or above is normal. Under 60 for 3 months or more means kidney disease, and a doctor should review it.",
+    ],
+    source: "Inker LA, et al. N Engl J Med 2021;385:1737–1749; KDIGO 2024 CKD guideline.",
+    links: [{ href: "/learn/kidney", label: "Kidney risk" }],
+  },
+  {
     mark: "PhenoAge", full: "Yale University study, 2018", use: "Biological age", tint: "text-[#00356B]",
     what: "A way to work out how old your body seems from nine routine blood tests. Scientists at Yale University made it by following the health of nearly 10,000 adults over many years.",
     how: [

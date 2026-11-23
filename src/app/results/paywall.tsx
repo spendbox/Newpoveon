@@ -50,7 +50,7 @@ export function Paywall({ results, answers, saved, offer, confirming, onOffline 
   const member = offer.consult && offer.discount ? memberPrice(offer.consult, offer.discount) : null;
 
   const perks: Perk[] = [
-    { icon: "gauge", anim: "pw-swing", tint: "bg-primary-soft text-primary", title: "Every score, in full", text: "Wellbeing, heart age, diabetes risk, blood pressure, sleep, mood and more." },
+    { icon: "gauge", anim: "pw-swing", tint: "bg-primary-soft text-primary", title: "Every score, in full", text: "Wellbeing, heart age, diabetes and kidney risk, sleep, mood and more." },
     { icon: "target", anim: "pw-pulse", tint: "bg-coral-soft text-act-text", title: `A ${offer.months}-month plan for you`, text: focus.length ? `Starting with ${focus.map((a) => AREA_INFO[a].title.toLowerCase()).join(" and ")}, made from your answers.` : "Made from your answers, around your day." },
     { icon: "check", anim: "pw-pop", tint: "bg-sun-soft text-check-text", title: "Daily check-ins that work", text: "Tick off each day. Targets step up as you keep going, and ease back when life gets busy." },
     ...(offer.perk ? [{ icon: "stethoscope" as IconName, anim: "pw-wiggle", tint: "bg-lavender-soft text-lavender", title: `${offer.perk} consultations`, text: member && offer.consult ? `Talk to a doctor for ${ngn(member)} instead of ${ngn(offer.consult)}, for ${offer.months} months.` : `On every doctor consultation for ${offer.months} months.` }] : []),

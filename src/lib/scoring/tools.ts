@@ -211,3 +211,57 @@ export function who5(items: number[]) {
   const band: Who5Band = score <= 28 ? "very low" : score <= 50 ? "low" : "good";
   return { raw, score, band } as const;
 }
+
+/* ------------------------------------------------------------------ SCORED (kidney) */
+
+/**
+ * SCORED: Screening for Occult REnal Disease. Bang H, et al. Arch Intern Med 2007;167:374–381.
+ * Estimates whether someone may already have chronic kidney disease (CKD) without knowing it.
+ * Points: age 50–59 = 2, 60–69 = 3, 70+ = 4; female 1; anaemia 1; high blood pressure 1; diabetes 1;
+ * heart attack or stroke 1; heart failure 1; poor circulation in the legs (peripheral vascular disease) 1;
+ * protein in the urine 1. A score of 4 or more means "get a kidney test" (in the derivation study about
+ * 1 in 5 people scoring 4+ had CKD, and the cut-off found about 9 in 10 people who had it).
+ */
+export interface ScoredInputs {
+  age: number;
+  sex: Sex;
+  anaemia: boolean;
+  hypertension: boolean;
+  diabetes: boolean;
+  cvd: boolean;
+  heartFailure: boolean;
+  pvd: boolean;
+  proteinuria: boolean;
+}
+export function scored(x: ScoredInputs) {
+  const agePts = x.age >= 70 ? 4 : x.age >= 60 ? 3 : x.age >= 50 ? 2 : 0;
+  const score = agePts + [x.sex === "female", x.anaemia, x.hypertension, x.diabetes, x.cvd, x.heartFailure, x.pvd, x.proteinuria].filter(Boolean).length;
+  return { score, high: score >= 4 };
+}
+
+/* ------------------------------------------------------------------ eGFR (kidney function) */
+
+/**
+ * eGFR from blood creatinine: CKD-EPI 2021 equation (no race term).
+ * Inker LA, et al. N Engl J Med 2021;385:1737–1749. Creatinine in mg/dL (µmol/L ÷ 88.4).
+ * Stages (KDIGO 2012/2024): G1 ≥90, G2 60–89, G3a 45–59, G3b 30–44, G4 15–29, G5 <15 mL/min/1.73m².
+ */
+export function egfrCkdEpi2021(creatinineMgDl: number, age: number, sex: Sex): number {
+  const k = sex === "female" ? 0.7 : 0.9;
+  const a = sex === "female" ? -0.241 : -0.302;
+  const r = creatinineMgDl / k;
+  return 142 * Math.min(r, 1) ** a * Math.max(r, 1) ** -1.2 * 0.9938 ** age * (sex === "female" ? 1.012 : 1);
+}
+export type EgfrStage = "G1" | "G2" | "G3a" | "G3b" | "G4" | "G5";
+export function egfrStage(egfr: number): EgfrStage {
+  return egfr >= 90 ? "G1" : egfr >= 60 ? "G2" : egfr >= 45 ? "G3a" : egfr >= 30 ? "G3b" : egfr >= 15 ? "G4" : "G5";
+}
+/** Plain words for each stage. G1–G2 are only kidney disease if there's other damage (such as protein in the urine). */
+export const EGFR_WORDS: Record<EgfrStage, { label: string; status: "good" | "check" | "act"; meaning: string }> = {
+  G1: { label: "Normal", status: "good", meaning: "Your kidneys are filtering well." },
+  G2: { label: "Mildly lower", status: "good", meaning: "Slightly below the top range, which is common with age. Fine on its own; recheck yearly if you have high blood pressure or diabetes." },
+  G3a: { label: "Mild to moderate decrease", status: "check", meaning: "Your kidneys are filtering less than they should. Repeat the test within 3 months and see a doctor; most people keep stable with care." },
+  G3b: { label: "Moderate to severe decrease", status: "act", meaning: "Your kidneys are working well below normal. Please see a doctor soon to protect what you have." },
+  G4: { label: "Severe decrease", status: "act", meaning: "Your kidneys are badly affected. See a doctor, ideally a kidney specialist, within days." },
+  G5: { label: "Kidney failure range", status: "act", meaning: "Your kidneys are barely filtering. See a doctor urgently, today if you feel unwell." },
+};
