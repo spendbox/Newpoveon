@@ -1,5 +1,5 @@
 import { Icon } from "@/components/icons";
-import { BIO_AGE_PREP, BIO_AGE_TESTS, differenceText, MARKER_BY_KEY, phenoAge } from "@/lib/bioage/phenoage";
+import { BIO_AGE_PREP, BIO_AGE_TESTS, differenceText, kidneyForResult, MARKER_BY_KEY, phenoAge } from "@/lib/bioage/phenoage";
 import type { BioAgeRow } from "@/lib/bioage/server";
 
 const dayFmt = new Intl.DateTimeFormat("en-NG", { day: "numeric", month: "short", year: "numeric", timeZone: "UTC" });
@@ -21,6 +21,8 @@ export function Latest({ row }: { row: BioAgeRow }) {
         </p>
         <p className="relative mt-3 text-[14px] text-white/70">Real age {Math.floor(row.age_years)} · blood taken {dayFmt.format(day(row.sample_date))}</p>
       </section>
+
+      <KidneyFunction row={row} />
 
       {row.notes && (
         <section className="rounded-[var(--radius-xl)] border border-line bg-surface p-5">
@@ -85,6 +87,31 @@ export function Intro() {
           <ul className="mt-2 flex flex-col gap-1.5 text-[15px]">
             {BIO_AGE_PREP.map((t) => <li key={t} className="flex gap-2"><Icon name="clock" size={16} strokeWidth={2.2} className="mt-1 shrink-0 text-primary" />{t}</li>)}
           </ul>
+        </div>
+      </div>
+    </section>
+  );
+}
+
+const KIDNEY_TONE = { good: "bg-good-bg text-good-text", check: "bg-check-bg text-check-text", act: "bg-act-bg text-act-text" } as const;
+
+/** Kidney function (eGFR) from the creatinine in the same blood test. */
+function KidneyFunction({ row }: { row: BioAgeRow }) {
+  const k = kidneyForResult(row);
+  if (!k) return null;
+  return (
+    <section className="rounded-[var(--radius-xl)] border border-line bg-surface p-5" aria-labelledby="kidney-fn">
+      <div className="flex items-start gap-4">
+        <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-[var(--radius-md)] bg-coral-soft text-act-text"><Icon name="drop" size={22} strokeWidth={2} /></span>
+        <div className="min-w-0 flex-1">
+          <h2 id="kidney-fn" className="font-semibold">Kidney function, from the same blood test</h2>
+          <p className="mt-1 flex flex-wrap items-baseline gap-x-2">
+            <span className="font-display text-3xl font-bold">{k.egfr}</span>
+            <span className="text-[14px] text-muted">eGFR</span>
+            <span className={`rounded-full px-2.5 py-0.5 text-[13px] font-semibold ${KIDNEY_TONE[k.status]}`}>{k.label}</span>
+          </p>
+          <p className="mt-1 text-[15px] leading-snug text-muted">{k.meaning}</p>
+          <p className="mt-2 text-[12px] text-subtle">How well your kidneys filter your blood, worked out from your creatinine (CKD-EPI 2021). 90 or above is normal. A urine test (albumin) completes the picture.</p>
         </div>
       </div>
     </section>

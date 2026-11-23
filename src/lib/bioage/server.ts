@@ -2,13 +2,13 @@ import "server-only";
 import { site } from "@/config/site";
 import { button, layout } from "@/lib/email";
 import { currentUser, supabaseAdmin, supabaseUser } from "@/lib/supabase/server";
-import { differenceText, type MarkerKey, type Values } from "./phenoage";
-import { dobFromAnswers, type DobGuess } from "./dob";
+import { differenceText, kidneyForResult, type MarkerKey, type Values } from "./phenoage";
+import { dobFromAnswers, sexFromAnswers, type DobGuess } from "./dob";
 export { normaliseMemberCode } from "./member";
 
 export type BioAgeRow = {
   id: string; user_id: string; member_code: string; sample_date: string; age_years: number; pheno_age: number;
-  markers: Values; entered: Record<MarkerKey, { value: number; unit: string }> | null;
+  markers: Values; entered: (Record<MarkerKey, { value: number; unit: string }> & { sex?: "female" | "male" }) | null;
   lab_name: string | null; lab_ref: string | null; notes: string | null; entered_by: string; emailed_at: string | null; created_at: string;
 };
 
@@ -42,25 +42,29 @@ export async function myMemberCode(userId: string): Promise<string | null> {
 }
 
 /**
- * The best date of birth we have for someone, for Admin: their account's latest answers first,
- * then every check saved with their account or email (newest first). An exact date beats an estimate.
+ * What Admin needs from someone's health checks: the best date of birth (their account's latest answers
+ * first, then every check saved with their account or email, newest first; an exact date beats an
+ * estimate) and their sex (for kidney function).
  */
-export async function dobForMember(userId: string, email: string, latestAnswers: unknown): Promise<DobGuess | null> {
+export async function memberFacts(userId: string, email: string, latestAnswers: unknown): Promise<{ dob: DobGuess | null; sex: "female" | "male" | null }> {
   const fromProfile = dobFromAnswers(latestAnswers, new Date().toISOString());
-  if (fromProfile?.source === "exact") return fromProfile;
+  let sex = sexFromAnswers(latestAnswers);
+  if (fromProfile?.source === "exact" && sex) return { dob: fromProfile, sex };
   const sb = supabaseAdmin();
   const [byUser, byEmail] = await Promise.all([
     sb.from("screenings").select("answers, created_at").eq("user_id", userId).order("created_at", { ascending: false }).limit(20),
     sb.from("screenings").select("answers, created_at").eq("email", email.toLowerCase()).order("created_at", { ascending: false }).limit(20),
   ]);
   const rows = [...(byUser.data ?? []), ...(byEmail.data ?? [])].sort((a, b) => (a.created_at < b.created_at ? 1 : -1));
+  let exact: DobGuess | null = fromProfile?.source === "exact" ? fromProfile : null;
   let estimate: DobGuess | null = null;
   for (const r of rows) {
+    sex ??= sexFromAnswers(r.answers);
     const g = dobFromAnswers(r.answers, r.created_at);
-    if (g?.source === "exact") return g;
-    if (g && !estimate) estimate = g;
+    if (g?.source === "exact") exact ??= g;
+    else if (g && !estimate) estimate = g;
   }
-  return estimate ?? fromProfile;
+  return { dob: exact ?? estimate ?? fromProfile, sex };
 }
 
 /** Price of the Biological Age Check in naira. Kept on its lab package; ₦125,000 until Admin sets one. */
@@ -83,7 +87,8 @@ export async function currentMemberCode(): Promise<string | null> {
 
 const esc = (s: string) => s.replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[c]!);
 
-export function bioAgeEmail(r: { pheno_age: number; age_years: number; sample_date: string }, name?: string | null) {
+export function bioAgeEmail(r: { pheno_age: number; age_years: number; sample_date: string; markers?: Values; entered?: { sex?: "female" | "male" } | null }, name?: string | null) {
+  const k = r.markers ? kidneyForResult({ markers: r.markers, age_years: r.age_years, entered: r.entered ?? null }) : null;
   const url = `${site.siteUrl}/account/bio-age`;
   const diff = r.pheno_age - r.age_years;
   const when = new Intl.DateTimeFormat("en-NG", { day: "numeric", month: "long", year: "numeric", timeZone: "UTC" }).format(new Date(`${r.sample_date}T12:00:00Z`));
@@ -91,6 +96,7 @@ export function bioAgeEmail(r: { pheno_age: number; age_years: number; sample_da
 <p>Your blood results from ${esc(when)} are in, and we've worked out your biological age.</p>
 <p style="margin:16px 0;font-size:40px;font-weight:800;color:#136F58;text-align:center">${Math.round(r.pheno_age)}</p>
 <p style="text-align:center;margin:0 0 16px;font-size:16px">That's <b>${esc(differenceText(diff))}</b>.</p>
+${k ? `<p>Your kidney function (eGFR) from the same test is <b>${k.egfr}</b>: ${esc(k.label.toLowerCase())}. ${esc(k.meaning)}</p>` : ""}
 <p>See which results helped, which added years, and what to do next on your dashboard.</p>
 ${button(url, "See my biological age")}
 <p style="margin-top:16px;font-size:13px;color:#5E706A">Biological age is an estimate from routine blood tests (Levine's PhenoAge, 2018). It's not a diagnosis. If any result worries you, talk to one of our doctors.</p>`);

@@ -7,7 +7,7 @@ import type { IconName } from "@/components/icons";
 import type { ResultCard, Status } from "@/lib/scoring/results";
 
 export type LearnSlug = ResultCard["id"];
-export type BodyArea = "mind" | "sleep" | "lungs" | "heart" | "bp" | "liver" | "sugar" | "waist" | "legs";
+export type BodyArea = "mind" | "sleep" | "lungs" | "heart" | "bp" | "liver" | "sugar" | "kidneys" | "waist" | "legs";
 
 export interface LearnTopic {
   slug: LearnSlug;
@@ -146,6 +146,34 @@ export const LEARN: Record<LearnSlug, LearnTopic> = {
     consult: "lower-my-risk", consultLabel: "Talk to a doctor",
     test: { name: "HbA1c (3-month blood sugar average)", why: "It shows whether your blood sugar is normal, raised (pre-diabetes) or in the diabetes range." },
     related: ["body", "activity", "heart"],
+  },
+  kidney: {
+    slug: "kidney", title: "Kidney risk", area: "kidneys", icon: "drop",
+    tagline: "Whether you might have kidney disease without knowing it.",
+    whatItIs: "Your kidneys clean your blood, control your blood pressure and help make red blood cells. Kidney disease usually has no symptoms until the kidneys are badly damaged, so many people find out late. Your kidney risk score shows whether you should have a simple blood and urine test to check them.",
+    whyItMatters: [
+      "Kidney disease is common in Nigeria, and most people with it don't know yet.",
+      "High blood pressure and diabetes are the biggest causes. Both are common and often silent.",
+      "Found early, kidney damage can usually be slowed or stopped. Found late, it can mean dialysis, which is costly and hard to get.",
+    ],
+    howWeCheck: { tool: "SCORED (Screening for Occult Renal Disease)", detail: "Points for age, being female, anaemia, high blood pressure, diabetes, heart attack or stroke, heart failure, poor circulation in the legs and protein in the urine. Scored 0 to 12. A score of 4 or more means you should get a kidney test.", source: "Bang H, et al. Arch Intern Med 2007;167:374–381; KDIGO 2024 Clinical Practice Guideline for CKD." },
+    bands: [
+      { label: "Low risk", range: "Score 0 to 3", status: "good", meaning: "Hidden kidney disease is unlikely. If you have diabetes, high blood pressure or kidney failure in the family, still have a kidney test every year." },
+      { label: "Higher risk", range: "Score 4 or more", status: "check", meaning: "About 1 in 5 people with this score have kidney disease without knowing it. It doesn't mean you have it: a blood and urine test will tell you." },
+    ],
+    improve: [
+      { title: "Keep blood pressure under control", text: "Aim for under 140/90, or lower if your doctor advises. This protects the kidneys more than anything else." },
+      { title: "Keep blood sugar in range", text: "If you have diabetes, regular checks and taking your medicine every day protect the tiny filters in your kidneys." },
+      { title: "Be careful with painkillers", text: "Taking pain tablets like ibuprofen or diclofenac often can harm the kidneys. Ask a doctor or pharmacist what's safe for you." },
+      { title: "Avoid unknown herbal mixtures", text: "Some herbal remedies and \"bitters\" can damage the kidneys. Tell your doctor about anything you take." },
+      { title: "Cut down on salt and stop smoking", text: "Both raise blood pressure and speed up kidney damage." },
+      { title: "Drink water through the day", text: "Most people need about 6 to 8 cups a day, more in the heat. Your doctor will tell you if you need less." },
+    ],
+    seeDoctor: ["Your score is 4 or more", "You have diabetes or high blood pressure and haven't had a kidney test this year", "Swollen feet or face, foamy urine, passing much less urine, or feeling very tired and itchy"],
+    urgent: "Passing very little or no urine, severe swelling, or breathlessness with swelling: go to hospital now or call 112.",
+    consult: "condition-review", consultLabel: "Talk to a doctor",
+    test: { name: "Kidney check: creatinine (eGFR) and urine albumin", why: "A blood test shows how well your kidneys filter, and a urine test shows if they're leaking protein, the earliest sign of damage." },
+    related: ["bp", "diabetes", "heart"],
   },
   body: {
     slug: "body", title: "Weight and waist", area: "waist", icon: "scale",
@@ -345,4 +373,4 @@ export const LEARN: Record<LearnSlug, LearnTopic> = {
   },
 };
 
-export const LEARN_ORDER: LearnSlug[] = ["wellbeing", "heart", "bp", "diabetes", "body", "sleep", "mood", "anxiety", "alcohol", "smoking", "activity"];
+export const LEARN_ORDER: LearnSlug[] = ["wellbeing", "heart", "bp", "diabetes", "kidney", "body", "sleep", "mood", "anxiety", "alcohol", "smoking", "activity"];

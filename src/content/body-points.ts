@@ -9,6 +9,7 @@ export const AREA_POINTS: Record<BodyArea, { x: number; y: number; label: string
   bp: { x: 92, y: 196, label: "Blood pressure" },
   liver: { x: 136, y: 220, label: "Liver" },
   sugar: { x: 163, y: 236, label: "Blood sugar" },
+  kidneys: { x: 124, y: 248, label: "Kidneys" },
   waist: { x: 150, y: 266, label: "Weight and waist" },
   legs: { x: 172, y: 436, label: "Movement" },
 };

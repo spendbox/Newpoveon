@@ -30,7 +30,9 @@ export async function saveBioAge(f: FormData) {
   const age = dob && sample ? exactAge(dob, sample) : null;
   if (age === null || age < 18 || age > 100) back("Enter a valid date of birth (18 or older on the test day).");
 
-  const entered = {} as Record<MarkerKey, { value: number; unit: string }>;
+  const sex = str(f, "sex", 10);
+  if (sex !== "female" && sex !== "male") back("Choose their sex (needed for kidney function).");
+  const entered = { sex } as Record<MarkerKey, { value: number; unit: string }> & { sex: "female" | "male" };
   const values = {} as Values;
   for (const m of MARKERS) {
     const raw = str(f, m.key, 20).replace(",", ".");
