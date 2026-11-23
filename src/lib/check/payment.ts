@@ -4,6 +4,7 @@ import { emailConfigured, resultsEmail, sendEmail } from "@/lib/email";
 import { initializeTransaction, verifyTransaction } from "@/lib/paystack";
 import { lagosDay, mondayOf, weightTarget, type Goal } from "@/lib/plan/engine";
 import { loadPlan, planHints, welcomeEmail } from "@/lib/plan/server";
+import { personalWhy } from "@/lib/plan/personal";
 import { loadPlanSettings } from "@/lib/plan/settings";
 import type { Answers } from "@/lib/questions";
 import type { Results } from "@/lib/scoring/results";
@@ -50,7 +51,7 @@ export function defaultGoals(answers: Answers, results: Results | null): Goal[] 
     if (r.area === "sleep") goals.push({ area: "sleep", settings: { wake: "06:30", startLevel: h.sleepStart } });
     if (r.area === "weight" && h.weightKg) goals.push({ area: "weight", settings: { startKg: h.weightKg, targetKg: weightTarget(h.weightKg), weighDay: 6, moveStart: Math.min(6, h.moveStart) } });
     if (r.area === "eat") goals.push({ area: "eat", settings: { swaps: h.swaps.slice(0, 4) } });
-    if (r.area === "calm") goals.push({ area: "calm", settings: { practice: "breathe", cue: "Before bed" } });
+    if (r.area === "calm") goals.push({ area: "calm", settings: h.calm });
   }
   // Everything already looks good? Keep the momentum with movement.
   if (!goals.length) goals.push({ area: "move", settings: { cue: "After work", activity: "Brisk walking", startLevel: h.moveStart } });
@@ -121,7 +122,8 @@ export async function confirmCheckPayment(reference: string, source: "webhook" |
     await sendEmail(screening.email, m.subject, m.html, m.text);
     const loaded = await loadPlan(account.id);
     if (loaded?.goals.length) {
-      const w = welcomeEmail(loaded.goals, null, { email: screening.email, newAccount: account.created });
+      const whys = Object.fromEntries(loaded.goals.map((g) => [g.area, personalWhy(g.area, screening.answers as Answers, screening.results as Results)]));
+      const w = welcomeEmail(loaded.goals, null, { email: screening.email, newAccount: account.created, whys });
       await sendEmail(screening.email, w.subject, w.html, w.text);
     }
   }

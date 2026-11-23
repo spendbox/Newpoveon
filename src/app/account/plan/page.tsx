@@ -14,6 +14,7 @@ import { loadPlanSettings } from "@/lib/plan/settings";
 import { PageHead } from "../panels";
 import { PlanBuilder } from "./plan-builder";
 import { PlanHome } from "./plan-home";
+import { personalAim, personalExtras, personalWhy, planFocus } from "@/lib/plan/personal";
 
 export const metadata: Metadata = { title: "My plan", robots: { index: false } };
 
@@ -43,11 +44,18 @@ export default async function PlanPage({ searchParams }: PageProps<"/account/pla
   const recheckDue = !!latest && Date.now() - new Date(latest.created_at).getTime() > 84 * 864e5; // eslint-disable-line react-hooks/purity
 
   if (active && loaded && sp.edit !== "1") {
+    const answers = (latest?.answers ?? {}) as Answers;
+    const personal = {
+      checkDate: latest?.created_at ?? null,
+      focus: planFocus(latest?.results ?? null),
+      extras: personalExtras(latest?.results ?? null),
+      goals: Object.fromEntries(loaded.goals.map((g) => [g.id, { why: personalWhy(g.area, answers, latest?.results ?? null), aim: personalAim({ area: g.area, settings: g.settings }) }])),
+    };
     return (
       <>
         <PageHead eyebrow="My plan" title="Your plan" sub="Tick things off each day. Your targets adjust every week." />
         {justPaid && <div className="mb-4"><Notice tone="good">You&apos;re all set. Your plan starts this week, and we&apos;ve emailed you the details.</Notice></div>}
-        <PlanHome perkLabel={perkLabel} goals={loaded.goals} today={today} paidUntil={loaded.plan.paid_until!} startsOn={loaded.plan.starts_on ?? today} reminders={loaded.plan.reminders} recheckDue={recheckDue} />
+        <PlanHome personal={personal} perkLabel={perkLabel} goals={loaded.goals} today={today} paidUntil={loaded.plan.paid_until!} startsOn={loaded.plan.starts_on ?? today} reminders={loaded.plan.reminders} recheckDue={recheckDue} />
       </>
     );
   }

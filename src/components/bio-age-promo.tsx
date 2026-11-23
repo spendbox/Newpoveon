@@ -40,7 +40,7 @@ export function BioAgePromo({ state, price }: { state: BioPromoState; price: num
               <span className="h-2 w-2 rounded-full bg-sun" aria-hidden="true" /> New · Biological Age Check
             </p>
             <h2 id="bio-promo" className="mt-4 text-[34px] leading-[1.05] font-bold text-white md:text-[46px]">
-              {mine ? <>Your body is <span className="text-sun">{bio}</span>.</> : <>Your body has an age of <span className="text-sun">its own</span>.</>}
+              {mine ? <>Your body is <span className="text-sun">{bio}</span>.</> : <>Are you a <span className="whitespace-nowrap">30-year-old</span> in a <span className="text-sun"><span className="whitespace-nowrap">50-year-old&apos;s</span> body?</span></>}
             </h2>
             <p className="mt-3 max-w-md text-[17px] leading-relaxed text-white/75">
               {mine

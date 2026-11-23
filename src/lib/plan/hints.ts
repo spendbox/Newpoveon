@@ -3,6 +3,7 @@ import { ageOf, num, str, type Answers } from "@/lib/questions";
 import { bmi as calcBmi, waistToHeight } from "@/lib/scoring/tools";
 import type { Results } from "@/lib/scoring/results";
 import { moveStartLevel, recommend, sleepStartLevel, suggestedSwaps, type Recommendation } from "./engine";
+import { calmFor, personalWhy } from "./personal";
 
 export function planHints(answers: Answers | null, results: Results | null) {
   const a = answers ?? {};
@@ -19,11 +20,12 @@ export function planHints(answers: Answers | null, results: Results | null) {
     wellbeing: results?.wellbeing?.score ?? null,
     vegDaily: a.veg_daily === "yes" ? true : a.veg_daily === "no" ? false : null,
   };
-  const recs: Recommendation[] = recommend(input);
+  // Each reason uses the person's own numbers, not a generic sentence.
+  const recs: Recommendation[] = recommend(input).map((r) => ({ ...r, why: personalWhy(r.area, a, results) }));
   return {
     recs, weightKg: weight, age: ageOf(a),
     moveStart: moveStartLevel(input.activeDays), sleepStart: sleepStartLevel(input.sleepHours),
-    swaps: suggestedSwaps(input), canLoseWeight: bmi === null || bmi >= 23,
+    swaps: suggestedSwaps(input), canLoseWeight: bmi === null || bmi >= 23, calm: calmFor(a, results),
   };
 }
 

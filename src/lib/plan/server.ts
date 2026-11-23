@@ -78,19 +78,19 @@ const esc = (s: string) => s.replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&
 const planUrl = () => `${site.siteUrl}/account/plan`;
 const hi = (name?: string | null) => (name ? `Hi ${esc(name.split(" ")[0])},` : "Hi,");
 
-function goalList(goals: GoalView[], which: "now" | "next" = "now") {
+function goalList(goals: GoalView[], whys: Partial<Record<Area, string>> = {}) {
   return goals.map((g) => {
-    const t = which === "now" ? g.progress.target : g.progress.target;
-    return `<li style="margin:6px 0"><b>${esc(AREA_INFO[g.area].title)}:</b> ${esc(t.headline)}</li>`;
+    const why = whys[g.area] ? `<br><span style="color:#5E706A;font-size:13px">${esc(whys[g.area]!)}</span>` : "";
+    return `<li style="margin:8px 0"><b>${esc(AREA_INFO[g.area].title)}:</b> ${esc(g.progress.target.headline)}${why}</li>`;
   }).join("");
 }
 
-export function welcomeEmail(goals: GoalView[], name?: string | null, opts: { email?: string; newAccount?: boolean } = {}) {
+export function welcomeEmail(goals: GoalView[], name?: string | null, opts: { email?: string; newAccount?: boolean; whys?: Partial<Record<Area, string>> } = {}) {
   const login = opts.newAccount && opts.email
     ? `<p style="background:#E3F2EC;border-radius:12px;padding:12px 14px">We've made a Poveon account for <b>${esc(opts.email)}</b>. To log in, tap the button below and enter this email. We'll send you a code, then you choose a password.</p>`
     : "";
   const html = layout("Your plan starts now", `<p>${hi(name)}</p>
-<p>Your personal plan is ready. Here's week 1:</p><ul style="padding-left:18px">${goalList(goals)}</ul>
+<p>Your personal plan is ready, made from your check. Here's week 1, and why each part is in your plan:</p><ul style="padding-left:18px">${goalList(goals, opts.whys)}</ul>
 <p>Tick things off in the app each day. Every Sunday we'll send your week's summary and adjust next week: a step up when it's going well, a step back if life got busy.</p>
 ${login}
 ${button(planUrl(), "Open my plan")}`);

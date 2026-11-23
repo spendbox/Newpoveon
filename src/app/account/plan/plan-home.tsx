@@ -9,6 +9,9 @@ import { ButtonLink, Notice } from "@/components/ui";
 import { DAY_NAMES, type WeightSettings } from "@/lib/plan/engine";
 import type { GoalView } from "@/lib/plan/server";
 import { AREA_INFO } from "@/lib/plan/options";
+import type { Extra } from "@/lib/plan/personal";
+
+export type Personal = { checkDate: string | null; focus: string[]; extras: Extra[]; goals: Record<string, { why: string; aim: string }> };
 
 const short = new Intl.DateTimeFormat("en-NG", { day: "numeric", month: "short", timeZone: "UTC" });
 const long = new Intl.DateTimeFormat("en-NG", { day: "numeric", month: "long", year: "numeric", timeZone: "UTC" });
@@ -28,8 +31,10 @@ function reviewLine(g: GoalView): string | null {
  * The plan, day to day: tick things off, see the week fill up, and see how next week will adjust.
  * Every number here is worked out on the server from what's been ticked off.
  */
-export function PlanHome({ goals, today, paidUntil, reminders, startsOn, recheckDue, perkLabel = "" }: {
+export function PlanHome({ goals, today, paidUntil, reminders, startsOn, recheckDue, perkLabel = "", personal = null }: {
   goals: GoalView[]; today: string; paidUntil: string; reminders: boolean; startsOn: string; recheckDue: boolean; perkLabel?: string;
+  /** What makes this plan theirs: built from which results, why each goal, where it's heading. */
+  personal?: Personal | null;
 }) {
   const router = useRouter();
   const [pending, setPending] = useState<string | null>(null);
@@ -70,6 +75,16 @@ export function PlanHome({ goals, today, paidUntil, reminders, startsOn, recheck
         </div>
       </section>
 
+      {personal?.checkDate && personal.focus.length > 0 && (
+        <section className="rounded-[var(--radius-xl)] border border-primary/30 bg-primary-soft p-5" aria-labelledby="made-for-you">
+          <p id="made-for-you" className="flex items-center gap-2 font-semibold"><Icon name="target" size={18} strokeWidth={2.2} className="text-primary" /> Made for you</p>
+          <p className="mt-1 text-[15px] text-ink/80">Built from your check on {long.format(new Date(personal.checkDate))}, around:</p>
+          <ul className="mt-3 flex flex-wrap gap-2">
+            {personal.focus.map((f) => <li key={f} className="rounded-full bg-surface px-3 py-1.5 text-[14px] font-semibold">{f}</li>)}
+          </ul>
+        </section>
+      )}
+
       {error && <Notice tone="warn">{error}</Notice>}
       {perkLabel && (
         <Link href="/doctor" className="flex items-center gap-3 rounded-[var(--radius-xl)] border border-primary/30 bg-primary-soft p-4">
@@ -98,9 +113,13 @@ export function PlanHome({ goals, today, paidUntil, reminders, startsOn, recheck
               <span className="shrink-0 rounded-full bg-surface-2 px-2.5 py-1 text-xs font-semibold text-muted tabular">{Math.min(p.thisWeek.done, p.thisWeek.needed)}/{p.thisWeek.needed}</span>
             </div>
 
+            {personal?.goals[g.id] && (
+              <p className="mt-3 rounded-[var(--radius-md)] bg-primary-soft/60 px-3 py-2.5 text-[14px] leading-snug text-ink/85"><b className="text-primary">Why it&apos;s in your plan: </b>{personal.goals[g.id].why}</p>
+            )}
             <ul className="mt-3 flex flex-col gap-1.5 text-[15px] text-ink/80">
               {p.target.steps.map((s) => <li key={s} className="flex gap-2"><Icon name="check" size={16} strokeWidth={2.4} className="mt-1 shrink-0 text-primary" />{s}</li>)}
             </ul>
+            {personal?.goals[g.id] && <p className="mt-2 flex gap-2 text-[14px] font-medium text-muted"><Icon name="arrowRight" size={16} strokeWidth={2.2} className="mt-0.5 shrink-0 text-primary" />{personal.goals[g.id].aim}</p>}
             {review && <p className="mt-3 rounded-[var(--radius-md)] bg-surface-2 px-3 py-2 text-sm text-muted">{review}</p>}
 
               <>
@@ -149,6 +168,22 @@ export function PlanHome({ goals, today, paidUntil, reminders, startsOn, recheck
           </section>
         );
       })}
+
+      {personal && personal.extras.length > 0 && (
+        <section aria-labelledby="also-for-you">
+          <h2 id="also-for-you" className="text-xl font-semibold">Also for you</h2>
+          <p className="text-[14px] text-muted">Other things from your check worth acting on.</p>
+          <ul className="mt-3 flex flex-col gap-3">
+            {personal.extras.map((x) => (
+              <li key={x.id} className="rounded-[var(--radius-xl)] border border-line bg-surface p-4">
+                <p className="font-semibold">{x.title}</p>
+                <p className="mt-1 text-[14px] leading-snug text-muted">{x.text}</p>
+                <Link href={x.href} className="mt-2 inline-flex items-center gap-1 text-sm font-semibold whitespace-nowrap text-primary hover:underline">{x.label} <Icon name="arrowRight" size={14} /></Link>
+              </li>
+            ))}
+          </ul>
+        </section>
+      )}
 
       <section className="flex flex-col gap-3 rounded-[var(--radius-xl)] border border-line bg-surface p-5 sm:flex-row sm:items-center sm:justify-between">
         <label className="flex items-center gap-3 text-[15px]">

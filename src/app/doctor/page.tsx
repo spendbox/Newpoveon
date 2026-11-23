@@ -24,11 +24,16 @@ export default async function DoctorPage({ searchParams }: PageProps<"/doctor">)
   // Health plan perk: members see their lower price; everyone else sees the offer.
   const plan = await loadPlanSettings().catch(() => null);
   let isMember = false;
+  let account: { email: string; name: string | null; phone: string | null } | null = null;
   if (supabaseConfigured()) {
     const user = await currentUser().catch(() => null);
     if (user) {
-      const { data } = await supabaseAdmin().from("plans").select("status, paid_until").eq("user_id", user.id).maybeSingle();
+      const [{ data }, { data: profile }] = await Promise.all([
+        supabaseAdmin().from("plans").select("status, paid_until").eq("user_id", user.id).maybeSingle(),
+        supabaseAdmin().from("profiles").select("email, full_name, phone").eq("id", user.id).maybeSingle(),
+      ]);
       isMember = !!data && isActive(data as PlanRow);
+      account = { email: profile?.email ?? user.email ?? "", name: profile?.full_name ?? null, phone: profile?.phone ?? null };
     }
   }
   const perk = plan && discountLabel(plan.discount) ? { isMember, discount: plan.discount, label: discountLabel(plan.discount), planPrice: plan.price } : null;
@@ -39,7 +44,7 @@ export default async function DoctorPage({ searchParams }: PageProps<"/doctor">)
         <Logo />
         <LeaveBookingButton />
       </div>
-      <BookingForm perk={perk} types={types} preselect={preselect} defaultReason={sp.reason === "support" ? "I'd like to talk to someone about how I've been feeling." : ""} />
+      <BookingForm perk={perk} account={account} types={types} preselect={preselect} defaultReason={sp.reason === "support" ? "I'd like to talk to someone about how I've been feeling." : ""} />
     </main>
   );
 }

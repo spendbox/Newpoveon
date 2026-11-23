@@ -86,6 +86,13 @@ export async function POST(req: Request) {
     }
 
     const user = await currentUser();
+    // Signed in: keep their name and phone on the account (filling gaps only), so every device has them.
+    if (user) {
+      await Promise.all([
+        sb.from("profiles").update({ full_name: name }).eq("id", user.id).is("full_name", null),
+        sb.from("profiles").update({ phone }).eq("id", user.id).is("phone", null),
+      ]).catch(() => undefined);
+    }
     const shareResults = b.shareResults !== false;
     let screeningId: string | null = null;
     if (shareResults && typeof b.screeningId === "string") {
