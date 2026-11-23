@@ -66,9 +66,13 @@ export async function dobForMember(userId: string, email: string, latestAnswers:
 /** Price of the Biological Age Check in naira. Kept on its lab package; ₦125,000 until Admin sets one. */
 export const BIO_AGE_DEFAULT_PRICE = 125000;
 export async function bioAgePrice(): Promise<number> {
-  const { data, error } = await supabaseAdmin().from("home_tests").select("price_naira").eq("code", "biological-age").maybeSingle();
-  if (error || !data || data.price_naira == null) return BIO_AGE_DEFAULT_PRICE;
-  return Number(data.price_naira);
+  try {
+    const { data, error } = await supabaseAdmin().from("home_tests").select("price_naira").eq("code", "biological-age").maybeSingle();
+    if (error || !data || data.price_naira == null) return BIO_AGE_DEFAULT_PRICE;
+    return Number(data.price_naira);
+  } catch {
+    return BIO_AGE_DEFAULT_PRICE; // never let the price take a page down
+  }
 }
 
 /** The member ID of whoever is logged in, or null for visitors (and before SQL 17). */
