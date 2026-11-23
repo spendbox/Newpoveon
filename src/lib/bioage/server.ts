@@ -3,6 +3,7 @@ import { site } from "@/config/site";
 import { button, layout } from "@/lib/email";
 import { currentUser, supabaseAdmin, supabaseUser } from "@/lib/supabase/server";
 import { differenceText, type MarkerKey, type Values } from "./phenoage";
+import { dobFromAnswers, type DobGuess } from "./dob";
 export { normaliseMemberCode } from "./member";
 
 export type BioAgeRow = {
@@ -38,6 +39,36 @@ export async function myMemberCode(userId: string): Promise<string | null> {
   const { data, error } = await sb.from("profiles").select("member_code").eq("id", userId).maybeSingle();
   if (error) return null;
   return (data?.member_code as string | null) ?? null;
+}
+
+/**
+ * The best date of birth we have for someone, for Admin: their account's latest answers first,
+ * then every check saved with their account or email (newest first). An exact date beats an estimate.
+ */
+export async function dobForMember(userId: string, email: string, latestAnswers: unknown): Promise<DobGuess | null> {
+  const fromProfile = dobFromAnswers(latestAnswers, new Date().toISOString());
+  if (fromProfile?.source === "exact") return fromProfile;
+  const sb = supabaseAdmin();
+  const [byUser, byEmail] = await Promise.all([
+    sb.from("screenings").select("answers, created_at").eq("user_id", userId).order("created_at", { ascending: false }).limit(20),
+    sb.from("screenings").select("answers, created_at").eq("email", email.toLowerCase()).order("created_at", { ascending: false }).limit(20),
+  ]);
+  const rows = [...(byUser.data ?? []), ...(byEmail.data ?? [])].sort((a, b) => (a.created_at < b.created_at ? 1 : -1));
+  let estimate: DobGuess | null = null;
+  for (const r of rows) {
+    const g = dobFromAnswers(r.answers, r.created_at);
+    if (g?.source === "exact") return g;
+    if (g && !estimate) estimate = g;
+  }
+  return estimate ?? fromProfile;
+}
+
+/** Price of the Biological Age Check in naira. Kept on its lab package; ₦125,000 until Admin sets one. */
+export const BIO_AGE_DEFAULT_PRICE = 125000;
+export async function bioAgePrice(): Promise<number> {
+  const { data, error } = await supabaseAdmin().from("home_tests").select("price_naira").eq("code", "biological-age").maybeSingle();
+  if (error || !data || data.price_naira == null) return BIO_AGE_DEFAULT_PRICE;
+  return Number(data.price_naira);
 }
 
 /** The member ID of whoever is logged in, or null for visitors (and before SQL 17). */

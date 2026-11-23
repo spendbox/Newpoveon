@@ -3,12 +3,12 @@ import Link from "next/link";
 import { site } from "@/config/site";
 import { SubmitButton } from "@/components/buttons";
 import { MARKER_BY_KEY, MARKERS, type MarkerKey } from "@/lib/bioage/phenoage";
-import { bioAgesFor, normaliseMemberCode, type BioAgeRow } from "@/lib/bioage/server";
+import { bioAgePrice, bioAgesFor, dobForMember, normaliseMemberCode, type BioAgeRow } from "@/lib/bioage/server";
 import { lagosDay } from "@/lib/plan/engine";
 import { supabaseAdmin } from "@/lib/supabase/server";
-import { aBtnQuiet, aInput, Badge, Card, H1 } from "../../ui";
+import { aBtn, aBtnQuiet, aInput, Badge, Card, H1 } from "../../ui";
 import { BioAgeForm } from "./bio-age-form";
-import { deleteBioAge } from "./actions";
+import { deleteBioAge, saveBioAgePrice } from "./actions";
 import { LabRequest } from "./lab-request";
 
 type Member = { id: string; email: string; full_name: string | null; phone: string | null; member_code: string; latest_answers: Record<string, unknown> | null };
@@ -37,8 +37,9 @@ export default async function BioAgePage({ searchParams }: PageProps<"/admin/bio
     members = (res.data ?? []) as Member[];
   }
   const member = members.length === 1 ? members[0] : null;
-  const history = member ? await bioAgesFor(member.id) : [];
+  const [history, dobGuess] = member ? await Promise.all([bioAgesFor(member.id), dobForMember(member.id, member.email, member.latest_answers)]) : [[], null];
 
+  const price = await bioAgePrice();
   const { data: recentRaw, error: recentErr } = await sb.from("bio_age_results")
     .select("id, member_code, sample_date, age_years, pheno_age, entered_by, emailed_at, created_at, lab_name")
     .order("created_at", { ascending: false }).limit(30);
@@ -52,6 +53,22 @@ export default async function BioAgePage({ searchParams }: PageProps<"/admin/bio
       {sp.saved && <p className="mb-4 rounded-lg bg-good-bg px-4 py-2 text-sm font-medium text-good-text">Saved{sp.saved === "emailed" ? " and emailed" : ". Not emailed"}. It&apos;s on their dashboard now.</p>}
       {sp.deleted && <p className="mb-4 rounded-lg bg-good-bg px-4 py-2 text-sm font-medium text-good-text">Result deleted.</p>}
       {typeof sp.error === "string" && <p className="mb-4 rounded-lg bg-act-bg px-4 py-2 text-sm font-medium text-act-text">{sp.error}</p>}
+
+      {sp.price === "saved" && <p className="mb-4 rounded-lg bg-good-bg px-4 py-2 text-sm font-medium text-good-text">Price saved. It&apos;s showing on the website now.</p>}
+      {!member && (
+        <Card className="mb-5">
+          <form action={saveBioAgePrice} className="flex flex-col gap-3 sm:flex-row sm:items-end">
+            <label className="flex-1 text-sm font-semibold">Price of the Biological Age Check
+              <span className="mt-1 flex items-center gap-2">
+                <span className="text-base font-bold">₦</span>
+                <input name="price" inputMode="numeric" defaultValue={price} className={aInput} aria-describedby="price-help" required />
+              </span>
+              <span id="price-help" className="mt-1 block text-xs font-normal text-muted">Shown on the home page, the lab tests page and the dashboard. People pay on WhatsApp for now.</span>
+            </label>
+            <SubmitButton className={`${aBtn} shrink-0`}>Save price</SubmitButton>
+          </form>
+        </Card>
+      )}
 
       <LabRequest memberCode={member?.member_code ?? null} />
 
@@ -90,7 +107,7 @@ export default async function BioAgePage({ searchParams }: PageProps<"/admin/bio
 
           <Card>
             <h2 className="mb-4 text-lg font-semibold">Add a result</h2>
-            <BioAgeForm userId={member.id} defaultDob={typeof member.latest_answers?.dob === "string" ? member.latest_answers.dob : ""} today={lagosDay()} />
+            <BioAgeForm userId={member.id} dobGuess={dobGuess} today={lagosDay()} />
           </Card>
 
           {history.length > 0 && (
