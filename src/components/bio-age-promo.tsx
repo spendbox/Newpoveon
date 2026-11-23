@@ -2,6 +2,7 @@ import Link from "next/link";
 import { differenceText } from "@/lib/bioage/phenoage";
 import { withMemberId } from "@/lib/bioage/member";
 import { Icon, type IconName } from "./icons";
+import { BIO_STUDY_SHORT } from "./bio-age-study";
 import { WhatsAppButton } from "./whatsapp-catalog";
 
 export type BioPromoState =
@@ -35,7 +36,7 @@ export function BioAgePromo({ state, price }: { state: BioPromoState; price: num
         <div className="relative grid items-center gap-8 md:grid-cols-[1.1fr_1fr] md:gap-12">
           <div>
             <p className="inline-flex items-center gap-1.5 rounded-full bg-white/12 px-3 py-1 text-[13px] font-semibold text-white/90 ring-1 ring-white/15">
-              <Icon name="sparkle" size={14} strokeWidth={2.4} className="text-sun" /> New · Biological Age Check
+              <span className="h-2 w-2 rounded-full bg-sun" aria-hidden="true" /> New · Biological Age Check
             </p>
             <h2 id="bio-promo" className="mt-4 text-[34px] leading-[1.05] font-bold text-white md:text-[46px]">
               {mine ? <>Your body is <span className="text-sun">{bio}</span>.</> : <>Your body has an age of <span className="text-sun">its own</span>.</>}
@@ -57,6 +58,10 @@ export function BioAgePromo({ state, price }: { state: BioPromoState; price: num
             <p className="mt-6 flex flex-wrap items-baseline gap-x-2">
               <span className="font-display text-[30px] leading-none font-bold">₦{price.toLocaleString("en-NG")}</span>
               <span className="text-[14px] text-white/60">pay on WhatsApp when we confirm your time</span>
+            </p>
+            <p className="mt-3 flex items-start gap-2 text-[14px] text-white/70">
+              <Icon name="shield" size={16} strokeWidth={2.2} className="mt-0.5 shrink-0 text-primary-soft" />
+              <span>{BIO_STUDY_SHORT}. <Link href="/home-tests#bio-study" className="font-semibold whitespace-nowrap text-white underline underline-offset-2">How accurate is it?</Link></span>
             </p>
 
             <div className="mt-5 flex flex-col gap-3 sm:flex-row sm:items-center">

@@ -82,7 +82,7 @@ export function OverviewPanel({ history, plan = null }: { history: Row[]; plan?:
           </div>
         </div>
         <div className="flex shrink-0 flex-col items-stretch gap-1.5 sm:items-end">
-          <ButtonLink href="/account/retake" icon="sparkle" variant={isDue ? "primary" : "secondary"}>Retake the check</ButtonLink>
+          <ButtonLink href="/account/retake" icon="clipboard" variant={isDue ? "primary" : "secondary"}>Retake the check</ButtonLink>
           <Link href="/account/edit" className="text-center text-sm font-semibold text-primary hover:underline">Or just update one answer</Link>
         </div>
       </section>
@@ -98,7 +98,7 @@ export function OverviewPanel({ history, plan = null }: { history: Row[]; plan?:
             <p className="mt-1 font-display text-2xl font-semibold text-white">Add it in 1 minute</p>
             <p className="mt-1 text-[15px] text-white/75">Five quick questions about the last two weeks.</p>
           </div>
-          <ButtonLink href="/account/retake" variant="secondary" icon="sparkle" className="shrink-0">Add it now</ButtonLink>
+          <ButtonLink href="/account/retake" variant="secondary" icon="sun" className="shrink-0">Add it now</ButtonLink>
         </section>
       )}
 
