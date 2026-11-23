@@ -154,11 +154,12 @@ export const LEARN: Record<LearnSlug, LearnTopic> = {
     whyItMatters: [
       "Kidney disease is common in Nigeria, and most people with it don't know yet.",
       "High blood pressure and diabetes are the biggest causes. Both are common and often silent.",
+      "In Nigeria it often affects younger adults too, from kidney inflammation, sickle cell disease, HIV, and some herbal remedies and painkillers.",
       "Found early, kidney damage can usually be slowed or stopped. Found late, it can mean dialysis, which is costly and hard to get.",
     ],
-    howWeCheck: { tool: "SCORED (Screening for Occult Renal Disease)", detail: "Points for age, being female, anaemia, high blood pressure, diabetes, heart attack or stroke, heart failure, poor circulation in the legs and protein in the urine. Scored 0 to 12. A score of 4 or more means you should get a kidney test.", source: "Bang H, et al. Arch Intern Med 2007;167:374–381; KDIGO 2024 Clinical Practice Guideline for CKD." },
+    howWeCheck: { tool: "SCORED (Screening for Occult Renal Disease)", detail: "Points for age, being female, anaemia, high blood pressure, diabetes, heart attack or stroke, heart failure, poor circulation in the legs and protein in the urine. Scored 0 to 12. A score of 4 or more means you should get a kidney test. It was built on adults aged 20 and over and works best from age 50.", source: "Bang H, et al. Arch Intern Med 2007;167:374–381; KDIGO 2024 Clinical Practice Guideline for CKD." },
     bands: [
-      { label: "Low risk", range: "Score 0 to 3", status: "good", meaning: "Hidden kidney disease is unlikely. If you have diabetes, high blood pressure or kidney failure in the family, still have a kidney test every year." },
+      { label: "Low risk", range: "Score 0 to 3", status: "good", meaning: "Hidden kidney disease is unlikely. If you have diabetes, high blood pressure, sickle cell disease or kidney failure in the family, still have a kidney test every year. Under 40, a low score is reassuring but not a guarantee, because the score gives no points for age before 50." },
       { label: "Higher risk", range: "Score 4 or more", status: "check", meaning: "About 1 in 5 people with this score have kidney disease without knowing it. It doesn't mean you have it: a blood and urine test will tell you." },
     ],
     improve: [
@@ -169,7 +170,7 @@ export const LEARN: Record<LearnSlug, LearnTopic> = {
       { title: "Cut down on salt and stop smoking", text: "Both raise blood pressure and speed up kidney damage." },
       { title: "Drink water through the day", text: "Most people need about 6 to 8 cups a day, more in the heat. Your doctor will tell you if you need less." },
     ],
-    seeDoctor: ["Your score is 4 or more", "You have diabetes or high blood pressure and haven't had a kidney test this year", "Swollen feet or face, foamy urine, passing much less urine, or feeling very tired and itchy"],
+    seeDoctor: ["Your score is 4 or more", "You have diabetes, high blood pressure or sickle cell disease and haven't had a kidney test this year", "Swollen feet or face, foamy urine, passing much less urine, or feeling very tired and itchy"],
     urgent: "Passing very little or no urine, severe swelling, or breathlessness with swelling: go to hospital now or call 112.",
     consult: "condition-review", consultLabel: "Talk to a doctor",
     test: { name: "Kidney check: creatinine (eGFR) and urine albumin", why: "A blood test shows how well your kidneys filter, and a urine test shows if they're leaking protein, the earliest sign of damage." },
