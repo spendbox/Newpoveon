@@ -236,6 +236,7 @@ export const QUESTIONS: Question[] = [
       { value: "protein", label: "Protein in your urine", icon: "flask" },
       { value: "heart_failure", label: "Heart failure", icon: "heart" },
       { value: "pvd", label: "Poor circulation in your legs", icon: "walk" },
+      { value: "sickle", label: "Sickle cell disease (SS or SC)", icon: "dna" },
       { value: "ckd", label: "Kidney disease", icon: "shield" },
       { value: "none", label: "None of these", icon: "question" },
     ],

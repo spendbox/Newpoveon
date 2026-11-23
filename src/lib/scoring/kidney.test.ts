@@ -69,3 +69,15 @@ describe("kidney function from lab results", () => {
     expect(kidneyForResult({ markers: { ...markers, creatinine: 60 }, age_years: 40, entered: { sex: "female" } })?.stage).toBe("G1");
   });
 });
+
+describe("kidney card for younger people", () => {
+  it("adds the age caveat under 40, but not from 40", () => {
+    expect(kidney({ ...base, kidney_conditions: ["none"], family_kidney: "no" })?.summary).toContain("most accurate from age 50");
+    expect(kidney({ ...base, dob: "1980-01-01", kidney_conditions: ["none"], family_kidney: "no" })?.summary).not.toContain("most accurate from age 50");
+  });
+  it("treats sickle cell disease as a reason for a yearly test", () => {
+    const c = kidney({ ...base, told_high_bp: "yes", kidney_conditions: ["sickle"], family_kidney: "yes" });
+    expect(c).toMatchObject({ value: "Worth a yearly test" });
+    expect(c?.summary).toContain("high blood pressure, sickle cell disease and kidney failure in your family");
+  });
+});

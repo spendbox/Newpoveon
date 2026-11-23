@@ -207,6 +207,9 @@ export function computeResults(a: Answers): Results {
     const told = new Set(a.kidney_conditions as string[]);
     const hypertension = a.told_high_bp === "yes" || a.bp_meds === "yes";
     const familyKidney = a.family_kidney === "yes";
+    const sickle = told.has("sickle");
+    // SCORED gives no points before 50, so it can miss younger people (see the kidney guide).
+    const youngNote = age < 40 ? " This score is most accurate from age 50. At your age, a low score is reassuring but not a guarantee: if you have swollen feet, foamy urine, or often take painkillers or herbal mixtures, get a kidney test." : "";
     const s = scored({
       age, sex, anaemia: told.has("anaemia"), hypertension, diabetes: hasDiabetes, cvd: hasCvd,
       heartFailure: told.has("heart_failure"), pvd: told.has("pvd"), proteinuria: told.has("protein"),
@@ -221,20 +224,20 @@ export function computeResults(a: Answers): Results {
     } else if (s.high) {
       cards.push({
         id: "kidney", topic: "Kidney risk", status: "check", value: "Higher risk", sensitive: true,
-        summary: `Your score is ${s.score} out of 12. About 1 in 5 people with a score of 4 or more have kidney disease without knowing it. A simple blood and urine test will tell you.${familyKidney ? " Kidney failure in your family is another reason to check." : ""}`,
+        summary: `Your score is ${s.score} out of 12. About 1 in 5 people with a score of 4 or more have kidney disease without knowing it. A simple blood and urine test will tell you.${familyKidney ? " Kidney failure in your family is another reason to check." : ""}${sickle ? " Sickle cell disease is another reason to check." : ""}`,
         basis: "Estimate based on SCORED.", next: checkTest,
       });
-    } else if (hasDiabetes || hypertension || familyKidney) {
-      const why = [hasDiabetes && "diabetes", hypertension && "high blood pressure", familyKidney && "kidney failure in your family"].filter(Boolean) as string[];
+    } else if (hasDiabetes || hypertension || familyKidney || sickle) {
+      const why = [hasDiabetes && "diabetes", hypertension && "high blood pressure", sickle && "sickle cell disease", familyKidney && "kidney failure in your family"].filter(Boolean) as string[];
       cards.push({
         id: "kidney", topic: "Kidney risk", status: "check", value: "Worth a yearly test", sensitive: true,
-        summary: `Your score is ${s.score} out of 12, but ${why.join(" and ")} can quietly damage the kidneys. Doctors advise a kidney blood and urine test every year.`,
+        summary: `Your score is ${s.score} out of 12, but ${why.length > 1 ? `${why.slice(0, -1).join(", ")} and ${why.at(-1)}` : why[0]} can quietly damage the kidneys. Doctors advise a kidney blood and urine test every year.${youngNote}`,
         basis: "Estimate based on SCORED, with KDIGO testing advice.", next: checkTest,
       });
     } else {
       cards.push({
         id: "kidney", topic: "Kidney risk", status: "good", value: "Low", sensitive: true,
-        summary: `Your score is ${s.score} out of 12. Hidden kidney disease is unlikely. Keeping blood pressure and sugar healthy keeps it that way.`,
+        summary: `Your score is ${s.score} out of 12. Hidden kidney disease is unlikely. Keeping blood pressure and sugar healthy keeps it that way.${youngNote}`,
         basis: "Estimate based on SCORED.", next: retest(12),
       });
     }
