@@ -212,3 +212,18 @@ h1, h2, h3, .font-display {
   .tt-copy { display: none; }
   .tt-viewport { overflow-x: auto; }
 }
+
+/* Home page biological age section: soft moving glow, a floating badge, bars that fill and pills that pop in. */
+@media (prefers-reduced-motion: no-preference) {
+  .bp-glow { animation: bp-glow 9s ease-in-out infinite; }
+  .bp-glow-2 { animation-delay: -4.5s; }
+  .bp-float { animation: hc-float 3.6s ease-in-out infinite; }
+  .bp-rise { animation: bp-rise .8s cubic-bezier(.2,.8,.2,1) both; }
+  .bp-bar { transform-origin: left; animation: bp-grow 1.2s cubic-bezier(.2,.8,.2,1) .3s both; }
+  .bp-bar-2 { animation-delay: .6s; }
+  .bp-pill { animation: bp-pop .5s cubic-bezier(.2,.8,.2,1) both; }
+}
+@keyframes bp-glow { 0%,100% { transform: translate(0,0) scale(1); opacity: .9; } 50% { transform: translate(30px,20px) scale(1.15); opacity: .6; } }
+@keyframes bp-rise { from { opacity: 0; transform: translateY(24px) scale(.97); } }
+@keyframes bp-grow { from { transform: scaleX(0); } }
+@keyframes bp-pop { from { opacity: 0; transform: translateY(8px) scale(.9); } }

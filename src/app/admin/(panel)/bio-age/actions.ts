@@ -77,3 +77,17 @@ export async function deleteBioAge(f: FormData) {
   revalidatePath("/account/bio-age");
   redirect(`/admin/bio-age?code=${encodeURIComponent(row.member_code)}&deleted=1`);
 }
+
+/** Set the price shown for the Biological Age Check (paid on WhatsApp for now). */
+export async function saveBioAgePrice(f: FormData) {
+  await requireAdmin();
+  const price = Math.round(Number(str(f, "price", 12).replace(/[^\d.]/g, "")));
+  if (!Number.isFinite(price) || price < 1000 || price > 10_000_000) redirect(`/admin/bio-age?error=${encodeURIComponent("Enter a price between ₦1,000 and ₦10,000,000.")}`);
+  const { data, error } = await supabaseAdmin().from("home_tests").update({ price_naira: price, updated_at: new Date().toISOString() }).eq("code", "biological-age").select("id");
+  if (error || !data?.length) redirect(`/admin/bio-age?error=${encodeURIComponent("Couldn't save the price. Has SQL 17 been run?")}`);
+  revalidatePath("/admin/bio-age");
+  revalidatePath("/home-tests");
+  revalidatePath("/account/bio-age");
+  revalidatePath("/");
+  redirect("/admin/bio-age?price=saved");
+}

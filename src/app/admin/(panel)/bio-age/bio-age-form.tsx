@@ -2,14 +2,17 @@
 import { useMemo, useState } from "react";
 import { SubmitButton } from "@/components/buttons";
 import { checkValues, differenceText, exactAge, MARKER_BY_KEY, MARKERS, phenoAge, toBase, type MarkerKey, type Values } from "@/lib/bioage/phenoage";
+import type { DobGuess } from "@/lib/bioage/dob";
 import { saveBioAge } from "./actions";
 import { aBtn, aInput } from "../../ui";
 
 type Typed = Record<MarkerKey, { value: string; unit: string }>;
 
 /** Type the nine results as they appear on the lab report, pick each unit, and see the age as you go. */
-export function BioAgeForm({ userId, defaultDob, today }: { userId: string; defaultDob: string; today: string }) {
-  const [dob, setDob] = useState(defaultDob);
+const shortDay = (iso: string) => new Intl.DateTimeFormat("en-NG", { day: "numeric", month: "short", year: "numeric", timeZone: "Africa/Lagos" }).format(new Date(iso));
+
+export function BioAgeForm({ userId, dobGuess, today }: { userId: string; dobGuess: DobGuess | null; today: string }) {
+  const [dob, setDob] = useState(dobGuess?.dob ?? "");
   const [sample, setSample] = useState(today);
   const [typed, setTyped] = useState<Typed>(() => Object.fromEntries(MARKERS.map((m) => [m.key, { value: "", unit: m.units[0].label }])) as Typed);
 
@@ -37,7 +40,13 @@ export function BioAgeForm({ userId, defaultDob, today }: { userId: string; defa
         </label>
         <label className="text-sm font-semibold">Date of birth
           <input type="date" name="dob" value={dob} max={today} onChange={(e) => setDob(e.target.value)} className={`${aInput} mt-1`} required />
-          <span className="mt-1 block text-xs font-normal text-muted">{defaultDob ? "From their health check. Check it against the lab form." : "Not in their health check. Ask them or use the lab form."}</span>
+          {!dobGuess ? (
+            <span className="mt-1 block text-xs font-normal text-muted">Not in any of their health checks. Ask them or use the lab form.</span>
+          ) : dobGuess.source === "exact" ? (
+            <span className="mt-1 block text-xs font-normal text-muted">From their health check ({shortDay(dobGuess.from)}). Check it against the lab form.</span>
+          ) : (
+            <span className="mt-1 block rounded-md bg-check-bg px-2 py-1 text-xs font-medium text-check-text">Estimated from the age they gave on {shortDay(dobGuess.from)}. Confirm it with them or the lab form: a year out changes the result.</span>
+          )}
         </label>
         <label className="text-sm font-semibold">Lab name
           <input name="lab_name" className={`${aInput} mt-1`} placeholder="e.g. Synlab Yaba" maxLength={120} />

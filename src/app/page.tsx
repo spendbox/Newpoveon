@@ -1,5 +1,8 @@
 import Link from "next/link";
 import { TrustedTools } from "@/components/trusted-tools";
+import { BioAgePromo, type BioPromoState } from "@/components/bio-age-promo";
+import { bioAgePrice, myBioAges, myMemberCode } from "@/lib/bioage/server";
+import { currentUser } from "@/lib/supabase/server";
 import { features } from "@/config/site";
 import { Icon, type IconName } from "@/components/icons";
 import { Logo, Overline } from "@/components/ui";
@@ -20,7 +23,16 @@ const FINDINGS: { icon: IconName; title: string; text: string; tint: string }[] 
 
 export const dynamic = "force-dynamic";
 
-export default function HomePage() {
+/** Who's looking decides how the biological age section reads. Never fails the page. */
+async function bioPromoState(): Promise<BioPromoState> {
+  const user = await currentUser().catch(() => null);
+  if (!user) return { kind: "guest" };
+  const [rows, code] = await Promise.all([myBioAges().catch(() => []), myMemberCode(user.id).catch(() => null)]);
+  return rows[0] ? { kind: "result", code, bio: rows[0].pheno_age, real: rows[0].age_years } : { kind: "member", code };
+}
+
+export default async function HomePage() {
+  const [bioState, bioPrice] = await Promise.all([bioPromoState(), bioAgePrice().catch(() => 125000)]);
   return (
     <main className="mx-auto w-full max-w-6xl px-5 md:px-8">
       <header className="flex items-center justify-between gap-3 py-5">
@@ -75,6 +87,8 @@ export default function HomePage() {
       <p className="mt-5 flex items-center justify-center gap-2 text-center text-[12px] text-subtle md:hidden">
         <Icon name="shield" size={14} strokeWidth={2} /> Built on WHO screening tools. Private. Not a diagnosis.
       </p>
+
+      <BioAgePromo state={bioState} price={bioPrice} />
 
       <TrustedTools />
 

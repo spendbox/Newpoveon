@@ -5,7 +5,7 @@ import { MemberId } from "@/components/member-id";
 import { TrendLine } from "@/components/trend-line";
 import { WhatsAppButton } from "@/components/whatsapp-catalog";
 import { withMemberId } from "@/lib/bioage/member";
-import { myBioAges, myMemberCode } from "@/lib/bioage/server";
+import { bioAgePrice, myBioAges, myMemberCode } from "@/lib/bioage/server";
 import { supabaseConfigured } from "@/lib/supabase/server";
 import { getAccount } from "../data";
 import { PageHead } from "../panels";
@@ -20,7 +20,7 @@ const day = (d: string) => new Date(`${d}T12:00:00Z`);
 export default async function BioAgePage() {
   if (!supabaseConfigured()) redirect("/account");
   const { user } = await getAccount();
-  const [rows, code] = await Promise.all([myBioAges(), myMemberCode(user.id)]);
+  const [rows, code, price] = await Promise.all([myBioAges(), myMemberCode(user.id), bioAgePrice()]);
   const latest = rows[0];
   const ask = withMemberId(latest ? "Hello, I'd like to book a repeat Biological Age Check." : "Hello, I'd like to book the Biological Age Check.", code);
 
@@ -51,7 +51,7 @@ export default async function BioAgePage() {
 
         <section className="flex flex-col gap-4 rounded-[var(--radius-xl)] bg-primary-soft p-5 md:flex-row md:items-center md:justify-between" aria-label="Book a test">
           <div>
-            <p className="font-semibold">{latest ? "Re-test in 6 to 12 months" : "Book your test"}</p>
+            <p className="font-semibold">{latest ? "Re-test in 6 to 12 months" : "Book your test"} · ₦{price.toLocaleString("en-NG")}</p>
             <p className="text-[15px] text-ink/75">{latest ? "See if your changes are taking years off." : "A home blood test. Your result appears here, and we email you."} Message us on WhatsApp{code ? " with your ID" : ""}.</p>
           </div>
           <WhatsAppButton message={ask} size="sm" className="shrink-0 self-start md:self-auto">Book on WhatsApp</WhatsAppButton>
