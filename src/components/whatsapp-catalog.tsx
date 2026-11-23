@@ -60,8 +60,12 @@ export function WhatsAppCatalog({
 
       {children}
 
-      <h2 className="mt-12 text-2xl font-semibold md:text-3xl">What we can arrange</h2>
-      <p className="mt-1 text-muted">Don&apos;t see it? Ask anyway. If it exists, we&apos;ll do our best to find it.</p>
+      <h2 className="mt-12 text-2xl font-semibold md:text-3xl">{kind === "lab test" ? "Run any test, when it suits you" : "Get any medicine, delivered"}</h2>
+      <p className="mt-1 max-w-2xl text-muted">
+        {kind === "lab test"
+          ? "Choose a test below, or send us a message with any test you or your doctor have in mind. We'll take your sample at home, or you can visit a lab near you."
+          : "Choose below, or send us a message with the medicine's name or a photo of your prescription. We'll find it and bring it to your door."}
+      </p>
       <div className="mt-6 grid gap-4 md:grid-cols-2 lg:grid-cols-3">
         {groups.map((g) => (
           <article key={g.key} className="flex flex-col rounded-[var(--radius-xl)] border border-line bg-surface p-5">

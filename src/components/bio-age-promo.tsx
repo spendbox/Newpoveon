@@ -3,6 +3,7 @@ import { differenceText } from "@/lib/bioage/phenoage";
 import { withMemberId } from "@/lib/bioage/member";
 import { Icon, type IconName } from "./icons";
 import { BIO_STUDY_SHORT } from "./bio-age-study";
+import { DnaHelix } from "./dna-helix";
 import { WhatsAppButton } from "./whatsapp-catalog";
 
 export type BioPromoState =
@@ -25,7 +26,7 @@ export function BioAgePromo({ state, price }: { state: BioPromoState; price: num
     { label: "Inflammation", years: "−0.9y", good: true },
     { label: "Red cell size", years: "+0.6y", good: false },
   ];
-  const facts: [IconName, string][] = [["flask", "9 blood results"], ["home", "Sample taken at home"], ["clock", "Results in 2–3 days"]];
+  const facts: [IconName, string][] = [["flask", "9 blood results"], ["home", "We come to your home"], ["clock", "Results in 2–3 days"]];
 
   return (
     <section className="py-8" aria-labelledby="bio-promo">
@@ -44,7 +45,7 @@ export function BioAgePromo({ state, price }: { state: BioPromoState; price: num
             <p className="mt-3 max-w-md text-[17px] leading-relaxed text-white/75">
               {mine
                 ? `That's ${differenceText(diff)}. See what's shaping it, and re-test to watch it change.`
-                : "Nine routine blood results, one home visit. Find out how old your body really is, what's adding years, and what's taking them off."}
+                : "We send a trained health worker to your home to take a small blood sample. From nine routine results, you'll see how old your body really is, and what's adding or taking away years."}
             </p>
 
             <ul className="mt-5 flex flex-wrap gap-2">
@@ -92,20 +93,20 @@ export function BioAgePromo({ state, price }: { state: BioPromoState; price: num
 
           {/* The result card: an example for visitors, their own for people with a result. */}
           <div className="relative mx-auto w-full max-w-[380px]">
-            <span className="bp-float absolute -top-5 -right-3 z-10 flex h-14 w-14 items-center justify-center rounded-2xl bg-sun text-ink shadow-[var(--shadow-lg)]" aria-hidden="true">
-              <Icon name="dna" size={28} strokeWidth={2.2} />
-            </span>
-            <div className="bp-rise rounded-[28px] bg-white/10 p-6 ring-1 ring-white/20 backdrop-blur-md">
-              <p className="text-[12px] font-semibold tracking-[0.1em] text-white/60 uppercase">{mine ? "Your latest result" : "Example result"}</p>
-              <div className="mt-2 flex items-end gap-3">
+            <div className="bp-rise relative overflow-hidden rounded-[28px] bg-white/10 p-6 ring-1 ring-white/20 backdrop-blur-md">
+              {/* The turning helix sits beside the number, with a soft glow behind it. */}
+              <span className="pointer-events-none absolute top-6 right-2 h-40 w-28 rounded-full bg-sun/25 blur-2xl" aria-hidden="true" />
+              <DnaHelix className="pointer-events-none absolute top-4 right-4 h-[168px] w-[76px]" />
+              <p className="relative text-[12px] font-semibold tracking-[0.1em] text-white/60 uppercase">{mine ? "Your latest result" : "Example result"}</p>
+              <div className="relative mt-2 flex items-end gap-3">
                 <span className="font-display text-[72px] leading-none font-bold">{bio}</span>
                 <span className="pb-2 text-[15px] text-white/70">body age</span>
               </div>
-              <p className={`mt-2 inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-[13px] font-semibold ${diff < 0 ? "bg-good-bg text-good-text" : diff > 0 ? "bg-sun text-ink" : "bg-white/15 text-white"}`}>
+              <p className={`relative mt-2 inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-[13px] font-semibold ${diff < 0 ? "bg-good-bg text-good-text" : diff > 0 ? "bg-sun text-ink" : "bg-white/15 text-white"}`}>
                 {diff < 0 && <Icon name="check" size={13} strokeWidth={3} />}{diff === 0 ? "Same as real age" : `${Math.abs(diff)} year${Math.abs(diff) === 1 ? "" : "s"} ${diff < 0 ? "younger" : "older"}`}
               </p>
 
-              <div className="mt-5 space-y-3" role="img" aria-label={`Real age ${real}, body age ${bio}`}>
+              <div className="relative mt-5 space-y-3" role="img" aria-label={`Real age ${real}, body age ${bio}`}>
                 {[["Real age", real, "bg-white/45", "bp-bar"], ["Body age", bio, "bg-sun", "bp-bar bp-bar-2"]].map(([label, v, color, anim]) => (
                   <div key={label as string}>
                     <div className="flex justify-between text-[13px] text-white/70"><span>{label}</span><span className="font-semibold text-white">{v}</span></div>
@@ -117,7 +118,7 @@ export function BioAgePromo({ state, price }: { state: BioPromoState; price: num
               </div>
 
               {!mine && (
-                <ul className="mt-5 flex flex-wrap gap-1.5" aria-label="Example of what shapes it">
+                <ul className="relative mt-5 flex flex-wrap gap-1.5" aria-label="Example of what shapes it">
                   {drivers.map((d, i) => (
                     <li key={d.label} className="bp-pill inline-flex items-center gap-1.5 rounded-full bg-white/10 px-2.5 py-1 text-[12px] text-white/85" style={{ animationDelay: `${0.9 + i * 0.25}s` }}>
                       {d.label}<b className={d.good ? "text-[#7FE0B8]" : "text-sun"}>{d.years}</b>

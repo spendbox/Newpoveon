@@ -227,3 +227,19 @@ h1, h2, h3, .font-display {
 @keyframes bp-rise { from { opacity: 0; transform: translateY(24px) scale(.97); } }
 @keyframes bp-grow { from { transform: scaleX(0); } }
 @keyframes bp-pop { from { opacity: 0; transform: translateY(8px) scale(.9); } }
+
+/* Turning DNA helix (src/components/dna-helix.tsx). Each dot swings across; the rung shrinks as the dots pass. */
+.dna-dot { transform: translateX(-30px); }
+.dna-rung { transform-box: fill-box; transform-origin: center; }
+@media (prefers-reduced-motion: no-preference) {
+  .dna-dot { animation: dna-swing 3.2s ease-in-out infinite; }
+  .dna-rung { animation: dna-rung 3.2s ease-in-out infinite; }
+}
+@keyframes dna-swing {
+  0%   { transform: translateX(-30px) scale(.8); opacity: .7; }
+  25%  { transform: translateX(0) scale(1.15); opacity: 1; }
+  50%  { transform: translateX(30px) scale(.8); opacity: .7; }
+  75%  { transform: translateX(0) scale(.55); opacity: .4; }
+  100% { transform: translateX(-30px) scale(.8); opacity: .7; }
+}
+@keyframes dna-rung { 0%, 50%, 100% { transform: scaleX(1); } 25%, 75% { transform: scaleX(.05); } }
