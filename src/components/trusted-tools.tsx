@@ -97,6 +97,17 @@ const TOOLS: Tool[] = [
     links: [{ href: "/learn/sleep", label: "Sleep" }],
   },
   {
+    mark: "PhenoAge", full: "Yale University study, 2018", use: "Biological age", tint: "text-[#00356B]",
+    what: "A way to work out how old your body seems from nine routine blood tests. Scientists at Yale University made it by following the health of nearly 10,000 adults over many years.",
+    how: [
+      "We use it for the Biological Age Check: your nine blood results and your real age go in, and your biological age comes out.",
+      "People whose result was older than their real age were more likely to get long-term illnesses, like heart disease and diabetes. Each extra year meant about a 9% higher risk.",
+      "It's a guide, not an exact number: a difference of 1 or 2 years is about the same. It was tested on adults in the USA, not yet on large groups of Nigerians.",
+    ],
+    source: "Levine ME, et al. Aging 2018;10:573–591.",
+    links: [{ href: "/home-tests#biological-age", label: "Biological Age Check" }],
+  },
+  {
     mark: "NICE", full: "National Institute for Health and Care Excellence", use: "Waist-to-height", tint: "text-[#4A2A6B]",
     what: "The UK body that writes health guidelines for doctors. It recommends checking your waist against your height.",
     how: ["Keep your waist to less than half your height. This spots risky belly fat that BMI alone can miss."],
@@ -164,7 +175,7 @@ function Explainer({ t, onClose }: { t: Tool; onClose: () => void }) {
           <div className="mt-5 flex flex-wrap gap-2">
             {t.links.map((l) => (
               <Link key={l.href} href={l.href} className="inline-flex items-center gap-1.5 rounded-full border border-line px-3.5 py-2 text-[14px] font-semibold whitespace-nowrap text-primary hover:bg-primary-soft">
-                {l.label} guide <Icon name="arrowRight" size={14} strokeWidth={2.4} />
+                {l.label}{l.label.endsWith("Check") ? "" : " guide"} <Icon name="arrowRight" size={14} strokeWidth={2.4} />
               </Link>
             ))}
           </div>

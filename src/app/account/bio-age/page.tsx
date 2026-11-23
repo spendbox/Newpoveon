@@ -9,6 +9,7 @@ import { bioAgePrice, myBioAges, myMemberCode } from "@/lib/bioage/server";
 import { supabaseConfigured } from "@/lib/supabase/server";
 import { getAccount } from "../data";
 import { PageHead } from "../panels";
+import { BioAgeStudy } from "@/components/bio-age-study";
 import { Intro, Latest } from "./parts";
 
 export const metadata: Metadata = { title: "Biological age", robots: { index: false } };
@@ -59,7 +60,7 @@ export default async function BioAgePage() {
 
         {code && <MemberId code={code} />}
 
-        <p className="text-[12px] leading-snug text-subtle">Biological age uses Levine&apos;s PhenoAge (Aging, 2018), built from data on US adults. It&apos;s an estimate, not a diagnosis. A recent illness can raise it for a while. If any result worries you, talk to one of our doctors.</p>
+        <BioAgeStudy id="study" />
       </div>
     </>
   );

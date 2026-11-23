@@ -54,7 +54,7 @@ export function Paywall({ results, answers, saved, offer, confirming, onOffline 
     { icon: "target", anim: "pw-pulse", tint: "bg-coral-soft text-act-text", title: `A ${offer.months}-month plan for you`, text: focus.length ? `Starting with ${focus.map((a) => AREA_INFO[a].title.toLowerCase()).join(" and ")}, made from your answers.` : "Made from your answers, around your day." },
     { icon: "check", anim: "pw-pop", tint: "bg-sun-soft text-check-text", title: "Daily check-ins that work", text: "Tick off each day. Targets step up as you keep going, and ease back when life gets busy." },
     ...(offer.perk ? [{ icon: "stethoscope" as IconName, anim: "pw-wiggle", tint: "bg-lavender-soft text-lavender", title: `${offer.perk} consultations`, text: member && offer.consult ? `Talk to a doctor for ${ngn(member)} instead of ${ngn(offer.consult)}, for ${offer.months} months.` : `On every doctor consultation for ${offer.months} months.` }] : []),
-    { icon: "sparkle", anim: "pw-spin", tint: "bg-primary-soft text-primary", title: "How to improve each one", text: "Plain-English guides for every result, with what to do this week." },
+    { icon: "leaf", anim: "pw-swing", tint: "bg-primary-soft text-primary", title: "How to improve each one", text: "Plain-English guides for every result, with what to do this week." },
     { icon: "shield", anim: "pw-float", tint: "bg-surface-2 text-ink", title: "Saved and emailed to you", text: "Kept privately in your account, so you can watch your scores move." },
   ];
 

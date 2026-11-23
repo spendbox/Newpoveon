@@ -3,6 +3,7 @@ import Link from "next/link";
 import { LAB_GROUPS, TEST_NAMES } from "@/config/catalog";
 import { Icon } from "@/components/icons";
 import { WhatsAppButton, WhatsAppCatalog } from "@/components/whatsapp-catalog";
+import { BioAgeStudy } from "@/components/bio-age-study";
 import { BIO_AGE_PREP, BIO_AGE_TESTS } from "@/lib/bioage/phenoage";
 import { withMemberId } from "@/lib/bioage/member";
 import { bioAgePrice, currentMemberCode } from "@/lib/bioage/server";
@@ -27,6 +28,7 @@ export default async function LabTestsPage({ searchParams }: PageProps<"/home-te
       steps={["Message us with the test you need", "We confirm the price and a time", "We collect your sample and send your results"]}
     >
       <BioAgePackage memberCode={memberCode} price={price} />
+      <BioAgeStudy id="bio-study" className="mt-8" />
     </WhatsAppCatalog>
   );
 }
@@ -36,7 +38,7 @@ function BioAgePackage({ memberCode, price }: { memberCode: string | null; price
   return (
     <section id="biological-age" className="mt-10 scroll-mt-6 overflow-hidden rounded-[var(--radius-xl)] border-2 border-lavender/40 bg-surface" aria-labelledby="bio-title">
       <div className="bg-lavender-soft px-5 py-5 md:px-8 md:py-7">
-        <p className="inline-flex items-center gap-1.5 rounded-full bg-surface px-3 py-1 text-[13px] font-semibold text-lavender"><Icon name="sparkle" size={14} strokeWidth={2.4} /> New</p>
+        <p className="inline-flex items-center gap-1.5 rounded-full bg-surface px-3 py-1 text-[13px] font-semibold text-lavender"><span className="h-2 w-2 rounded-full bg-lavender" aria-hidden="true" /> New</p>
         <h2 id="bio-title" className="mt-3 text-[28px] leading-tight font-bold md:text-4xl">Biological Age Check</h2>
         <p className="mt-1 max-w-2xl text-[16px] text-ink/75">How old is your body, really? Nine routine blood results, turned into one number, with what&apos;s adding years and what&apos;s taking them off.</p>
         <p className="mt-4 flex flex-wrap items-baseline gap-x-2"><span className="font-display text-[32px] leading-none font-bold">₦{price.toLocaleString("en-NG")}</span><span className="text-[14px] text-ink/70">all nine results and your biological age · pay when we confirm on WhatsApp</span></p>
