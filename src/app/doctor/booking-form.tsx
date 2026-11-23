@@ -53,7 +53,11 @@ function useNow() {
 
 export type Perk = { isMember: boolean; discount: Discount; label: string; planPrice: number } | null;
 
-export function BookingForm({ types, preselect, defaultReason, perk = null }: { types: Type[]; preselect: string | null; defaultReason: string; perk?: Perk }) {
+export function BookingForm({ types, preselect, defaultReason, perk = null, account = null }: {
+  types: Type[]; preselect: string | null; defaultReason: string; perk?: Perk;
+  /** The signed-in person's details, which fill the form first. */
+  account?: { email: string; name: string | null; phone: string | null } | null;
+}) {
   const router = useRouter();
   // A topic is only set when someone arrives from a guide or result card (e.g. "Help me stop smoking").
   const [topicId, setTopicId] = useState<string | null>(types.find((t) => t.code === preselect)?.id ?? null);
@@ -73,6 +77,8 @@ export function BookingForm({ types, preselect, defaultReason, perk = null }: { 
   const [phone, setPhone] = useState("");
   const [email, setEmail] = useState("");
   const [share, setShare] = useState(true);
+  /** Details already known (account or this device): show a summary with "Change" instead of empty boxes. */
+  const [editDetails, setEditDetails] = useState(true);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [saved, setSaved] = useState<ReturnType<typeof loadSaved>>(null);
@@ -106,21 +112,31 @@ export function BookingForm({ types, preselect, defaultReason, perk = null }: { 
     const s = loadSaved();
     /* eslint-disable react-hooks/set-state-in-effect -- prefill from this browser */
     setSaved(s);
+    // Fill in what we know, best source first: the account, then this device, then the last check.
     const me = loadMe();
-    if (s) {
-      setEmail(s.email);
-      if (s.phone) setPhone(s.phone);
-    }
-    if (me && (!s || s.email.toLowerCase() === me.email)) {
-      if (!s) setEmail(me.email);
-      if (me.phone && !s?.phone) setPhone(me.phone);
-      if (me.name) setName(me.name);
-    }
+    const sameMe = me && (!account || me.email === account.email.toLowerCase()) ? me : null;
+    const sameSaved = s && (!account || s.email.toLowerCase() === account.email.toLowerCase()) ? s : null;
+    const e = account?.email || sameMe?.email || sameSaved?.email || "";
+    const n = account?.name || sameMe?.name || sameSaved?.name || "";
+    const p = account?.phone || sameMe?.phone || sameSaved?.phone || "";
+    setEmail(e);
+    setName(n);
+    setPhone(p);
+    if (n.trim().length > 1 && p.trim().length > 6 && /\S+@\S+\.\S+/.test(e)) setEditDetails(false);
     const tz = Intl.DateTimeFormat().resolvedOptions().timeZone;
     if (tz && tz !== TZ && new Date().toLocaleString("en-GB", { timeZone: tz }) !== new Date().toLocaleString("en-GB", { timeZone: TZ })) setMyTz(tz);
     /* eslint-enable react-hooks/set-state-in-effect */
     fetch("/api/slots").then((r) => r.json()).then((d) => setSlots(d.slots ?? [])).catch(() => setSlots([]));
+    // Read once on arrival; the account doesn't change while the form is open.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
+  // Remember details as they're typed, so they're never lost if the person leaves and comes back.
+  useEffect(() => {
+    if (!/\S+@\S+\.\S+/.test(email)) return;
+    const t = setTimeout(() => rememberMe({ email, phone: phone.trim() || undefined, name: name.trim() || undefined }), 600);
+    return () => clearTimeout(t);
+  }, [email, phone, name]);
 
   const topic = types.find((t) => t.id === topicId) ?? null;
   // Everyone else books a general consult: no categories to choose from.
@@ -357,13 +373,24 @@ export function BookingForm({ types, preselect, defaultReason, perk = null }: { 
       ),
     },
     {
-      key: "you", title: "Your details", hint: "Your doctor will call the number you give.", valid: name.trim().length > 1 && phone.trim().length > 6 && /\S+@\S+\.\S+/.test(email),
+      key: "you", title: editDetails ? "Your details" : "Is this still right?", hint: "Your doctor will call this number.", valid: name.trim().length > 1 && phone.trim().length > 6 && /\S+@\S+\.\S+/.test(email),
       content: (
+        !editDetails ? (
+          <div className="flex items-start justify-between gap-3 rounded-[var(--radius-lg)] border border-line bg-surface p-4">
+            <dl className="grid min-w-0 gap-1 text-[15px]">
+              <div><dt className="sr-only">Name</dt><dd className="font-semibold">{name}</dd></div>
+              <div><dt className="sr-only">Phone</dt><dd className="text-muted">{phone}</dd></div>
+              <div><dt className="sr-only">Email</dt><dd className="break-all text-muted">{email}</dd></div>
+            </dl>
+            <button type="button" onClick={() => setEditDetails(true)} className="shrink-0 rounded-full border border-line px-3.5 py-2 text-sm font-semibold text-primary hover:bg-primary-soft">Change</button>
+          </div>
+        ) : (
         <>
           <Field id="b-name" label="Your name"><input id="b-name" autoComplete="name" className={inputCls} value={name} onChange={(e) => setName(e.target.value)} /></Field>
           <Field id="b-phone" label="Phone or WhatsApp number"><input id="b-phone" type="tel" autoComplete="tel" className={inputCls} value={phone} onChange={(e) => setPhone(e.target.value)} placeholder="0803 000 0000" /></Field>
           <Field id="b-email" label="Email (for your receipt)"><input id="b-email" type="email" autoComplete="email" className={inputCls} value={email} onChange={(e) => setEmail(e.target.value)} /></Field>
         </>
+        )
       ),
     },
     {

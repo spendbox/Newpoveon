@@ -8,7 +8,7 @@ import { Steps, type Step } from "@/components/steps";
 import { bedtimeFor, CALM_PRACTICES, DAY_NAMES, EAT_SWAPS, MOVE_LADDER, targetFor, wakeLabel, weightTarget, type Area, type Goal, type Recommendation } from "@/lib/plan/engine";
 import { AREA_INFO, CALM_CUES, MAX_AREAS, MOVE_ACTIVITIES, MOVE_CUES, WAKE_TIMES } from "@/lib/plan/options";
 
-export type Hints = { recs: Recommendation[]; weightKg: number | null; moveStart: number; sleepStart: number; swaps: string[]; canLoseWeight: boolean };
+export type Hints = { recs: Recommendation[]; weightKg: number | null; moveStart: number; sleepStart: number; swaps: string[]; canLoseWeight: boolean; calm: { practice: string; cue: string } };
 
 const ngn = (n: number) => `₦${n.toLocaleString("en-NG")}`;
 const ORDER: Area[] = ["move", "sleep", "weight", "eat", "calm"];
@@ -25,7 +25,7 @@ export function PlanBuilder({ hints, existing, active, price, expired, perkLabel
   const [sleep, setSleep] = useState({ wake: find<{ wake: string }>("sleep")?.wake ?? "06:30", startLevel: find<{ startLevel: number }>("sleep")?.startLevel ?? hints.sleepStart });
   const [weight, setWeight] = useState({ startKg: String(find<{ startKg: number }>("weight")?.startKg ?? hints.weightKg ?? ""), weighDay: find<{ weighDay: number }>("weight")?.weighDay ?? 6 });
   const [swaps, setSwaps] = useState<string[]>(find<{ swaps: string[] }>("eat")?.swaps ?? hints.swaps.slice(0, 3));
-  const [calm, setCalm] = useState({ practice: find<{ practice: string }>("calm")?.practice ?? "breathe", cue: find<{ cue: string }>("calm")?.cue ?? "" });
+  const [calm, setCalm] = useState({ practice: find<{ practice: string }>("calm")?.practice ?? hints.calm.practice, cue: find<{ cue: string }>("calm")?.cue ?? hints.calm.cue });
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
 

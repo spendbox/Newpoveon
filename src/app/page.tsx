@@ -54,8 +54,8 @@ export default async function HomePage() {
             <span className="block whitespace-nowrap">are you?</span>
           </h1>
           <p className="mt-4 max-w-md text-[17px] leading-relaxed text-balance text-muted md:text-lg">
-            <span className="md:hidden"><span className="whitespace-nowrap">How old is your heart?</span><br /><span className="whitespace-nowrap">What&apos;s your wellbeing score?</span><br /><span className="whitespace-nowrap">And much more, in 10 minutes.</span></span>
-            <span className="hidden md:inline">How old is your heart? What&apos;s your wellbeing score? Find out in 10 minutes, along with your diabetes risk, blood pressure and much more.</span>
+            <span className="md:hidden"><span className="whitespace-nowrap">Your wellbeing score, heart age</span><br /><span className="whitespace-nowrap">and more, in 10 minutes.</span></span>
+            <span className="hidden md:inline">Your wellbeing score, heart age, diabetes and kidney risk, and more, in 10 minutes.</span>
           </p>
           <div className="mt-7 max-w-sm">
             <StartButton />

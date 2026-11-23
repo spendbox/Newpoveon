@@ -73,7 +73,7 @@ export function Intro() {
   return (
     <section className="rounded-[var(--radius-xl)] border border-line bg-surface p-5 md:p-7">
       <span className="flex h-12 w-12 items-center justify-center rounded-[var(--radius-md)] bg-primary-soft text-primary"><Icon name="dna" size={24} strokeWidth={2} /></span>
-      <h2 className="mt-4 text-2xl font-semibold">How old is your body, really?</h2>
+      <h2 className="mt-4 text-2xl font-semibold">Are you a <span className="whitespace-nowrap">30-year-old</span> in a <span className="whitespace-nowrap">50-year-old&apos;s</span> body?</h2>
       <p className="mt-1 text-[16px] text-muted">We send a trained health worker to your home to take a small blood sample. The lab runs nine routine tests, and we turn them into your biological age, show what&apos;s adding or taking away years, and track it here each time you re-test.</p>
       <div className="mt-5 grid gap-4 md:grid-cols-2">
         <div>

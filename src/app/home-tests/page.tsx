@@ -40,7 +40,7 @@ function BioAgePackage({ memberCode, price }: { memberCode: string | null; price
       <div className="bg-lavender-soft px-5 py-5 md:px-8 md:py-7">
         <p className="inline-flex items-center gap-1.5 rounded-full bg-surface px-3 py-1 text-[13px] font-semibold text-lavender"><span className="h-2 w-2 rounded-full bg-lavender" aria-hidden="true" /> New</p>
         <h2 id="bio-title" className="mt-3 text-[28px] leading-tight font-bold md:text-4xl">Biological Age Check</h2>
-        <p className="mt-1 max-w-2xl text-[16px] text-ink/75">How old is your body, really? Nine routine blood results, turned into one number, with what&apos;s adding years and what&apos;s taking them off.</p>
+        <p className="mt-1 max-w-2xl text-[16px] text-ink/75">Are you a <span className="whitespace-nowrap">30-year-old</span> in a <span className="whitespace-nowrap">50-year-old&apos;s</span> body? Nine routine blood results, turned into one number, with what&apos;s adding years and what&apos;s taking them off.</p>
         <p className="mt-4 flex flex-wrap items-baseline gap-x-2"><span className="font-display text-[32px] leading-none font-bold">₦{price.toLocaleString("en-NG")}</span><span className="text-[14px] text-ink/70">all nine results and your biological age · pay when we confirm on WhatsApp</span></p>
       </div>
       <ol className="grid gap-3 border-b border-line px-5 py-5 md:grid-cols-3 md:px-8">

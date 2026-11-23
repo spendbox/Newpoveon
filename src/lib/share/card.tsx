@@ -56,7 +56,7 @@ export async function shareCard({ age, heartAge, format = "story" }: { age: numb
         <div style={{ display: "flex", flexDirection: "column", alignItems: story ? "center" : "flex-start", maxWidth: story ? 900 : 560 }}>
           <div style={{ fontFamily: "Bricolage", fontWeight: 700, fontSize: 88 * s, lineHeight: 1.04, letterSpacing: -2 * s, textAlign: story ? "center" : "left" }}>{headline}</div>
           <div style={{ fontFamily: "Bricolage", fontWeight: 700, fontSize: 88 * s, lineHeight: 1.04, letterSpacing: -2 * s, color: C.primary }}>{sub}</div>
-          <div style={{ display: "flex", marginTop: 60 * s, background: C.primary, color: "#FFFFFF", borderRadius: 999, padding: `${26 * s}px ${52 * s}px`, fontWeight: 600, fontSize: 40 * s }}>Check yours free</div>
+          <div style={{ display: "flex", marginTop: 60 * s, background: C.primary, color: "#FFFFFF", borderRadius: 999, padding: `${26 * s}px ${52 * s}px`, fontWeight: 600, fontSize: 40 * s }}>Check yours</div>
           <div style={{ marginTop: 30 * s, fontSize: 32 * s, fontWeight: 500, color: C.muted }}>{site.siteUrl.replace(/^https?:\/\//, "")}</div>
         </div>
         <div style={{ position: "absolute", bottom: 60 * s, fontSize: 24 * s, fontWeight: 500, color: C.muted }}>An estimate based on WHO risk charts, not a diagnosis.</div>
