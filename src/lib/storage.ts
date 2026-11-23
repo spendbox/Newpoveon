@@ -64,3 +64,26 @@ export function clearSaved() {
 const PREFILL_KEY = "hc.prefill.v1";
 export const loadPrefill = () => safeGet<{ email: string; phone?: string }>(PREFILL_KEY);
 export const savePrefill = (p: { email: string; phone?: string }) => safeSet(PREFILL_KEY, p);
+
+/**
+ * Who uses this browser: their email (and phone and name if they gave them), so forms fill in by
+ * themselves and the login page can offer "Continue as …". Kept only on this device; "Use a different
+ * email" forgets it.
+ */
+const ME_KEY = "poveon.me.v1";
+export interface Remembered { email: string; phone?: string; name?: string; hasAccount?: boolean }
+export const loadMe = () => safeGet<Remembered>(ME_KEY);
+export function rememberMe(p: Partial<Remembered>) {
+  const email = p.email?.trim().toLowerCase();
+  const prev = loadMe();
+  // A different email starts fresh, so one person's phone never fills in for another.
+  const base = prev && (!email || prev.email === email) ? prev : null;
+  if (!email && !base) return;
+  const clean = Object.fromEntries(Object.entries(p).filter(([, v]) => v !== undefined && v !== "")) as Partial<Remembered>;
+  safeSet(ME_KEY, { ...base, ...clean, email: email ?? base!.email });
+}
+export function forgetMe() {
+  try {
+    window.localStorage.removeItem(ME_KEY);
+  } catch {}
+}

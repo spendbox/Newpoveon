@@ -12,15 +12,16 @@ import { BodyMap } from "@/components/body-map";
 import { WellbeingHero } from "@/components/score-widgets";
 import { ShareSection } from "./share-section";
 import { Paywall } from "./paywall";
+import { LoginForm } from "@/app/login/login-form";
 import type { Discount } from "@/lib/plan/perks";
 import { Steps } from "@/components/steps";
 import { isComplete } from "@/lib/questions";
 import { computeResults, displayValue, type Results } from "@/lib/scoring/results";
-import { loadPrefill, loadProgress, loadSaved, saveSaved, type Progress, type SavedScreening } from "@/lib/storage";
+import { loadMe, loadPrefill, loadProgress, loadSaved, rememberMe, saveSaved, type Progress, type SavedScreening } from "@/lib/storage";
 
 export type Offer = { price: number; months: number; perk: string; discount: Discount | null; consult: number | null };
 
-export function ResultsView({ offer }: { offer: Offer }) {
+export function ResultsView({ offer, signedInEmail = null }: { offer: Offer; signedInEmail?: string | null }) {
   const [progress, setProgress] = useState<Progress | null | undefined>(undefined);
   const [saved, setSaved] = useState<SavedScreening | null>(null);
   const [emailed, setEmailed] = useState(false);
@@ -86,7 +87,7 @@ export function ResultsView({ offer }: { offer: Offer }) {
   if (!offline && saved && !saved.paid) {
     return <Paywall results={results} answers={progress.answers} saved={saved} offer={offer} confirming={confirming} onOffline={() => setOffline(true)} />;
   }
-  return <Reveal results={results} saved={offline ? null : saved} offer={offer} />;
+  return <Reveal results={results} saved={offline ? null : saved} offer={offer} signedIn={!!signedInEmail} />;
 }
 
 /* ------------------------------------------------------------------ Email + consent */
@@ -94,8 +95,9 @@ export function ResultsView({ offer }: { offer: Offer }) {
 function EmailGate({ progress, onDone }: { progress: Progress; onDone: (s: SavedScreening | null) => void }) {
   const prior = typeof window !== "undefined" ? loadSaved() : null;
   const pre = typeof window !== "undefined" ? loadPrefill() : null;
-  const [email, setEmail] = useState(pre?.email ?? prior?.email ?? "");
-  const [phone, setPhone] = useState(pre?.phone ?? prior?.phone ?? "");
+  const me = typeof window !== "undefined" ? loadMe() : null;
+  const [email, setEmail] = useState(pre?.email ?? prior?.email ?? me?.email ?? "");
+  const [phone, setPhone] = useState(pre?.phone ?? prior?.phone ?? me?.phone ?? "");
   const [consent, setConsent] = useState(false);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -113,6 +115,7 @@ function EmailGate({ progress, onDone }: { progress: Progress; onDone: (s: Saved
       });
       const data = await res.json().catch(() => ({}));
       if (res.ok && data.screeningId) {
+        rememberMe({ email: email.trim(), phone: phone.trim() || undefined });
         onDone({ screeningId: data.screeningId, ownerToken: data.ownerToken, email: email.trim(), phone: phone.trim() || undefined, savedAt: new Date().toISOString() });
       } else if (res.status === 503) {
         // Backend not connected yet (e.g. a preview): still show results, nothing stored.
@@ -168,7 +171,7 @@ function EmailGate({ progress, onDone }: { progress: Progress; onDone: (s: Saved
 
 /* ------------------------------------------------------------------ The reveal */
 
-function Reveal({ results, saved, offer }: { results: Results; saved: SavedScreening | null; offer: Offer }) {
+function Reveal({ results, saved, offer, signedIn }: { results: Results; saved: SavedScreening | null; offer: Offer; signedIn: boolean }) {
   const reduce = useReducedMotion();
   const [support, setSupport] = useState(results.selfHarmFlag);
   const heart = results.heart;
@@ -198,11 +201,21 @@ function Reveal({ results, saved, offer }: { results: Results; saved: SavedScree
         <span className="w-[68px]" />
       </div>
 
-      {saved?.paid && (
+      {saved?.paid && signedIn && (
         <section className="mt-4 flex flex-col gap-3 rounded-[var(--radius-xl)] border border-primary/30 bg-primary-soft p-5" aria-label="Your plan">
           <p className="flex items-center gap-2 font-semibold"><Icon name="target" size={20} strokeWidth={2} className="text-primary" /> Your {offer.months}-month plan is ready</p>
-          <p className="text-[15px] text-ink/80">We&apos;ve made a plan from these results{offer.perk ? `, and you get ${offer.perk} every doctor consultation while it's active` : ""}. {saved.accountNew ? `We've created your account for ${saved.email}; log in with a code sent to that email to open it.` : "Open it to see this week's steps."}</p>
+          <p className="text-[15px] text-ink/80">We&apos;ve made a plan from these results{offer.perk ? `, and you get ${offer.perk} every doctor consultation while it's active` : ""}. Open it to see this week&apos;s steps.</p>
           <ButtonLink href="/account/plan" icon="target">Open my plan</ButtonLink>
+        </section>
+      )}
+      {saved?.paid && !signedIn && (
+        <section className="mt-4 rounded-[var(--radius-xl)] border border-primary/30 bg-primary-soft p-5" aria-labelledby="setup-login">
+          <p className="flex items-center gap-2 text-[13px] font-semibold tracking-[0.06em] text-primary uppercase"><Icon name="check" size={16} strokeWidth={3} /> Payment received</p>
+          <h2 id="setup-login" className="mt-1 text-[22px] leading-tight font-semibold">Set up your login</h2>
+          <p className="mt-1 text-[15px] text-ink/80">
+            Your results and {offer.months}-month plan are saved to your account{offer.perk ? `, with ${offer.perk} every doctor consultation` : ""}. We&apos;ll email you a code, then you choose a password, so you can come back any time.
+          </p>
+          <div className="-mt-2"><LoginForm next="/account" presetEmail={saved.email} /></div>
         </section>
       )}
 

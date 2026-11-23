@@ -121,7 +121,7 @@ export async function confirmCheckPayment(reference: string, source: "webhook" |
     await sendEmail(screening.email, m.subject, m.html, m.text);
     const loaded = await loadPlan(account.id);
     if (loaded?.goals.length) {
-      const w = welcomeEmail(loaded.goals, null);
+      const w = welcomeEmail(loaded.goals, null, { email: screening.email, newAccount: account.created });
       await sendEmail(screening.email, w.subject, w.html, w.text);
     }
   }
