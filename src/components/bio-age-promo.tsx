@@ -15,7 +15,9 @@ export type BioPromoState =
  * Home page: the Biological Age Check. Visitors see an example; logged-in people can book on WhatsApp
  * with their ID; people with a result see their own number.
  */
-export function BioAgePromo({ state, price }: { state: BioPromoState; price: number }) {
+export function BioAgePromo({ state, price, memberPrice = null }: { state: BioPromoState; price: number; memberPrice?: number | null }) {
+  const member = memberPrice != null;
+  const ask = (m: string) => withMemberId(member ? `${m} I'm a Poveon plan member.` : m, state.kind === "guest" ? null : state.code);
   const mine = state.kind === "result";
   const real = mine ? Math.floor(state.real) : 38;
   const bio = mine ? Math.round(state.bio) : 33;
@@ -57,8 +59,8 @@ export function BioAgePromo({ state, price }: { state: BioPromoState; price: num
             </ul>
 
             <p className="mt-6 flex flex-wrap items-baseline gap-x-2">
-              <span className="font-display text-[30px] leading-none font-bold">₦{price.toLocaleString("en-NG")}</span>
-              <span className="text-[14px] text-white/60">pay on WhatsApp when we confirm your time</span>
+              <span className="font-display text-[30px] leading-none font-bold">₦{(memberPrice ?? price).toLocaleString("en-NG")}</span>{member && <span className="text-[15px] text-white/50 line-through">₦{price.toLocaleString("en-NG")}</span>}
+              <span className="text-[14px] text-white/60">{member ? "your plan member price · " : ""}pay on WhatsApp when we confirm your time</span>
             </p>
             <p className="mt-3 flex items-start gap-2 text-[14px] text-white/70">
               <Icon name="shield" size={16} strokeWidth={2.2} className="mt-0.5 shrink-0 text-primary-soft" />
@@ -76,7 +78,7 @@ export function BioAgePromo({ state, price }: { state: BioPromoState; price: num
               )}
               {state.kind === "member" && (
                 <>
-                  <WhatsAppButton size="lg" message={withMemberId("Hello, I'd like to book the Biological Age Check.", state.code)}>Book on WhatsApp</WhatsAppButton>
+                  <WhatsAppButton size="lg" message={ask("Hello, I'd like to book the Biological Age Check.")}>Book on WhatsApp</WhatsAppButton>
                   <Link href="/account/bio-age" className="text-center text-[15px] font-semibold text-white/80 underline-offset-4 hover:underline">How it works</Link>
                 </>
               )}
@@ -85,7 +87,7 @@ export function BioAgePromo({ state, price }: { state: BioPromoState; price: num
                   <Link href="/account/bio-age" className="inline-flex min-h-[52px] items-center justify-center gap-2 rounded-[var(--radius-md)] bg-white px-6 text-[16px] font-semibold whitespace-nowrap text-ink hover:bg-primary-soft">
                     See my result <Icon name="arrowRight" size={18} strokeWidth={2.4} />
                   </Link>
-                  <WhatsAppButton size="sm" message={withMemberId("Hello, I'd like to book a repeat Biological Age Check.", state.code)}>Book a re-test</WhatsAppButton>
+                  <WhatsAppButton size="sm" message={ask("Hello, I'd like to book a repeat Biological Age Check.")}>Book a re-test</WhatsAppButton>
                 </>
               )}
             </div>

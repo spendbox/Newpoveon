@@ -1,8 +1,9 @@
 import Link from "next/link";
 import { TrustedTools } from "@/components/trusted-tools";
 import { BioAgePromo, type BioPromoState } from "@/components/bio-age-promo";
-import { bioAgePrice, myBioAges, myMemberCode } from "@/lib/bioage/server";
+import { bioAgeOffer, currentUserId, myBioAges, myMemberCode } from "@/lib/bioage/server";
 import { currentUser } from "@/lib/supabase/server";
+import { consultsOn, HELP } from "@/lib/help";
 import { features } from "@/config/site";
 import { Icon, type IconName } from "@/components/icons";
 import { Logo, Overline } from "@/components/ui";
@@ -33,7 +34,7 @@ async function bioPromoState(): Promise<BioPromoState> {
 }
 
 export default async function HomePage() {
-  const [bioState, bioPrice] = await Promise.all([bioPromoState(), bioAgePrice().catch(() => 125000)]);
+  const [bioState, bioOffer] = await Promise.all([bioPromoState(), currentUserId().then(bioAgeOffer).catch(() => ({ price: 125000, member: null }))]);
   return (
     <main className="mx-auto w-full max-w-6xl px-5 md:px-8">
       <header className="flex items-center justify-between gap-3 py-5">
@@ -70,7 +71,7 @@ export default async function HomePage() {
       {/* ---------------- Phone: four simple choices ---------------- */}
       <nav className="flex flex-col divide-y divide-line overflow-hidden rounded-[var(--radius-xl)] border border-line bg-surface md:hidden" aria-label="What would you like to do?">
         {[
-          { href: "/doctor", icon: "stethoscope" as const, title: "Get help with a health concern", text: "We match you with the right doctor", tint: "bg-primary-soft text-primary" },
+          { href: "/doctor", icon: HELP.icon, title: consultsOn ? "Get help with a health concern" : "Chat with our team", text: consultsOn ? "We match you with the right doctor" : "Questions about your health or results", tint: "bg-primary-soft text-primary" },
           { href: "/home-tests", icon: "flask" as const, title: "Lab tests", text: "Samples collected at home", tint: "bg-lavender-soft text-lavender" },
           { href: "/medication", icon: "box" as const, title: "Medication delivery", text: "Any medicine, even hard-to-find ones", tint: "bg-sun-soft text-check-text" },
           ...(features.familyCare ? [{ href: "/family", icon: "family" as const, title: "Care for parents in Nigeria", text: "For family living abroad", tint: "bg-coral-soft text-act-text" }] : []),
@@ -89,7 +90,7 @@ export default async function HomePage() {
         <Icon name="shield" size={14} strokeWidth={2} /> Built on WHO screening tools. Private. Not a diagnosis.
       </p>
 
-      <BioAgePromo state={bioState} price={bioPrice} />
+      <BioAgePromo state={bioState} price={bioOffer.price} memberPrice={bioOffer.member} />
 
       <TrustedTools />
 
@@ -131,7 +132,7 @@ export default async function HomePage() {
             {[
               ["Answer", "One question at a time, with tap-to-answer choices."],
               ["See your results", "Instantly, with a copy sent to your email."],
-              ["Take the next step", "Talk to a doctor, book a lab test, or check again later."],
+              ["Take the next step", consultsOn ? "Talk to a doctor, book a lab test, or check again later." : "Chat with our team, book a lab test, or check again later."],
             ].map(([t, d], i) => (
               <li key={t} className="flex gap-4 md:flex-col md:gap-3">
                 <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-primary-soft font-display text-base font-bold text-primary">{i + 1}</span>
@@ -151,9 +152,9 @@ export default async function HomePage() {
         <h2 id="services" className="mt-2 text-3xl font-bold md:text-[40px]">From results to real help</h2>
         <div className="mt-8 grid gap-4 md:grid-cols-3">
           <Link href="/doctor" className="group flex flex-col rounded-[var(--radius-xl)] bg-ink p-6 text-white shadow-[var(--shadow-md)] transition-transform hover:-translate-y-0.5">
-            <span className="flex h-11 w-11 items-center justify-center rounded-[var(--radius-md)] bg-white/10"><Icon name="stethoscope" size={22} strokeWidth={2} /></span>
-            <h3 className="mt-5 text-2xl font-semibold">Get help with a health concern</h3>
-            <p className="mt-1 text-[15px] text-white/70">Tell us what&apos;s going on and we&apos;ll match you with the right doctor, at a time that suits you.</p>
+            <span className="flex h-11 w-11 items-center justify-center rounded-[var(--radius-md)] bg-white/10"><Icon name={HELP.icon} size={22} strokeWidth={2} /></span>
+            <h3 className="mt-5 text-2xl font-semibold">{consultsOn ? "Get help with a health concern" : "Chat with our team"}</h3>
+            <p className="mt-1 text-[15px] text-white/70">{consultsOn ? <>Tell us what&apos;s going on and we&apos;ll match you with the right doctor, at a time that suits you.</> : <>Questions about your results, a symptom, a test or a medicine? Message us on WhatsApp and we&apos;ll help.</>}</p>
             <span className="mt-auto inline-flex items-center gap-1 pt-6 text-sm font-semibold">Get help now <Icon name="arrowRight" size={16} strokeWidth={2} /></span>
           </Link>
           <Link href="/home-tests" className="group flex flex-col rounded-[var(--radius-xl)] border border-line bg-surface p-6 transition-[transform,box-shadow] hover:-translate-y-0.5 hover:shadow-[var(--shadow-md)]">

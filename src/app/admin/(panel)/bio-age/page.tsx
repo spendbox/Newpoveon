@@ -3,7 +3,7 @@ import Link from "next/link";
 import { site } from "@/config/site";
 import { SubmitButton } from "@/components/buttons";
 import { kidneyForResult, MARKER_BY_KEY, MARKERS, type MarkerKey } from "@/lib/bioage/phenoage";
-import { bioAgePrice, bioAgesFor, memberFacts, normaliseMemberCode, type BioAgeRow } from "@/lib/bioage/server";
+import { bioAgeOffer, bioAgePrice, bioAgesFor, memberFacts, normaliseMemberCode, type BioAgeRow } from "@/lib/bioage/server";
 import { lagosDay } from "@/lib/plan/engine";
 import { supabaseAdmin } from "@/lib/supabase/server";
 import { aBtn, aBtnQuiet, aInput, Badge, Card, H1 } from "../../ui";
@@ -40,6 +40,7 @@ export default async function BioAgePage({ searchParams }: PageProps<"/admin/bio
   const [history, facts] = member ? await Promise.all([bioAgesFor(member.id), memberFacts(member.id, member.email, member.latest_answers)]) : [[], null];
 
   const price = await bioAgePrice();
+  const offer = member ? await bioAgeOffer(member.id) : null;
   const { data: recentRaw, error: recentErr } = await sb.from("bio_age_results")
     .select("id, member_code, sample_date, age_years, pheno_age, entered_by, emailed_at, created_at, lab_name")
     .order("created_at", { ascending: false }).limit(30);
@@ -102,6 +103,11 @@ export default async function BioAgePage({ searchParams }: PageProps<"/admin/bio
                 <p className="text-sm text-muted">{member.email}{member.phone ? ` · ${member.phone}` : ""}</p>
               </div>
               <span className="rounded-lg bg-primary-soft px-3 py-1.5 font-mono text-lg font-bold text-primary">{member.member_code}</span>
+            </div>
+            <div className="mt-3 rounded-lg bg-ground px-3 py-2 text-sm">
+              {offer?.member != null
+                ? <>Active plan member until <b>{dayFmt.format(new Date(`${offer.until}T12:00:00Z`))}</b>: charge <b>₦{offer.member.toLocaleString("en-NG")}</b> instead of ₦{offer.price.toLocaleString("en-NG")} ({offer.perk}).</>
+                : <>No active plan: charge the full price, <b>₦{(offer?.price ?? price).toLocaleString("en-NG")}</b>.</>}
             </div>
           </Card>
 

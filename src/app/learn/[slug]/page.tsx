@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import { consultsOn, HELP, helpLabel } from "@/lib/help";
 import { notFound } from "next/navigation";
 import { LEARN, LEARN_ORDER, type LearnSlug } from "@/content/learn";
 import { Icon } from "@/components/icons";
@@ -53,7 +54,7 @@ export default async function LearnPage({ params }: PageProps<"/learn/[slug]">) 
           <h1 className="mt-4 text-[36px] leading-[1.05] font-bold md:text-5xl">{t.title}</h1>
           <p className="mt-3 max-w-xl text-[18px] text-muted">{t.tagline}</p>
           <div className="mt-6 flex flex-col gap-3 sm:flex-row">
-            <ButtonLink href={`/doctor?type=${t.consult}`} icon="stethoscope">{t.consultLabel}</ButtonLink>
+            <ButtonLink href={`/doctor?type=${t.consult}`} icon={HELP.icon}>{helpLabel(t.consultLabel)}</ButtonLink>
             {t.test && <WhatsAppButton message={`Hello, I'd like to request a test: ${t.test.name}.`} className="sm:w-auto">Request a test</WhatsAppButton>}
           </div>
         </div>
@@ -113,7 +114,7 @@ export default async function LearnPage({ params }: PageProps<"/learn/[slug]">) 
               </p>
             )}
             <div className="mt-5 flex flex-col gap-3 sm:flex-row">
-              <ButtonLink href={`/doctor?type=${t.consult}`} icon="stethoscope" variant="secondary">{t.consultLabel}</ButtonLink>
+              <ButtonLink href={`/doctor?type=${t.consult}`} icon={HELP.icon} variant="secondary">{helpLabel(t.consultLabel)}</ButtonLink>
             </div>
           </section>
 
@@ -137,10 +138,10 @@ export default async function LearnPage({ params }: PageProps<"/learn/[slug]">) 
             </div>
           )}
           <div className="rounded-[var(--radius-xl)] border border-line bg-surface p-5">
-            <span className="flex h-10 w-10 items-center justify-center rounded-[var(--radius-md)] bg-primary-soft text-primary"><Icon name="stethoscope" size={20} strokeWidth={2} /></span>
-            <p className="mt-3 font-semibold">Talk to a doctor</p>
-            <p className="mt-1 text-[14px] text-muted">Private, from your phone, at a time that suits you.</p>
-            <ButtonLink href={`/doctor?type=${t.consult}`} variant="secondary" className="mt-4 w-full">Book a consult</ButtonLink>
+            <span className="flex h-10 w-10 items-center justify-center rounded-[var(--radius-md)] bg-primary-soft text-primary"><Icon name={HELP.icon} size={20} strokeWidth={2} /></span>
+            <p className="mt-3 font-semibold">{HELP.label}</p>
+            <p className="mt-1 text-[14px] text-muted">{consultsOn ? "Private, from your phone, at a time that suits you." : "Questions about this result? Message us on WhatsApp."}</p>
+            <ButtonLink href={`/doctor?type=${t.consult}`} variant="secondary" className="mt-4 w-full">{consultsOn ? "Book a consult" : "Chat with us"}</ButtonLink>
           </div>
           <div className="rounded-[var(--radius-xl)] border border-line bg-surface p-5">
             <p className="font-semibold">Related</p>

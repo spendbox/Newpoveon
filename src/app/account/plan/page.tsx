@@ -1,5 +1,6 @@
 export const dynamic = "force-dynamic";
 import type { Metadata } from "next";
+import { perkText } from "@/lib/help";
 import { redirect } from "next/navigation";
 import { site } from "@/config/site";
 import { Icon } from "@/components/icons";
@@ -83,7 +84,7 @@ export default async function PlanPage({ searchParams }: PageProps<"/account/pla
           {ended ? `Take a new check to see how your scores have moved and renew your plan for another ${settings.months} months. Your history is kept.` : `Your plan comes with your health check. For ${ngn} you get your full results and a personal plan for ${settings.months} months, made from them.`}
         </p>
         <ul className="mt-4 flex flex-col gap-2 text-[15px]">
-          {["Move more, sleep better, lose weight, eat better or feel calmer: up to 3 at a time", "A daily check-off and a weekly review that adjusts your targets", "Sunday summaries and a midweek nudge by email", ...(perkLabel ? [`${perkLabel} every doctor consultation while your plan is active`] : [])].map((x) => (
+          {["Move more, sleep better, lose weight, eat better or feel calmer: up to 3 at a time", "A daily check-off and a weekly review that adjusts your targets", "Sunday summaries and a midweek nudge by email", ...(perkLabel ? [`${perkText(perkLabel)} while your plan is active`] : [])].map((x) => (
             <li key={x} className="flex gap-2"><Icon name="check" size={18} strokeWidth={2.6} className="mt-0.5 shrink-0 text-primary" />{x}</li>
           ))}
         </ul>

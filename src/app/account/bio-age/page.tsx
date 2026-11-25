@@ -5,7 +5,7 @@ import { MemberId } from "@/components/member-id";
 import { TrendLine } from "@/components/trend-line";
 import { WhatsAppButton } from "@/components/whatsapp-catalog";
 import { withMemberId } from "@/lib/bioage/member";
-import { bioAgePrice, myBioAges, myMemberCode } from "@/lib/bioage/server";
+import { bioAgeOffer, myBioAges, myMemberCode } from "@/lib/bioage/server";
 import { supabaseConfigured } from "@/lib/supabase/server";
 import { getAccount } from "../data";
 import { PageHead } from "../panels";
@@ -21,9 +21,10 @@ const day = (d: string) => new Date(`${d}T12:00:00Z`);
 export default async function BioAgePage() {
   if (!supabaseConfigured()) redirect("/account");
   const { user } = await getAccount();
-  const [rows, code, price] = await Promise.all([myBioAges(), myMemberCode(user.id), bioAgePrice()]);
+  const [rows, code, offer] = await Promise.all([myBioAges(), myMemberCode(user.id), bioAgeOffer(user.id)]);
+  const price = offer.member ?? offer.price;
   const latest = rows[0];
-  const ask = withMemberId(latest ? "Hello, I'd like to book a repeat Biological Age Check." : "Hello, I'd like to book the Biological Age Check.", code);
+  const ask = withMemberId(`${latest ? "Hello, I'd like to book a repeat Biological Age Check." : "Hello, I'd like to book the Biological Age Check."}${offer.member != null ? " I'm a Poveon plan member." : ""}`, code);
 
   return (
     <>
@@ -52,7 +53,7 @@ export default async function BioAgePage() {
 
         <section className="flex flex-col gap-4 rounded-[var(--radius-xl)] bg-primary-soft p-5 md:flex-row md:items-center md:justify-between" aria-label="Book a test">
           <div>
-            <p className="font-semibold">{latest ? "Re-test in 6 to 12 months" : "Book your test"} · ₦{price.toLocaleString("en-NG")}</p>
+            <p className="font-semibold">{latest ? "Re-test in 6 to 12 months" : "Book your test"} · ₦{price.toLocaleString("en-NG")}{offer.member != null && <span className="ml-2 rounded-full bg-good-bg px-2 py-0.5 text-[12px] font-semibold text-good-text">member price</span>}</p>
             <p className="text-[15px] text-ink/75">{latest ? "See if your changes are taking years off." : "We send a trained health worker to your home to take a small blood sample. Your result appears here, and we email you."} Message us on WhatsApp{code ? " with your ID" : ""}.</p>
           </div>
           <WhatsAppButton message={ask} size="sm" className="shrink-0 self-start md:self-auto">Book on WhatsApp</WhatsAppButton>

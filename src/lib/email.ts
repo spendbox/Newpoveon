@@ -1,5 +1,6 @@
 import "server-only";
 import { Resend } from "resend";
+import { consultsOn, HELP, helpLabel } from "@/lib/help";
 import { site } from "@/config/site";
 import { displayValue, STATUS_LABEL, type Results } from "@/lib/scoring/results";
 import { clockTime } from "@/lib/time";
@@ -95,17 +96,17 @@ export function resultsEmail(r: Results) {
     "Here are your results",
     `${wb}${heart}<table role="presentation" width="100%">${cards}</table>
 ${due ? `<h2 style="font-size:18px;margin:18px 0 6px">Check-ups you're due for</h2><ul style="padding-left:18px;margin:0;font-size:14px">${due}</ul>` : ""}
-<p style="margin:20px 0 8px;font-size:15px">Something worrying? A doctor can talk it through with you.</p>
-${button(`${site.siteUrl}/doctor`, "Get help from a doctor")}
+<p style="margin:20px 0 8px;font-size:15px">${consultsOn ? "Something worrying? A doctor can talk it through with you." : "Something worrying, or a question about a result? Our team is a message away."}</p>
+${button(`${site.siteUrl}/doctor`, consultsOn ? "Get help from a doctor" : "Chat with our team")}
 <p style="margin:18px 0 0;font-size:13px;color:#5E706A">Your results and your personal plan are saved to your account. <a href="${site.siteUrl}/account" style="color:#10221D">Open my dashboard</a> (log in with a code sent to this email).</p>`,
   );
   const text = [
     `Your ${site.appName} results`,
     r.wellbeing ? `Wellbeing score: ${r.wellbeing.score}/100 (WHO-5).` : "",
     r.heart ? `Heart age: ${r.heart.heartAge.value} (you're ${r.age}). 10-year risk: ${r.heart.riskPercent}%.` : r.heartNote ?? "",
-    ...r.cards.map((c) => `- ${c.topic}: ${STATUS_LABEL[c.status]} — ${displayValue(c)}. ${c.summary} (${c.basis}) Next: ${c.next.label}`),
+    ...r.cards.map((c) => `- ${c.topic}: ${STATUS_LABEL[c.status]} — ${displayValue(c)}. ${c.summary} (${c.basis}) Next: ${helpLabel(c.next.label)}`),
     "Every result is an estimate, not a diagnosis.",
-    `Talk to a doctor: ${site.siteUrl}/doctor`,
+    `${HELP.label}: ${site.siteUrl}/doctor`,
   ].join("\n");
   return { subject: `Your ${site.appName} results`, html, text };
 }

@@ -4,6 +4,7 @@ import { cleanText, handleError, isEmail, isPhone, json, readJson } from "@/lib/
 import { initializeTransaction, paystackConfigured } from "@/lib/paystack";
 import { canManageScreening } from "@/lib/share/access";
 import { currentUser, supabaseAdmin, supabaseConfigured } from "@/lib/supabase/server";
+import { consultsOn } from "@/lib/help";
 import { randomToken } from "@/lib/tokens";
 import { memberPrice } from "@/lib/plan/perks";
 import { isActive, type PlanRow } from "@/lib/plan/server";
@@ -19,6 +20,8 @@ const MAX_FILES = 3;
 
 export async function POST(req: Request) {
   try {
+    // Doctor consults are paused (features.consults): no new bookings or payments.
+    if (!consultsOn) return json({ error: "Doctor bookings are paused for now. Please chat with our team on WhatsApp." }, 403);
     if (!supabaseConfigured() || !paystackConfigured()) return json({ error: "Online booking isn't switched on yet. Please message us on WhatsApp." }, 503);
     // The form sends JSON, or multipart (JSON in "data" + an optional "voice" recording).
     let b: Record<string, unknown>;

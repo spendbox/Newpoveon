@@ -3,6 +3,10 @@ import { site } from "@/config/site";
 import { button, layout } from "@/lib/email";
 import { currentUser, supabaseAdmin, supabaseUser } from "@/lib/supabase/server";
 import { differenceText, kidneyForResult, type MarkerKey, type Values } from "./phenoage";
+import { consultsOn } from "@/lib/help";
+import { loadPlanSettings } from "@/lib/plan/settings";
+import { discountLabel, memberPrice } from "@/lib/plan/perks";
+import { lagosDay } from "@/lib/plan/engine";
 import { dobFromAnswers, sexFromAnswers, type DobGuess } from "./dob";
 export { normaliseMemberCode } from "./member";
 
@@ -77,6 +81,33 @@ export async function bioAgePrice(): Promise<number> {
   } catch {
     return BIO_AGE_DEFAULT_PRICE; // never let the price take a page down
   }
+}
+
+/**
+ * The Biological Age Check price for someone: the full price, and (while doctor consults are paused, when
+ * the member perk moves to this test) their member price if they have an active plan.
+ */
+export async function bioAgeOffer(userId: string | null): Promise<{ price: number; member: number | null; perk: string; until: string | null }> {
+  const price = await bioAgePrice();
+  if (consultsOn || !userId) return { price, member: null, perk: "", until: null };
+  try {
+    const [settings, plan] = await Promise.all([
+      loadPlanSettings(),
+      supabaseAdmin().from("plans").select("status, paid_until").eq("user_id", userId).maybeSingle(),
+    ]);
+    const perk = discountLabel(settings.discount);
+    const row = plan.data as { status: string; paid_until: string | null } | null;
+    const active = !!row && row.status === "active" && !!row.paid_until && row.paid_until >= lagosDay();
+    return { price, member: perk && active ? memberPrice(price, settings.discount) : null, perk, until: active ? row!.paid_until : null };
+  } catch {
+    return { price, member: null, perk: "", until: null };
+  }
+}
+
+/** The logged-in person's id, or null. */
+export async function currentUserId(): Promise<string | null> {
+  const user = await currentUser().catch(() => null);
+  return user?.id ?? null;
 }
 
 /** The member ID of whoever is logged in, or null for visitors (and before SQL 17). */

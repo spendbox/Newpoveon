@@ -12,6 +12,7 @@ import { BodyMap } from "@/components/body-map";
 import { WellbeingHero } from "@/components/score-widgets";
 import { ShareSection } from "./share-section";
 import { Paywall } from "./paywall";
+import { consultsOn, HELP, perkText } from "@/lib/help";
 import { LoginForm } from "@/app/login/login-form";
 import type { Discount } from "@/lib/plan/perks";
 import { Steps } from "@/components/steps";
@@ -19,7 +20,7 @@ import { isComplete } from "@/lib/questions";
 import { computeResults, displayValue, type Results } from "@/lib/scoring/results";
 import { loadMe, loadPrefill, loadProgress, loadSaved, rememberMe, saveSaved, type Progress, type SavedScreening } from "@/lib/storage";
 
-export type Offer = { price: number; months: number; perk: string; discount: Discount | null; consult: number | null };
+export type Offer = { price: number; months: number; perk: string; discount: Discount | null; consult: number | null; bioAge?: number | null };
 
 export function ResultsView({ offer, signedInEmail = null }: { offer: Offer; signedInEmail?: string | null }) {
   const [progress, setProgress] = useState<Progress | null | undefined>(undefined);
@@ -204,7 +205,7 @@ function Reveal({ results, saved, offer, signedIn }: { results: Results; saved: 
       {saved?.paid && signedIn && (
         <section className="mt-4 flex flex-col gap-3 rounded-[var(--radius-xl)] border border-primary/30 bg-primary-soft p-5" aria-label="Your plan">
           <p className="flex items-center gap-2 font-semibold"><Icon name="target" size={20} strokeWidth={2} className="text-primary" /> Your {offer.months}-month plan is ready</p>
-          <p className="text-[15px] text-ink/80">We&apos;ve made a plan from these results{offer.perk ? `, and you get ${offer.perk} every doctor consultation while it's active` : ""}. Open it to see this week&apos;s steps.</p>
+          <p className="text-[15px] text-ink/80">We&apos;ve made a plan from these results{offer.perk ? `, and you get ${perkText(offer.perk)} while it's active` : ""}. Open it to see this week&apos;s steps.</p>
           <ButtonLink href="/account/plan" icon="target">Open my plan</ButtonLink>
         </section>
       )}
@@ -213,7 +214,7 @@ function Reveal({ results, saved, offer, signedIn }: { results: Results; saved: 
           <p className="flex items-center gap-2 text-[13px] font-semibold tracking-[0.06em] text-primary uppercase"><Icon name="check" size={16} strokeWidth={3} /> Payment received</p>
           <h2 id="setup-login" className="mt-1 text-[22px] leading-tight font-semibold">Set up your login</h2>
           <p className="mt-1 text-[15px] text-ink/80">
-            Your results and {offer.months}-month plan are saved to your account{offer.perk ? `, with ${offer.perk} every doctor consultation` : ""}. We&apos;ll email you a code, then you choose a password, so you can come back any time.
+            Your results and {offer.months}-month plan are saved to your account{offer.perk ? `, with ${perkText(offer.perk)}` : ""}. We&apos;ll email you a code, then you choose a password, so you can come back any time.
           </p>
           <div className="-mt-2"><LoginForm next="/account" presetEmail={saved.email} /></div>
         </section>
@@ -332,7 +333,7 @@ function Reveal({ results, saved, offer, signedIn }: { results: Results; saved: 
 
       {/* Main actions */}
       <motion.section initial={reduce ? false : { opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: cardDelay(results.cards.length) }} className="mt-6 flex flex-col gap-3.5">
-        <ButtonLink href="/doctor?type=results-review" icon="stethoscope">Get help from a doctor</ButtonLink>
+        <ButtonLink href="/doctor?type=results-review" icon={HELP.icon}>{consultsOn ? "Get help from a doctor" : HELP.label}</ButtonLink>
         {testCard && testCard.next.kind === "test" && (
           <ButtonLink href={`/home-tests?test=${testCard.next.testCode}`} variant="secondary" icon="home">{testCard.next.label}</ButtonLink>
         )}

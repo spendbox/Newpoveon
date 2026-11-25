@@ -29,7 +29,7 @@ const POINTS: { icon: IconName; title: string; text: string }[] = [
   },
   {
     icon: "stethoscope", title: "What it isn't",
-    text: "It's not a diagnosis, and it can't tell you how long you will live. If any of your results worry you, talk to one of our doctors.",
+    text: "It's not a diagnosis, and it can't tell you how long you will live. If any of your results worry you, talk to a doctor.",
   },
 ];
 

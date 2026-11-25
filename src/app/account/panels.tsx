@@ -1,5 +1,6 @@
 import Link from "next/link";
 import type { ReactNode } from "react";
+import { consultsOn, HELP, perkText } from "@/lib/help";
 import { EXTENDED_MIN_AGE, site } from "@/config/site";
 import { Icon, type IconName } from "@/components/icons";
 import { BodyMap } from "@/components/body-map";
@@ -108,7 +109,7 @@ export function OverviewPanel({ history, plan = null }: { history: Row[]; plan?:
           {plan?.active ? (
             <><span className="block font-semibold">My plan · week {plan.week}</span><span className="block text-sm text-ink/70">{plan.pct}% done this week. Tap to tick off today.</span></>
           ) : (
-            <><span className="block font-semibold">Turn your results into a plan</span><span className="block text-sm text-ink/70">Moving, sleep, weight or eating, with a daily check-off and a weekly review{plan?.perk ? `. Plus ${plan.perk} every doctor consultation.` : "."}</span></>
+            <><span className="block font-semibold">Turn your results into a plan</span><span className="block text-sm text-ink/70">Moving, sleep, weight or eating, with a daily check-off and a weekly review{plan?.perk ? `. Plus ${perkText(plan.perk)}.` : "."}</span></>
           )}
         </span>
         <Icon name="arrowRight" size={18} strokeWidth={2} className="shrink-0 text-primary transition-transform group-hover:translate-x-0.5" />
@@ -136,7 +137,7 @@ export function OverviewPanel({ history, plan = null }: { history: Row[]; plan?:
       <section className="grid gap-3 sm:grid-cols-3" aria-label="Shortcuts">
         <Shortcut href="/account/progress" icon="gauge" title="My progress" text={`${history.length} check${history.length === 1 ? "" : "s"} so far`} />
         <Shortcut href="/account/checkups" icon="shield" title="Check-ups" text={due ? `${due} due` : "All up to date"} />
-        <Shortcut href="/doctor" icon="stethoscope" title="Talk to a doctor" text="Private, from your phone" />
+        <Shortcut href="/doctor" icon={HELP.icon} title={HELP.label} text={consultsOn ? "Private, from your phone" : "Questions about your results"} />
       </section>
     </div>
   );

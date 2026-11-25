@@ -1,5 +1,6 @@
 import Link from "next/link";
 import type { ReactNode } from "react";
+import { helpLabel } from "@/lib/help";
 import { Icon, type IconName } from "./icons";
 import { PoveonMark } from "./poveon-mark";
 import { site } from "@/config/site";
@@ -62,7 +63,7 @@ export function ResultCard({ card }: { card: ResultCardData }) {
       <div className="mt-1 flex flex-wrap items-center gap-x-4 gap-y-2">
         {href ? (
           <Link href={href} className="inline-flex items-center gap-1 text-sm font-semibold text-primary hover:underline">
-            {card.next.label} <Icon name="arrowRight" size={16} strokeWidth={2} />
+            {helpLabel(card.next.label)} <Icon name="arrowRight" size={16} strokeWidth={2} />
           </Link>
         ) : (
           <p className="inline-flex items-center gap-1.5 text-sm font-medium text-muted">

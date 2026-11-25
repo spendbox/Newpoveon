@@ -1,5 +1,6 @@
 "use client";
 import Link from "next/link";
+import { consultsOn, perkText } from "@/lib/help";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { Icon, type IconName } from "@/components/icons";
@@ -87,9 +88,9 @@ export function PlanHome({ goals, today, paidUntil, reminders, startsOn, recheck
 
       {error && <Notice tone="warn">{error}</Notice>}
       {perkLabel && (
-        <Link href="/doctor" className="flex items-center gap-3 rounded-[var(--radius-xl)] border border-primary/30 bg-primary-soft p-4">
-          <Icon name="stethoscope" size={20} strokeWidth={2} className="shrink-0 text-primary" />
-          <span className="flex-1 text-[15px]"><b>Member perk:</b> {perkLabel} every doctor consultation, applied automatically when you book.</span>
+        <Link href={consultsOn ? "/doctor" : "/account/bio-age"} className="flex items-center gap-3 rounded-[var(--radius-xl)] border border-primary/30 bg-primary-soft p-4">
+          <Icon name={consultsOn ? "stethoscope" : "dna"} size={20} strokeWidth={2} className="shrink-0 text-primary" />
+          <span className="flex-1 text-[15px]"><b>Member perk:</b> {perkText(perkLabel)}{consultsOn ? ", applied automatically when you book." : ". Book on WhatsApp and we'll apply it."}</span>
           <Icon name="arrowRight" size={16} strokeWidth={2} className="shrink-0 text-primary" />
         </Link>
       )}

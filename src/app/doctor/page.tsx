@@ -7,12 +7,20 @@ import { discountLabel } from "@/lib/plan/perks";
 import { isActive, type PlanRow } from "@/lib/plan/server";
 import { loadPlanSettings } from "@/lib/plan/settings";
 import { BookingForm, LeaveBookingButton } from "./booking-form";
+import { TeamChat } from "./team-chat";
+import { consultsOn } from "@/lib/help";
+import { currentMemberCode } from "@/lib/bioage/server";
 
-export const metadata: Metadata = { title: "Get help with a health concern" };
+export const metadata: Metadata = { title: consultsOn ? "Get help with a health concern" : "Chat with our team" };
 
 /** A full-screen, app-like flow: what you need → safety check → tell us → who you'll see → time → details → pay. */
 export default async function DoctorPage({ searchParams }: PageProps<"/doctor">) {
   const sp = await searchParams;
+  // Doctor consults are paused: everyone gets a chat with our team instead (see features.consults).
+  if (!consultsOn) {
+    const topic = sp.reason === "support" ? "support" : typeof sp.type === "string" ? sp.type.slice(0, 40) : null;
+    return <TeamChat topic={topic} memberCode={await currentMemberCode()} />;
+  }
   let types: ConsultType[] = [];
   if (supabaseConfigured()) {
     try {

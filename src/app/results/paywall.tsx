@@ -48,12 +48,15 @@ export function Paywall({ results, answers, saved, offer, confirming, onOffline 
   const focus = planHints(answers, results).recs.slice(0, 2).map((r) => r.area);
   const perDay = Math.ceil(offer.price / (offer.months * 30));
   const member = offer.consult && offer.discount ? memberPrice(offer.consult, offer.discount) : null;
+  const bioMember = offer.bioAge && offer.discount ? memberPrice(offer.bioAge, offer.discount) : null;
 
   const perks: Perk[] = [
     { icon: "gauge", anim: "pw-swing", tint: "bg-primary-soft text-primary", title: "Every score, in full", text: "Wellbeing, heart age, diabetes and kidney risk, sleep, mood and more." },
     { icon: "target", anim: "pw-pulse", tint: "bg-coral-soft text-act-text", title: `A ${offer.months}-month plan for you`, text: focus.length ? `Starting with ${focus.map((a) => AREA_INFO[a].title.toLowerCase()).join(" and ")}, made from your answers.` : "Made from your answers, around your day." },
     { icon: "check", anim: "pw-pop", tint: "bg-sun-soft text-check-text", title: "Daily check-ins that work", text: "Tick off each day. Targets step up as you keep going, and ease back when life gets busy." },
-    ...(offer.perk ? [{ icon: "stethoscope" as IconName, anim: "pw-wiggle", tint: "bg-lavender-soft text-lavender", title: `${offer.perk} consultations`, text: member && offer.consult ? `Talk to a doctor for ${ngn(member)} instead of ${ngn(offer.consult)}, for ${offer.months} months.` : `On every doctor consultation for ${offer.months} months.` }] : []),
+    // Member perk: money off the Biological Age Check while doctor consults are paused (features.consults).
+    ...(offer.perk && offer.bioAge ? [{ icon: "dna" as IconName, anim: "pw-wiggle", tint: "bg-lavender-soft text-lavender", title: `${offer.perk} your body age test`, text: bioMember ? `Find your body's real age with our Biological Age Check for ${ngn(bioMember)} instead of ${ngn(offer.bioAge)}, for ${offer.months} months.` : `On our Biological Age Check for ${offer.months} months.` }] : []),
+    ...(offer.perk && !offer.bioAge ? [{ icon: "stethoscope" as IconName, anim: "pw-wiggle", tint: "bg-lavender-soft text-lavender", title: `${offer.perk} consultations`, text: member && offer.consult ? `Talk to a doctor for ${ngn(member)} instead of ${ngn(offer.consult)}, for ${offer.months} months.` : `On every doctor consultation for ${offer.months} months.` }] : []),
     { icon: "leaf", anim: "pw-swing", tint: "bg-primary-soft text-primary", title: "How to improve each one", text: "Plain-English guides for every result, with what to do this week." },
     { icon: "shield", anim: "pw-float", tint: "bg-surface-2 text-ink", title: "Saved and emailed to you", text: "Kept privately in your account, so you can watch your scores move." },
   ];
