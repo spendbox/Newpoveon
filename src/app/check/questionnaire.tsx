@@ -1,5 +1,6 @@
 "use client";
 import { useEffect, useMemo, useRef, useState } from "react";
+import { HELP } from "@/lib/help";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
@@ -119,8 +120,8 @@ export function Questionnaire() {
           <span className="block text-xs font-semibold tracking-[0.06em] text-primary uppercase">{q.topic}</span>
           {index + 1} of {list.length}
         </span>
-        <Link href="/doctor" aria-label="Talk to a doctor" className="flex h-11 items-center gap-1.5 rounded-full border border-line bg-surface pr-3.5 pl-1.5 text-[13px] font-medium hover:bg-surface-2">
-          <span className="flex h-8 w-8 items-center justify-center rounded-full bg-primary text-white"><Icon name="stethoscope" size={16} strokeWidth={2} /></span>Doctor
+        <Link href="/doctor" aria-label={HELP.label} className="flex h-11 items-center gap-1.5 rounded-full border border-line bg-surface pr-3.5 pl-1.5 text-[13px] font-medium hover:bg-surface-2">
+          <span className="flex h-8 w-8 items-center justify-center rounded-full bg-primary text-white"><Icon name={HELP.icon} size={16} strokeWidth={2} /></span>{HELP.short}
         </Link>
       </div>
 

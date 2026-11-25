@@ -1,11 +1,12 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import { consultsOn, perkText } from "@/lib/help";
 import { site } from "@/config/site";
 import { LegalPage } from "@/components/legal-page";
 import { discountLabel } from "@/lib/plan/perks";
 import { loadPlanSettings } from "@/lib/plan/settings";
 
-export const metadata: Metadata = { title: "Terms of use", description: "The terms for using Poveon's health check, doctor consults and other services." };
+export const metadata: Metadata = { title: "Terms of use", description: "The terms for using Poveon's health check, lab tests and other services." };
 
 export const dynamic = "force-dynamic";
 
@@ -54,6 +55,8 @@ export default async function TermsPage() {
             </ul>
           ),
         },
+        // Doctor consults are paused (features.consults): their terms come back when consults do.
+        ...(consultsOn ? [
         {
           id: "consults", title: "Doctor consults",
           body: (
@@ -79,6 +82,7 @@ export default async function TermsPage() {
             </ul>
           ),
         },
+        ] : []),
         {
           id: "plan", title: "The health check and your plan",
           body: (
@@ -88,7 +92,8 @@ export default async function TermsPage() {
               <li>When you pay, we create a Poveon account for your email if you don&apos;t have one, so your results and plan are kept safe. You log in with a code sent to that email.</li>
               <li>Your plan gives general lifestyle guidance based on published guidelines. It is not medical treatment. If you have a heart condition, diabetes, are pregnant, or get chest pain, dizziness or unusual breathlessness when active, talk to a doctor before starting or stepping up.</li>
               <li>You can ask for a <strong>full refund within 7 days</strong> of paying by emailing {mail}.</li>
-              {perk && <li>While your plan is active, you get <strong>{perk}</strong> every doctor consultation, applied automatically when you book while logged in. We may change this perk for future bookings; it never changes a consult you have already paid for.</li>}
+              {perk && consultsOn && <li>While your plan is active, you get <strong>{perk}</strong> every doctor consultation, applied automatically when you book while logged in. We may change this perk for future bookings; it never changes a consult you have already paid for.</li>}
+              {perk && !consultsOn && <li>While your plan is active, you get <strong>{perkText(perk)}</strong>. Mention that you&apos;re a plan member when you book on WhatsApp and we&apos;ll apply it. We may change this perk for future bookings; it never changes a test you have already paid for.</li>}
               <li>You can change your plan or switch off reminder emails at any time.</li>
             </ul>
           ),
@@ -98,7 +103,7 @@ export default async function TermsPage() {
           body: (
             <ul>
               <li>Lab tests and medicines are arranged through partner labs and licensed pharmacies, on WhatsApp. We confirm the price, timing and any delivery fee with you before you pay anything.</li>
-              <li><strong>Prescription medicines</strong> are only supplied with a valid prescription, from one of our doctors or your own.</li>
+              <li><strong>Prescription medicines</strong> are only supplied with a valid prescription, {consultsOn ? "from one of our doctors or your own." : "from a doctor."}</li>
               <li>Medicines are sourced from licensed suppliers. You can check any medicine&apos;s registration on the NAFDAC website.</li>
               <li>The partner lab or pharmacy is responsible for the test or medicine it provides.</li>
               <li><strong>Biological Age Check:</strong> our team enters your lab results into Poveon, which works out your biological age using a published formula (Levine&apos;s PhenoAge, 2018) and shows it on your dashboard. It is an <strong>estimate, not a diagnosis</strong>. It was developed using data from adults in the United States, and a recent illness can raise it for a while.</li>

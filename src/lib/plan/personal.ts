@@ -4,6 +4,7 @@
  * Pure functions: used on the plan page, in the builder and in emails.
  */
 import { num, str, type Answers } from "@/lib/questions";
+import { helpLabel } from "@/lib/help";
 import type { ResultCard, Results } from "@/lib/scoring/results";
 import { bmi as calcBmi, waistToHeight } from "@/lib/scoring/tools";
 import {
@@ -133,7 +134,7 @@ export function personalExtras(r: Results | null): Extra[] {
     .map((c) => ({
       id: c.id, title: c.value.toLowerCase() === c.topic.toLowerCase() ? c.topic : `${c.topic}: ${soften(c.value)}`, text: c.summary,
       href: c.next.kind === "test" ? `/home-tests?test=${encodeURIComponent(c.next.testCode)}` : c.next.kind === "doctor" ? "/doctor" : `/learn/${c.id}`,
-      label: c.next.kind === "retest" ? "Learn more" : c.next.label,
+      label: c.next.kind === "retest" ? "Learn more" : helpLabel(c.next.label),
     }));
 }
 

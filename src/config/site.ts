@@ -50,6 +50,12 @@ export const site = {
 export const features = {
   /** "Care for your parents" (/family) for Nigerians abroad. Next major launch. */
   familyCare: process.env.NEXT_PUBLIC_FEATURE_FAMILY_CARE === "true",
+  /**
+   * Doctor consults (booking, payment, availability). Paused for now: "Talk to a doctor" links lead to a
+   * "Chat with our team" page on WhatsApp instead, and the member perk is money off the Biological Age Check.
+   * Everything is kept, so switching this on brings consults straight back.
+   */
+  consults: process.env.NEXT_PUBLIC_FEATURE_CONSULTS === "true",
 };
 
 /** Comma-separated admin emails (env: ADMIN_EMAILS). Server only. */

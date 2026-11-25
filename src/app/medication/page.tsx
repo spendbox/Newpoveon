@@ -5,6 +5,7 @@ import { ButtonLink } from "@/components/ui";
 import { NafdacDemo } from "@/components/nafdac-demo";
 import { WhatsAppCatalog } from "@/components/whatsapp-catalog";
 import { currentMemberCode } from "@/lib/bioage/server";
+import { consultsOn, HELP } from "@/lib/help";
 
 export const metadata: Metadata = { title: "Medication delivery" };
 
@@ -44,8 +45,8 @@ export default async function MedicationPage() {
       <div className="mt-8 rounded-[var(--radius-xl)] border border-line bg-check-bg p-5 text-check-text">
         <span className="flex h-10 w-10 items-center justify-center rounded-[var(--radius-md)] bg-surface"><Icon name="stethoscope" size={20} strokeWidth={2} /></span>
         <h2 className="mt-4 text-lg font-semibold">Prescription medicines</h2>
-        <p className="mt-1 max-w-2xl text-[15px]">We only supply prescription medicines with a valid prescription. No prescription? One of our doctors can see you and prescribe if it&apos;s right for you.</p>
-        <ButtonLink href="/doctor" variant="secondary" className="mt-4">See a doctor</ButtonLink>
+        <p className="mt-1 max-w-2xl text-[15px]">We only supply prescription medicines with a valid prescription. {consultsOn ? <>No prescription? One of our doctors can see you and prescribe if it&apos;s right for you.</> : <>No prescription? Chat with our team and we&apos;ll point you to a doctor who can see you.</>}</p>
+        <ButtonLink href="/doctor" variant="secondary" className="mt-4">{consultsOn ? "See a doctor" : HELP.label}</ButtonLink>
       </div>
     </WhatsAppCatalog>
   );

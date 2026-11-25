@@ -1,5 +1,6 @@
 "use client";
 import Link, { useLinkStatus } from "next/link";
+import { consultsOn, HELP } from "@/lib/help";
 import { usePathname } from "next/navigation";
 import { useState, type ComponentProps } from "react";
 import { motion, useReducedMotion } from "framer-motion";
@@ -69,7 +70,7 @@ function HelpLabel() {
   return (
     <>
       <span className="flex h-11 w-11 items-center justify-center rounded-full bg-primary text-white">
-        {pending ? <span className="h-5 w-5 animate-spin rounded-full border-[2.5px] border-white/35 border-t-white" aria-hidden="true" /> : <Icon name="stethoscope" size={22} strokeWidth={2} />}
+        {pending ? <span className="h-5 w-5 animate-spin rounded-full border-[2.5px] border-white/35 border-t-white" aria-hidden="true" /> : <Icon name={HELP.icon} size={22} strokeWidth={2} />}
       </span>
       <span aria-live="polite">{pending ? "Opening…" : "Get help"}</span>
     </>
@@ -83,7 +84,7 @@ export function FloatingDoctor() {
     <Link
       href="/doctor"
       className="fixed right-4 bottom-4 z-40 inline-flex min-h-[60px] items-center gap-2.5 rounded-full border border-line bg-surface/95 py-2 pr-5 pl-2 text-[16px] font-semibold text-ink shadow-[var(--shadow-lg)] backdrop-blur transition-transform hover:-translate-y-0.5 active:scale-95"
-      aria-label="Get help from a doctor"
+      aria-label={consultsOn ? "Get help from a doctor" : "Get help: chat with our team"}
       style={{ marginBottom: "env(safe-area-inset-bottom, 0px)" }}
     >
       <HelpLabel />

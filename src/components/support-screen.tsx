@@ -1,5 +1,6 @@
 "use client";
 import { useEffect, useState } from "react";
+import { consultsOn } from "@/lib/help";
 import { FALLBACK_EMERGENCY_CONTACTS } from "@/config/site";
 import { IllustrationCard } from "./illustrations";
 import { Button, ButtonLink } from "./ui";
@@ -23,7 +24,7 @@ export function SupportScreen({ onClose }: { onClose: () => void }) {
       })
       .catch(() => {});
   }, []);
-  const wa = whatsappLink(`Hello, I'd like to talk to a doctor today, please.`);
+  const wa = whatsappLink(consultsOn ? `Hello, I'd like to talk to a doctor today, please.` : `Hello, I'd like to talk to someone today, please.`);
   return (
     <div role="dialog" aria-modal="true" aria-labelledby="support-title" className="fixed inset-0 z-50 overflow-y-auto bg-ground">
       <div className="mx-auto flex min-h-full w-full max-w-[430px] flex-col px-6 pt-7 pb-10">
@@ -33,7 +34,7 @@ export function SupportScreen({ onClose }: { onClose: () => void }) {
           It sounds like things have been really hard. You don&apos;t have to go through this alone, and talking to someone can help.
         </p>
         <div className="mt-5 flex flex-col gap-3">
-          <ButtonLink href="/doctor?reason=support" icon="chat">Talk to a doctor now</ButtonLink>
+          <ButtonLink href="/doctor?reason=support" icon="chat">{consultsOn ? "Talk to a doctor now" : "Talk to our team now"}</ButtonLink>
           {wa && (
             <a href={wa} target="_blank" rel="noopener noreferrer" className="inline-flex min-h-[52px] items-center justify-center gap-2 rounded-[18px] border border-line-strong bg-surface px-5 text-base font-semibold">
               <Icon name="whatsapp" size={22} /> Message us on WhatsApp
