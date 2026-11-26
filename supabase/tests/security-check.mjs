@@ -166,3 +166,14 @@ console.log("anon inserts screening:", await as("anon", null, ins(null, "evil@x.
   console.log("anon sees bio age:", (await as("anon", null, "select id from bio_age_results")).length);
   console.log("bio age package:", JSON.stringify((await db.query("select code, featured, fasting from home_tests where code = 'biological-age'")).rows));
 }
+{
+  // SQL 18: revenue. Offline payments are admin-only; refund columns exist.
+  const rv = fs.readFileSync(new URL("../migrations/20261201000000_revenue.sql", import.meta.url), "utf8");
+  await db.exec(rv); await db.exec(rv);
+  await db.exec(`insert into offline_payments (kind, amount_kobo, paid_at, entered_by, email) values ('bio_age', 12500000, now(), 'admin@x.com', 'a@x.com')`);
+  console.log("anon sees offline payments:", (await as("anon", null, "select id from offline_payments")).length);
+  console.log("u1 sees offline payments:", (await as("authenticated", u1, "select id from offline_payments")).length);
+  console.log("admin sees offline payments:", (await as("authenticated", u2, "select id from offline_payments")).length);
+  console.log("u1 adds an offline payment:", JSON.stringify(await as("authenticated", u1, `insert into offline_payments (kind, amount_kobo, paid_at, entered_by) values ('other', 100, now(), 'me')`)));
+  console.log("refund columns:", (await db.query("select refunded_at from plan_purchases limit 1")).fields.length === 1 && (await db.query("select refunded_at from bookings limit 1")).fields.length === 1);
+}
