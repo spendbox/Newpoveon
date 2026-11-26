@@ -55,6 +55,7 @@ const P: Record<string, React.ReactNode> = {
   stethoscope: <><path d="M10 5v9a7 7 0 0 0 14 0V5" /><path d="M17 21v4a8 8 0 0 0 16 0v-3" /><circle cx="33" cy="19" r="3" /></>,
   box: <><path d="M6 13l14-7 14 7v15l-14 7-14-7z" /><path d="M6 13l14 7 14-7M20 20v15" /></>,
   target: <><circle cx="20" cy="20" r="14" /><circle cx="20" cy="20" r="8" /><circle cx="20" cy="20" r="2" /></>,
+  chart: <><path d="M6 34h28" /><path d="M10 34V22M17 34V14M24 34V19M31 34V8" /></>,
   eye: <><path d="M3 20s6-11 17-11 17 11 17 11-6 11-17 11S3 20 3 20z" /><circle cx="20" cy="20" r="5" /></>,
   eyeOff: <><path d="M3 20s6-11 17-11c3.2 0 5.9.9 8.1 2.3M37 20s-6 11-17 11c-3.2 0-5.9-.9-8.1-2.3" /><path d="M16.5 23.5a5 5 0 0 1 7-7M6 34L34 6" /></>,
   mic: <><rect x="14" y="5" width="12" height="20" rx="6" /><path d="M9 19a11 11 0 0 0 22 0M20 30v5M14 35h12" /></>,
