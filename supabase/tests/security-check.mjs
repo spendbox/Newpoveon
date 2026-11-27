@@ -177,3 +177,20 @@ console.log("anon inserts screening:", await as("anon", null, ins(null, "evil@x.
   console.log("u1 adds an offline payment:", JSON.stringify(await as("authenticated", u1, `insert into offline_payments (kind, amount_kobo, paid_at, entered_by) values ('other', 100, now(), 'me')`)));
   console.log("refund columns:", (await db.query("select refunded_at from plan_purchases limit 1")).fields.length === 1 && (await db.query("select refunded_at from bookings limit 1")).fields.length === 1);
 }
+{
+  // SQL 19: visitors and drop-off. Admin-only reads; the furthest point only moves forward.
+  const fu = fs.readFileSync(new URL("../migrations/20261202000000_funnel.sql", import.meta.url), "utf8");
+  await db.exec(fu); await db.exec(fu);
+  const sid = "44444444-4444-4444-4444-444444444444";
+  for (const [st, q, i] of [["question", "dob", 1], ["question", "sex", 2], ["question", "height", 3], ["question", "sex", 2], ["completed", null, null], ["paywall", null, null]]) {
+    await db.query("select track_check($1, 'v1', 'whatsapp', 'phone', $2, $3, $4, 40)", [sid, st, q, i]);
+  }
+  const row = (await db.query(`select furthest_question, furthest_index, completed_at is not null done, paywall_at is not null pw from check_sessions where id='${sid}'`)).rows[0];
+  console.log("furthest stays forward:", row.furthest_question === "height" && row.furthest_index === 3, "finished + paywall:", row.done && row.pw);
+  await db.exec(`insert into page_views (path, visitor) values ('/', 'v1')`);
+  console.log("anon sees page views / sessions:", (await as("anon", null, "select id from page_views")).length, (await as("anon", null, "select id from check_sessions")).length);
+  console.log("u1 sees page views / sessions:", (await as("authenticated", u1, "select id from page_views")).length, (await as("authenticated", u1, "select id from check_sessions")).length);
+  console.log("admin sees page views / sessions:", (await as("authenticated", u2, "select id from page_views")).length, (await as("authenticated", u2, "select id from check_sessions")).length);
+  console.log("anon calls track_check:", JSON.stringify(await as("anon", null, `select track_check('${sid}', 'x', 'x', 'phone', 'completed', null, null, null)`)).slice(0, 60));
+  console.log("anon writes a page view:", JSON.stringify(await as("anon", null, `insert into page_views (path, visitor) values ('/x', 'v')`)).slice(0, 70));
+}
