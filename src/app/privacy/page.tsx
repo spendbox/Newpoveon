@@ -42,7 +42,7 @@ export default function PrivacyPage() {
                 <li><strong>Messages</strong> you send us by email or WhatsApp, for example to request a lab test or medicine.</li>
               </ul>
               <p><strong>Information from others:</strong> Paystack tells us whether your payment succeeded, the amount and a reference. <strong>We never see or store your card or bank details.</strong></p>
-              <p><strong>Information collected automatically:</strong> a simple count of how many health checks are started and finished, with no answers or identifiers attached; and the basic technical logs every website keeps (such as IP address and browser type) for security and to fix problems. We do <strong>not</strong> use advertising cookies, and no analytics or advertising company receives your health answers.</p>
+              <p><strong>Information collected automatically:</strong> simple, anonymous counts to improve the service: which of our pages are opened, roughly where the visit came from (for example WhatsApp or Google), whether it was a phone or a computer, and how far each health check gets (which question was on screen, and whether it was finished). These counts use a random number stored in your browser so each visitor is counted once; they never include your answers, name, email or IP address, and they are not shared with anyone. We also keep the basic technical logs every website keeps (such as IP address and browser type) for security and to fix problems. We do <strong>not</strong> use advertising cookies, and no analytics or advertising company receives your health answers.</p>
             </>
           ),
         },
@@ -51,7 +51,7 @@ export default function PrivacyPage() {
           body: (
             <>
               <p>While you answer the health check, your answers are saved only on your own device so you don&apos;t lose your place. <strong>Nothing is sent to us until you enter your email and tick the consent box</strong> to see your results.</p>
-              <p>We use a small number of essential cookies and browser storage: to keep you logged in, to keep your place in the check, to remember your email (and phone and name, if you gave them) so you don&apos;t have to type them again, and to remember settings like whether you have seen the logo animation. On the login page, &ldquo;Use a different email&rdquo; forgets your email on that device. You can clear these at any time in your browser settings.</p>
+              <p>We use a small number of essential cookies and browser storage: to keep you logged in, to keep your place in the check, to count visits anonymously (the random number above), to remember your email (and phone and name, if you gave them) so you don&apos;t have to type them again, and to remember settings like whether you have seen the logo animation. On the login page, &ldquo;Use a different email&rdquo; forgets your email on that device. You can clear these at any time in your browser settings.</p>
             </>
           ),
         },

@@ -4,7 +4,7 @@ import { consultsOn } from "@/lib/help";
 type Item = NavGroup["items"][number];
 
 const GROUPS: NavGroup[] = [
-  { title: "", items: [["/admin", "Overview", "home"], ["/admin/revenue", "Revenue", "chart"]] },
+  { title: "", items: [["/admin", "Overview", "home"], ["/admin/revenue", "Revenue", "chart"], ["/admin/visitors", "Visitors and drop-off", "eye"]] },
   // Doctor bookings and availability are hidden while consults are paused (features.consults); the pages are kept.
   { title: "People", items: [["/admin/users", "Users", "user"], ...(consultsOn ? [["/admin/bookings", "Doctor bookings", "stethoscope"] as Item] : []), ["/admin/requests", "Requests", "clipboard"], ["/admin/bio-age", "Biological age", "dna"]] },
   { title: "Setup", items: [["/admin/consults", consultsOn ? "Consults and fees" : "Check price and plan", "edit"], ...(consultsOn ? [["/admin/slots", "Availability", "calendar"] as Item] : []), ["/admin/contacts", "Emergency contacts", "phone"]] },

@@ -13,6 +13,8 @@ export interface Progress {
   currentId: string | null;
   startedAt: string;
   finished: boolean;
+  /** A random id for this attempt, for the anonymous drop-off report. */
+  sessionId?: string;
 }
 
 function safeGet<T>(key: string): T | null {

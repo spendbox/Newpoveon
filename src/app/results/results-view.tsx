@@ -12,6 +12,7 @@ import { BodyMap } from "@/components/body-map";
 import { WellbeingHero } from "@/components/score-widgets";
 import { ShareSection } from "./share-section";
 import { Paywall } from "./paywall";
+import { trackCheck } from "@/lib/track";
 import { consultsOn, HELP, perkText } from "@/lib/help";
 import { LoginForm } from "@/app/login/login-form";
 import type { Discount } from "@/lib/plan/perks";
@@ -57,6 +58,16 @@ export function ResultsView({ offer, signedInEmail = null }: { offer: Offer; sig
   }, []);
 
   const results = useMemo(() => (progress && isComplete(progress.answers) ? computeResults(progress.answers) : null), [progress]);
+
+  // Anonymous drop-off report: which step of the results this attempt reached.
+  const sid = progress?.sessionId;
+  const stage = !progress || !results ? null : !emailed && !offline ? null : !offline && saved && !saved.paid ? "paywall" : "unlocked";
+  useEffect(() => {
+    if (sid && emailed) trackCheck(sid, "emailed");
+  }, [sid, emailed]);
+  useEffect(() => {
+    if (sid && stage) trackCheck(sid, stage);
+  }, [sid, stage]);
 
   if (progress === undefined) return <div className="min-h-[70vh]" aria-busy="true" />;
   if (!progress || !results) {

@@ -12,7 +12,7 @@ import { Button, inputCls } from "@/components/ui";
 import { SupportScreen } from "@/components/support-screen";
 import { type Answers, type AnswerValue, type BpValue, type Question, pruneAnswers, visibleQuestions } from "@/lib/questions";
 import { loadProgress, saveProgress, type Progress } from "@/lib/storage";
-import { track } from "@/lib/track";
+import { newCheckId, track, trackCheck } from "@/lib/track";
 
 function cheerFor(i: number, total: number) {
   if (i >= total - 1) return "Last one!";
@@ -38,8 +38,10 @@ export function Questionnaire() {
     const now = new Date().toISOString();
     // A finished check re-opens with the old answers filled in, so people can change just one thing.
     // Reading browser storage has to happen after the first render.
+    // Each new attempt gets a random id for the anonymous drop-off report (re-opening a finished check is a new attempt).
     // eslint-disable-next-line react-hooks/set-state-in-effect
-    setProgress(p ? (p.finished ? { ...p, finished: false, currentId: null, startedAt: now } : p) : { answers: {}, currentId: null, startedAt: now, finished: false });
+    setProgress(p ? (p.finished ? { ...p, finished: false, currentId: null, startedAt: now, sessionId: newCheckId() } : { ...p, sessionId: p.sessionId ?? newCheckId() })
+      : { answers: {}, currentId: null, startedAt: now, finished: false, sessionId: newCheckId() });
     return () => {
       if (advanceTimer.current) clearTimeout(advanceTimer.current);
     };
@@ -49,6 +51,12 @@ export function Questionnaire() {
   const list = useMemo(() => visibleQuestions(answers), [answers]);
   const index = Math.max(0, progress?.currentId ? list.findIndex((q) => q.id === progress.currentId) : 0);
   const q = list[index];
+
+  // Count how far this attempt gets: which question is on screen (no answers are sent).
+  const sid = progress?.sessionId;
+  useEffect(() => {
+    if (sid && q) trackCheck(sid, "question", { id: q.id, index: index + 1, total: list.length });
+  }, [sid, q, index, list.length]);
 
   function update(next: Partial<Progress>) {
     setProgress((prev) => {
@@ -71,6 +79,7 @@ export function Questionnaire() {
     if (i >= l.length) {
       update({ finished: true });
       track("completed");
+      if (progress?.sessionId) trackCheck(progress.sessionId, "completed");
       router.push("/results");
       return;
     }
