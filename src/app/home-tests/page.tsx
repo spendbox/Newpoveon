@@ -6,6 +6,7 @@ import { WhatsAppButton, WhatsAppCatalog } from "@/components/whatsapp-catalog";
 import { BioAgeStudy } from "@/components/bio-age-study";
 import { BIO_AGE_PREP, BIO_AGE_TESTS } from "@/lib/bioage/phenoage";
 import { withMemberId } from "@/lib/bioage/member";
+import { BioAgeTeaser } from "@/components/bio-age-teaser";
 import { bioAgeOffer, currentMemberCode, currentUserId } from "@/lib/bioage/server";
 
 export const metadata: Metadata = { title: "Lab tests" };
@@ -14,7 +15,8 @@ export const dynamic = "force-dynamic";
 export default async function LabTestsPage({ searchParams }: PageProps<"/home-tests">) {
   const sp = await searchParams;
   const highlight = typeof sp.test === "string" ? TEST_NAMES[sp.test] ?? null : null;
-  const [memberCode, offer] = await Promise.all([currentMemberCode(), currentUserId().then(bioAgeOffer)]);
+  const userId = await currentUserId().catch(() => null);
+  const [memberCode, offer] = userId ? await Promise.all([currentMemberCode(), bioAgeOffer(userId)]) : [null, null];
   return (
     <WhatsAppCatalog
       eyebrow="Lab tests"
@@ -27,8 +29,13 @@ export default async function LabTestsPage({ searchParams }: PageProps<"/home-te
       memberCode={memberCode}
       steps={["Message us with the test you need", "We confirm the price and a time", "We collect your sample and send your results"]}
     >
-      <BioAgePackage memberCode={memberCode} price={offer.price} member={offer.member} />
-      <BioAgeStudy id="bio-study" className="mt-8" />
+      {/* The Biological Age Check, with its price and booking, is for people who are logged in. Visitors see a teaser. */}
+      {offer ? (
+        <>
+          <BioAgePackage memberCode={memberCode} price={offer.price} member={offer.member} />
+          <BioAgeStudy id="bio-study" className="mt-8" />
+        </>
+      ) : <BioAgeTeaser id="biological-age" loggedIn={false} className="mt-10" />}
     </WhatsAppCatalog>
   );
 }
